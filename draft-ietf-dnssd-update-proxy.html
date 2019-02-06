@@ -390,7 +390,7 @@
 <link href="#rfc.section.4.7" rel="Chapter" title="4.7 Proxy redundancy">
 <link href="#rfc.section.4.8" rel="Chapter" title="4.8 Service filtering and translation">
 <link href="#rfc.section.5" rel="Chapter" title="5 DNS update messages">
-<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Selection of unicast authoritative DNS server">
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Selection of authoritative unicast DNS server">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 DNS update prerequisites">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Cryptographically signed update messages">
 <link href="#rfc.section.6" rel="Chapter" title="6 DNS authoritative server behavior">
@@ -492,7 +492,7 @@
 </li>
 </ul><li>5.   <a href="#rfc.section.5">DNS update messages</a>
 </li>
-<ul><li>5.1.   <a href="#rfc.section.5.1">Selection of unicast authoritative DNS server</a>
+<ul><li>5.1.   <a href="#rfc.section.5.1">Selection of authoritative unicast DNS server</a>
 </li>
 <li>5.2.   <a href="#rfc.section.5.2">DNS update prerequisites</a>
 </li>
@@ -523,8 +523,8 @@
   <h1 id="rfc.section.1">
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
-<p id="rfc.section.1.p.1">Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn&#8217;t designed to traverse across multi-subnet campus networks. Second, IP multicast doesn&#8217;t work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular unicast DNS authoritative servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.</p>
-<p id="rfc.section.1.p.2">There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages directly to a unicast DNS authoritative server. While it is possible for each service advertiser to send it&#8217;s own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.</p>
+<p id="rfc.section.1.p.1">Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn&#8217;t designed to traverse across multi-subnet campus networks. Second, IP multicast doesn&#8217;t work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular authoritative unicast DNS servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.</p>
+<p id="rfc.section.1.p.2">There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages <a href="#RFC2136" class="xref">[RFC2136]</a> directly to an authoritative unicast DNS server. While it is possible for each service advertiser to send it&#8217;s own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.</p>
 <p id="rfc.section.1.p.3">This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update Proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.</p>
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#requirements-language" id="requirements-language">Requirements Language</a>
@@ -567,7 +567,10 @@
 </h1>
 <p id="rfc.section.4.2.p.1">As specified in Section 8.3 of <a href="#RFC6762" class="xref">[RFC6762]</a> service announcements are sent multiple times for redundancy. However, there is no need to send duplicate Update messages to the authoritative unicast DNS server. Therefore, the Update proxy should cache service announcements and only send DNS Update messages when needed.</p>
 <p id="rfc.section.4.2.p.2">As described in Section 8.4 of <a href="#RFC6762" class="xref">[RFC6762]</a>, a host may send &#8220;goodbye&#8221; announcements by setting the TTL to 0. In this case, the record MUST be removed from the cache or otherwise marked as expired and a DNS Update should be sent to the authoritative unicast DNS server removing the record.</p>
-<p id="rfc.section.4.2.p.3">The Update proxy MUST also remove/expire old cache entries and remove the records from the unicast authoritative DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of <a href="#RFC6762" class="xref">[RFC6762]</a>.</p>
+<p id="rfc.section.4.2.p.3">The Update proxy MUST also remove/expire old cache entries and remove the records from the authoritative unicast DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of <a href="#RFC6762" class="xref">[RFC6762]</a>.</p>
+<p id="rfc.section.4.2.p.4">A host providing a service may automatically refresh the TTL in the announcement from time to time keeping the service valid based on subsequent multicast queries it receives. However, if no mDNS clients are requesting the particular service for the length of the TTL value, the service announcement could timeout naturally. In order to keep accurate information regarding all of the services on the IP subnet, the Update proxy SHOULD send a unicast PTR query for the service name directly to the service provider and set the Unicast bit in the query to receive a unicast response back. This query should be sent at a random time between 5 and 10 seconds before the TTL value indicates the announcement will expire.</p>
+<p id="rfc.section.4.2.p.5">As described in Section 11 of <a href="#RFC6762" class="xref">[RFC6762]</a>, the Update proxy should use an IP source address of the IP subnet of the interface it is transmitting over and that is on the same IP subnet as the service provider. It is also permissible to use a link-local IP address in the IPv6 case as long as the service itself is available on an IPv6 address that is reachable from outside the local link.</p>
+<p id="rfc.section.4.2.p.6">This was not the intended behavior of mDNS since local clients would just ask dynamically when they needed to know all of the providers of a service name but keeping this information up to date in the authoritative server provides benefits to remote clients such as faster response times and ability to use DNSSEC validation that were not previously possible with multicast DNS. These benefits are provided at the additional cost of a slight increase in network activity and processing time by the service providers. However, if the Update proxy uses unicast to query the service providers directly, other clients are not affected by these refresh queries and do not have to turn their radios on for queries/responses that they have no interest in.</p>
 <h1 id="rfc.section.4.3">
 <a href="#rfc.section.4.3">4.3.</a> <a href="#mdns-probing" id="mdns-probing">mDNS probing</a>
 </h1>
@@ -592,7 +595,14 @@
 <h1 id="rfc.section.4.7">
 <a href="#rfc.section.4.7">4.7.</a> <a href="#proxy-redundancy" id="proxy-redundancy">Proxy redundancy</a>
 </h1>
-<p id="rfc.section.4.7.p.1">T</p>
+<p id="rfc.section.4.7.p.1">Providing redundant Update proxies for the same IP subnet can be easily achieved using the DNS Update protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.</p>
+<p id="rfc.section.4.7.p.2">One method is to apply section 2.4 of <a href="#RFC2136" class="xref">[RFC2136]</a> which describes the Prerequisite section which can be used by redundant proxies to pre-qualify the updates. If another Update proxy has already submitted the Update, subsequent Updates can be ignored.</p>
+<p id="rfc.section.4.7.p.3">Another method is to just attempt to insert the records in the authoritative server.</p>
+<pre>
+Future: discuss deleting existing records and replacing them.
+
+Future: discuss how to handle ping-pong Zone authority records (SOA)
+</pre>
 <h1 id="rfc.section.4.8">
 <a href="#rfc.section.4.8">4.8.</a> <a href="#service-filtering-and-translation" id="service-filtering-and-translation">Service filtering and translation</a>
 </h1>
@@ -600,7 +610,7 @@
 <a href="#rfc.section.5">5.</a> <a href="#dns-update-messages" id="dns-update-messages">DNS update messages</a>
 </h1>
 <h1 id="rfc.section.5.1">
-<a href="#rfc.section.5.1">5.1.</a> <a href="#selection-of-unicast-authoritative-dns-server" id="selection-of-unicast-authoritative-dns-server">Selection of unicast authoritative DNS server</a>
+<a href="#rfc.section.5.1">5.1.</a> <a href="#selection-of-authoritative-unicast-dns-server" id="selection-of-authoritative-unicast-dns-server">Selection of authoritative unicast DNS server</a>
 </h1>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#dns-update-prerequisites" id="dns-update-prerequisites">DNS update prerequisites</a>
@@ -639,6 +649,11 @@
 <td class="reference"><b id="RFC2119">[RFC2119]</b></td>
 <td class="top">
 <a>Bradner, S.</a>, "<a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>", BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2136">[RFC2136]</b></td>
+<td class="top">
+<a>Vixie, P.</a>, <a>Thomson, S.</a>, <a>Rekhter, Y.</a> and <a>J. Bound</a>, "<a href="https://tools.ietf.org/html/rfc2136">Dynamic Updates in the Domain Name System (DNS UPDATE)</a>", RFC 2136, DOI 10.17487/RFC2136, April 1997.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC2782">[RFC2782]</b></td>

@@ -34,9 +34,9 @@ This document describes a method to dynamically map multicast DNS advertisements
 
 # Introduction
 
-Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn't designed to traverse across multi-subnet campus networks. Second, IP multicast doesn't work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular unicast DNS authoritative servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.
+Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn't designed to traverse across multi-subnet campus networks. Second, IP multicast doesn't work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular authoritative unicast DNS servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.
 
-There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages directly to a unicast DNS authoritative server. While it is possible for each service advertiser to send it's own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.
+There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages {{!RFC2136}} directly to an authoritative unicast DNS server. While it is possible for each service advertiser to send it's own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.
 
 This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update Proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.
 
@@ -88,9 +88,13 @@ As specified in Section 8.3 of {{!RFC6762}} service announcements are sent multi
 
 As described in Section 8.4 of {{!RFC6762}}, a host may send "goodbye" announcements by setting the TTL to 0. In this case, the record MUST be removed from the cache or otherwise marked as expired and a DNS Update should be sent to the authoritative unicast DNS server removing the record.
 
-The Update proxy MUST also remove/expire old cache entries and remove the records from the unicast authoritative DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of {{!RFC6762}}.
+The Update proxy MUST also remove/expire old cache entries and remove the records from the authoritative unicast DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of {{!RFC6762}}.
 
-<!-- Add text about refreshing entries before TTL expires -->
+A host providing a service may automatically refresh the TTL in the announcement from time to time keeping the service valid based on subsequent multicast queries it receives. However, if no mDNS clients are requesting the particular service for the length of the TTL value, the service announcement could timeout naturally. In order to keep accurate information regarding all of the services on the IP subnet, the Update proxy SHOULD send a unicast PTR query for the service name directly to the service provider and set the Unicast bit in the query to receive a unicast response back. This query should be sent at a random time between 5 and 10 seconds before the TTL value indicates the announcement will expire.
+
+As described in Section 11 of {{!RFC6762}}, the Update proxy should use an IP source address of the IP subnet of the interface it is transmitting over and that is on the same IP subnet as the service provider. It is also permissible to use a link-local IP address in the IPv6 case as long as the service itself is available on an IPv6 address that is reachable from outside the local link.
+
+This was not the intended behavior of mDNS since local clients would just ask dynamically when they needed to know all of the providers of a service name but keeping this information up to date in the authoritative server provides benefits to remote clients such as faster response times and ability to use DNSSEC validation that were not previously possible with multicast DNS. These benefits are provided at the additional cost of a slight increase in network activity and processing time by the service providers. However, if the Update proxy uses unicast to query the service providers directly, other clients are not affected by these refresh queries and do not have to turn their radios on for queries/responses that they have no interest in.
 
 ## mDNS probing
 
@@ -120,13 +124,21 @@ If a SRV target resolves to addresses on multiple logical IP subnets of the same
 
 ## Proxy redundancy
 
-T
+Providing redundant Update proxies for the same IP subnet can be easily achieved using the DNS Update protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.
+
+One method is to apply section 2.4 of {{!RFC2136}} which describes the Prerequisite section which can be used by redundant proxies to pre-qualify the updates. If another Update proxy has already submitted the Update, subsequent Updates can be ignored.
+
+Another method is to just attempt to insert the records in the authoritative server.
+
+    Future: discuss deleting existing records and replacing them.
+
+    Future: discuss how to handle ping-pong Zone authority records (SOA)
 
 ## Service filtering and translation
 
 # DNS update messages
 
-## Selection of unicast authoritative DNS server
+## Selection of authoritative unicast DNS server
 
 ## DNS update prerequisites
 

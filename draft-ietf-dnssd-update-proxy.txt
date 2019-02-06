@@ -72,25 +72,25 @@ Table of Contents
    4.  Update proxy behavior . . . . . . . . . . . . . . . . . . . .   5
      4.1.  mDNS service announcements  . . . . . . . . . . . . . . .   5
      4.2.  Service caching and refresh . . . . . . . . . . . . . . .   5
-     4.3.  mDNS probing  . . . . . . . . . . . . . . . . . . . . . .   5
-     4.4.  Link-local addressing . . . . . . . . . . . . . . . . . .   5
-     4.5.  IPv6 and IPv4 on same link  . . . . . . . . . . . . . . .   6
-     4.6.  multiple logical IP subnets . . . . . . . . . . . . . . .   6
-     4.7.  Proxy redundancy  . . . . . . . . . . . . . . . . . . . .   6
-     4.8.  Service filtering and translation . . . . . . . . . . . .   7
-   5.  DNS update messages . . . . . . . . . . . . . . . . . . . . .   7
-     5.1.  Selection of unicast authoritative DNS server . . . . . .   7
-     5.2.  DNS update prerequisites  . . . . . . . . . . . . . . . .   7
-     5.3.  Cryptographically signed update messages  . . . . . . . .   7
-   6.  DNS authoritative server behavior . . . . . . . . . . . . . .   7
-     6.1.  DNSSEC compatibility  . . . . . . . . . . . . . . . . . .   7
-     6.2.  Lease lifetimes . . . . . . . . . . . . . . . . . . . . .   7
-     6.3.  Timeout resource records  . . . . . . . . . . . . . . . .   7
-   7.  Comparison to Discovery Proxy . . . . . . . . . . . . . . . .   7
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .   8
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
+     4.3.  mDNS probing  . . . . . . . . . . . . . . . . . . . . . .   6
+     4.4.  Link-local addressing . . . . . . . . . . . . . . . . . .   6
+     4.5.  IPv6 and IPv4 on same link  . . . . . . . . . . . . . . .   7
+     4.6.  multiple logical IP subnets . . . . . . . . . . . . . . .   7
+     4.7.  Proxy redundancy  . . . . . . . . . . . . . . . . . . . .   7
+     4.8.  Service filtering and translation . . . . . . . . . . . .   8
+   5.  DNS update messages . . . . . . . . . . . . . . . . . . . . .   8
+     5.1.  Selection of authoritative unicast DNS server . . . . . .   8
+     5.2.  DNS update prerequisites  . . . . . . . . . . . . . . . .   8
+     5.3.  Cryptographically signed update messages  . . . . . . . .   8
+   6.  DNS authoritative server behavior . . . . . . . . . . . . . .   8
+     6.1.  DNSSEC compatibility  . . . . . . . . . . . . . . . . . .   8
+     6.2.  Lease lifetimes . . . . . . . . . . . . . . . . . . . . .   8
+     6.3.  Timeout resource records  . . . . . . . . . . . . . . . .   8
+   7.  Comparison to Discovery Proxy . . . . . . . . . . . . . . . .   8
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .   9
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   9
 
 1.  Introduction
 
@@ -102,7 +102,7 @@ Table of Contents
    Therefore, a solution is desired to contain legacy multicast DNS
    service discovery and transition to a unicast DNS service discovery
    model.  By mapping the current mDNS discovered services into regular
-   unicast DNS authoritative servers, clients from any IP subnet can
+   authoritative unicast DNS servers, clients from any IP subnet can
    make unicast queries through normal unicast DNS resolvers.
 
 
@@ -116,14 +116,14 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
    There are many ways to map services discovered using multicast DNS
    into the unicast namespace.  This document describes a way to do the
-   mapping using a proxy that sends DNS Update messages directly to a
-   unicast DNS authoritative server.  While it is possible for each
-   service advertiser to send it's own DNS Update, key management has
-   prevented widespread deployment of DNS Updates across a domain.  By
-   having a limited number of proxies sitting on one or more IP subnets,
-   it is possible to provide secure DNS updates at a manageable scale.
-   Future work to automate secure DNS Updates on a larger scale is
-   needed.
+   mapping using a proxy that sends DNS Update messages [RFC2136]
+   directly to an authoritative unicast DNS server.  While it is
+   possible for each service advertiser to send it's own DNS Update, key
+   management has prevented widespread deployment of DNS Updates across
+   a domain.  By having a limited number of proxies sitting on one or
+   more IP subnets, it is possible to provide secure DNS updates at a
+   manageable scale.  Future work to automate secure DNS Updates on a
+   larger scale is needed.
 
    This document will explain how services on each .local domain will be
    mapped into the unicast DNS namespace and how unicast clients will
@@ -256,9 +256,49 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    removing the record.
 
    The Update proxy MUST also remove/expire old cache entries and remove
-   the records from the unicast authoritative DNS server when the cache-
+   the records from the authoritative unicast DNS server when the cache-
    flush bit is set on new announcements as described in Section 10.2 of
    [RFC6762].
+
+   A host providing a service may automatically refresh the TTL in the
+   announcement from time to time keeping the service valid based on
+   subsequent multicast queries it receives.  However, if no mDNS
+   clients are requesting the particular service for the length of the
+   TTL value, the service announcement could timeout naturally.  In
+   order to keep accurate information regarding all of the services on
+   the IP subnet, the Update proxy SHOULD send a unicast PTR query for
+   the service name directly to the service provider and set the Unicast
+   bit in the query to receive a unicast response back.  This query
+   should be sent at a random time between 5 and 10 seconds before the
+   TTL value indicates the announcement will expire.
+
+   As described in Section 11 of [RFC6762], the Update proxy should use
+   an IP source address of the IP subnet of the interface it is
+
+
+
+Pusateri                 Expires August 10, 2019                [Page 5]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
+   transmitting over and that is on the same IP subnet as the service
+   provider.  It is also permissible to use a link-local IP address in
+   the IPv6 case as long as the service itself is available on an IPv6
+   address that is reachable from outside the local link.
+
+   This was not the intended behavior of mDNS since local clients would
+   just ask dynamically when they needed to know all of the providers of
+   a service name but keeping this information up to date in the
+   authoritative server provides benefits to remote clients such as
+   faster response times and ability to use DNSSEC validation that were
+   not previously possible with multicast DNS.  These benefits are
+   provided at the additional cost of a slight increase in network
+   activity and processing time by the service providers.  However, if
+   the Update proxy uses unicast to query the service providers
+   directly, other clients are not affected by these refresh queries and
+   do not have to turn their radios on for queries/responses that they
+   have no interest in.
 
 4.3.  mDNS probing
 
@@ -274,14 +314,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    local IPv6 address that will probably be different than the IP subnet
    that the service is being provided on.  However, it is certainly
    possible that link-local addressing is used with IPv4 as well.  This
-
-
-
-Pusateri                 Expires August 10, 2019                [Page 5]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
-
    is not as common but exists in a zero-conf environment where no IPv4
    addresses are assigned via DHCP or statically and the hosts revert to
    link-local IPv4 addresses (169.254/16), see [RFC3927].
@@ -294,6 +326,17 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    In general, the Update proxy needs to ensure that the service is
    reachable outside of the link it is announced on before sending an
    Update to the authoritative server for the subdomain.
+
+
+
+
+
+
+
+Pusateri                 Expires August 10, 2019                [Page 6]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
 
 4.5.  IPv6 and IPv4 on same link
 
@@ -325,15 +368,28 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 4.7.  Proxy redundancy
 
-   T
+   Providing redundant Update proxies for the same IP subnet can be
+   easily achieved using the DNS Update protocol.  None of the redundant
+   proxies needs to be aware of any of the other redundant proxies on an
+   IP subnet.
+
+   One method is to apply section 2.4 of [RFC2136] which describes the
+   Prerequisite section which can be used by redundant proxies to pre-
+   qualify the updates.  If another Update proxy has already submitted
+   the Update, subsequent Updates can be ignored.
+
+   Another method is to just attempt to insert the records in the
+   authoritative server.
+
+   Future: discuss deleting existing records and replacing them.
+
+   Future: discuss how to handle ping-pong Zone authority records (SOA)
 
 
 
 
 
-
-
-Pusateri                 Expires August 10, 2019                [Page 6]
+Pusateri                 Expires August 10, 2019                [Page 7]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -342,7 +398,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 5.  DNS update messages
 
-5.1.  Selection of unicast authoritative DNS server
+5.1.  Selection of authoritative unicast DNS server
 
 5.2.  DNS update prerequisites
 
@@ -382,17 +438,22 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
 
+   [RFC2136]  Vixie, P., Ed., Thomson, S., Rekhter, Y., and J. Bound,
+              "Dynamic Updates in the Domain Name System (DNS UPDATE)",
+              RFC 2136, DOI 10.17487/RFC2136, April 1997,
+              <https://www.rfc-editor.org/info/rfc2136>.
+
+
+
+Pusateri                 Expires August 10, 2019                [Page 8]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
    [RFC2782]  Gulbrandsen, A., Vixie, P., and L. Esibov, "A DNS RR for
               specifying the location of services (DNS SRV)", RFC 2782,
               DOI 10.17487/RFC2782, February 2000,
               <https://www.rfc-editor.org/info/rfc2782>.
-
-
-
-Pusateri                 Expires August 10, 2019                [Page 7]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
    [RFC3596]  Thomson, S., Huitema, C., Ksinant, V., and M. Souissi,
               "DNS Extensions to Support IP Version 6", STD 88,
@@ -434,6 +495,17 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 Author's Address
 
+
+
+
+
+
+
+Pusateri                 Expires August 10, 2019                [Page 9]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
    Tom Pusateri
    Unaffiliated
    Raleigh  NC 27608
@@ -445,4 +517,44 @@ Author's Address
 
 
 
-Pusateri                 Expires August 10, 2019                [Page 8]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pusateri                 Expires August 10, 2019               [Page 10]
