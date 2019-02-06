@@ -5,7 +5,7 @@
 <head profile="http://www.w3.org/2006/03/hcard http://dublincore.org/documents/2008/08/04/dc-html/">
   <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
 
-  <title>DNS Stateful Operations</title>
+  <title>DNS Update Proxy for mDNS</title>
 
   <style type="text/css" title="Xml2Rfc (sans serif)">
   /*<![CDATA[*/
@@ -376,9 +376,31 @@
   <link href="#rfc.toc" rel="Contents">
 <link href="#rfc.section.1" rel="Chapter" title="1 Introduction">
 <link href="#rfc.section.2" rel="Chapter" title="2 Requirements Language">
-<link href="#rfc.section.3" rel="Chapter" title="3 Foobar">
-<link href="#rfc.section.4" rel="Chapter" title="4 Acknowledgements">
-<link href="#rfc.references" rel="Chapter" title="5 Normative References">
+<link href="#rfc.section.3" rel="Chapter" title="3 DNS subdomain model">
+<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Domain name discovery">
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Subdomain naming">
+<link href="#rfc.section.3.3" rel="Chapter" title="3.3 Client service discovery">
+<link href="#rfc.section.4" rel="Chapter" title="4 Update proxy behavior">
+<link href="#rfc.section.4.1" rel="Chapter" title="4.1 mDNS service announcements">
+<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Service caching and refresh">
+<link href="#rfc.section.4.3" rel="Chapter" title="4.3 mDNS probing">
+<link href="#rfc.section.4.4" rel="Chapter" title="4.4 multiple logical IP subnets">
+<link href="#rfc.section.4.5" rel="Chapter" title="4.5 IPv6 and IPv4 on same link">
+<link href="#rfc.section.4.6" rel="Chapter" title="4.6 IPv6 addressing">
+<link href="#rfc.section.4.7" rel="Chapter" title="4.7 Proxy redundancy">
+<link href="#rfc.section.4.8" rel="Chapter" title="4.8 Service filtering and translation">
+<link href="#rfc.section.5" rel="Chapter" title="5 DNS update messages">
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Selection of unicast authoritative DNS server">
+<link href="#rfc.section.5.2" rel="Chapter" title="5.2 DNS update prerequisites">
+<link href="#rfc.section.5.3" rel="Chapter" title="5.3 Cryptographically signed update messages">
+<link href="#rfc.section.6" rel="Chapter" title="6 DNS authoritative server behavior">
+<link href="#rfc.section.6.1" rel="Chapter" title="6.1 DNSSEC compatibility">
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Lease lifetimes">
+<link href="#rfc.section.6.3" rel="Chapter" title="6.3 Timeout resource records">
+<link href="#rfc.section.7" rel="Chapter" title="7 Comparison to Discovery Proxy">
+<link href="#rfc.references" rel="Chapter" title="8 References">
+<link href="#rfc.references.1" rel="Chapter" title="8.1 Normative References">
+<link href="#rfc.references.2" rel="Chapter" title="8.2 Informative References">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -387,9 +409,9 @@
 
   <meta name="dct.creator" content="Pusateri, T." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-dnssd-update-proxy-00" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-31" />
-  <meta name="dct.abstract" content="This document defines a new DNS OPCODE for DNS Stateful Operations" />
-  <meta name="description" content="This document defines a new DNS OPCODE for DNS Stateful Operations" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-06" />
+  <meta name="dct.abstract" content="This document describes a method to dynamically map multicast DNS advertisements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
+  <meta name="description" content="This document describes a method to dynamically map multicast DNS advertisements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
 
 </head>
 
@@ -408,10 +430,10 @@
 </tr>
 <tr>
 <td class="left">Intended status: Standards Track</td>
-<td class="right">January 31, 2019</td>
+<td class="right">February 6, 2019</td>
 </tr>
 <tr>
-<td class="left">Expires: August 4, 2019</td>
+<td class="left">Expires: August 10, 2019</td>
 <td class="right"></td>
 </tr>
 
@@ -419,16 +441,16 @@
     </tbody>
   </table>
 
-  <p class="title">DNS Stateful Operations<br />
+  <p class="title">DNS Update Proxy for mDNS<br />
   <span class="filename">draft-ietf-dnssd-update-proxy-00</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
-<p>This document defines a new DNS OPCODE for DNS Stateful Operations</p>
+<p>This document describes a method to dynamically map multicast DNS advertisements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner.</p>
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 4, 2019.</p>
+<p>This Internet-Draft will expire on August 10, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -442,13 +464,57 @@
 </li>
 <li>2.   <a href="#rfc.section.2">Requirements Language</a>
 </li>
-<li>3.   <a href="#rfc.section.3">Foobar</a>
+<li>3.   <a href="#rfc.section.3">DNS subdomain model</a>
 </li>
-<li>4.   <a href="#rfc.section.4">Acknowledgements</a>
+<ul><li>3.1.   <a href="#rfc.section.3.1">Domain name discovery</a>
 </li>
-<li>5.   <a href="#rfc.references">Normative References</a>
+<li>3.2.   <a href="#rfc.section.3.2">Subdomain naming</a>
 </li>
-<li><a href="#rfc.authors">Author's Address</a>
+<li>3.3.   <a href="#rfc.section.3.3">Client service discovery</a>
+</li>
+</ul><li>4.   <a href="#rfc.section.4">Update proxy behavior</a>
+</li>
+<ul><li>4.1.   <a href="#rfc.section.4.1">mDNS service announcements</a>
+</li>
+<li>4.2.   <a href="#rfc.section.4.2">Service caching and refresh</a>
+</li>
+<li>4.3.   <a href="#rfc.section.4.3">mDNS probing</a>
+</li>
+<li>4.4.   <a href="#rfc.section.4.4">multiple logical IP subnets</a>
+</li>
+<li>4.5.   <a href="#rfc.section.4.5">IPv6 and IPv4 on same link</a>
+</li>
+<li>4.6.   <a href="#rfc.section.4.6">IPv6 addressing</a>
+</li>
+<li>4.7.   <a href="#rfc.section.4.7">Proxy redundancy</a>
+</li>
+<li>4.8.   <a href="#rfc.section.4.8">Service filtering and translation</a>
+</li>
+</ul><li>5.   <a href="#rfc.section.5">DNS update messages</a>
+</li>
+<ul><li>5.1.   <a href="#rfc.section.5.1">Selection of unicast authoritative DNS server</a>
+</li>
+<li>5.2.   <a href="#rfc.section.5.2">DNS update prerequisites</a>
+</li>
+<li>5.3.   <a href="#rfc.section.5.3">Cryptographically signed update messages</a>
+</li>
+</ul><li>6.   <a href="#rfc.section.6">DNS authoritative server behavior</a>
+</li>
+<ul><li>6.1.   <a href="#rfc.section.6.1">DNSSEC compatibility</a>
+</li>
+<li>6.2.   <a href="#rfc.section.6.2">Lease lifetimes</a>
+</li>
+<li>6.3.   <a href="#rfc.section.6.3">Timeout resource records</a>
+</li>
+</ul><li>7.   <a href="#rfc.section.7">Comparison to Discovery Proxy</a>
+</li>
+<li>8.   <a href="#rfc.references">References</a>
+</li>
+<ul><li>8.1.   <a href="#rfc.references.1">Normative References</a>
+</li>
+<li>8.2.   <a href="#rfc.references.2">Informative References</a>
+</li>
+</ul><li><a href="#rfc.authors">Author's Address</a>
 </li>
 
 
@@ -457,20 +523,101 @@
   <h1 id="rfc.section.1">
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
-<p id="rfc.section.1.p.1">This document specifies a mechanism for managing stateful DNS connections.</p>
+<p id="rfc.section.1.p.1">Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn&#8217;t designed to traverse across multi-subnet campus networks. Second, IP multicast doesn&#8217;t work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular unicast DNS authoritative servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.</p>
+<p id="rfc.section.1.p.2">There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages directly to a unicast DNS authoritative server. While it is possible for each service advertiser to send it&#8217;s own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.</p>
+<p id="rfc.section.1.p.3">This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update Proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.</p>
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#requirements-language" id="requirements-language">Requirements Language</a>
 </h1>
-<p id="rfc.section.2.p.1">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP 14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.</p>
-<p></p>
+<p id="rfc.section.2.p.1">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP&#160;14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.  These words may also appear in this document in lower case as plain English words, absent their normative meanings.</p>
 <h1 id="rfc.section.3">
-<a href="#rfc.section.3">3.</a> <a href="#foobar" id="foobar">Foobar</a>
+<a href="#rfc.section.3">3.</a> <a href="#dns-subdomain-model" id="dns-subdomain-model">DNS subdomain model</a>
 </h1>
+<p id="rfc.section.3.p.1">Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browseable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of <a href="#RFC6763" class="xref">[RFC6763]</a> for more details about browsing. These subdomains are typically special use subdomains for mDNS mappings.</p>
+<h1 id="rfc.section.3.1">
+<a href="#rfc.section.3.1">3.1.</a> <a href="#domain-name-discovery" id="domain-name-discovery">Domain name discovery</a>
+</h1>
+<h1 id="rfc.section.3.2">
+<a href="#rfc.section.3.2">3.2.</a> <a href="#subdomain-naming" id="subdomain-naming">Subdomain naming</a>
+</h1>
+<p id="rfc.section.3.2.p.1">The browseable subdomain label is prepended to the domain name and seperated by a period. See <a href="#RFC7719" class="xref">[RFC7719]</a> for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency amoung redundant proxies:</p>
+<p></p>
+
+<ol>
+<li>PTR query for IP subnet through local resolver  <br><br> As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the proxy would issue a PTR query for 0.113.0.203.in-addr.arpa. If a response is returned with an answer, then the name in the answer should be the subdomain name including the domain name for the network.</li>
+<li>proxy local configuration override  <br><br> If no answer is returned, the proxy may have local configuration containing a subdomain name for the network. If so, this subdomain should be used.</li>
+<li>algorithmic subdomain label generation  <br><br> If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to hexidecimal. This will give a 8 character unique string to use as a subdomain label.</li>
+</ol>
+<h1 id="rfc.section.3.3">
+<a href="#rfc.section.3.3">3.3.</a> <a href="#client-service-discovery" id="client-service-discovery">Client service discovery</a>
+</h1>
+<p id="rfc.section.3.3.p.1">Fortunately, clients performing service discovery require no changes in order to work with the Update proxy. Existing clients already support wide-area bonjour which specifies how to query search domains and subdomains for services. See section 11 of <a href="#RFC6763" class="xref">[RFC6763]</a>.</p>
 <h1 id="rfc.section.4">
-<a href="#rfc.section.4">4.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
+<a href="#rfc.section.4">4.</a> <a href="#update-proxy-behavior" id="update-proxy-behavior">Update proxy behavior</a>
 </h1>
+<p id="rfc.section.4.p.1">Since no new protocols are defined, this document mostly describes the expected behavior of the Update proxy and how it uses existing protocols to achieve multi IP subnet service discovery. The behavior is mostly intuitive but is described to ensure compatibility and completeness.</p>
+<h1 id="rfc.section.4.1">
+<a href="#rfc.section.4.1">4.1.</a> <a href="#mdns-service-announcements" id="mdns-service-announcements">mDNS service announcements</a>
+</h1>
+<p id="rfc.section.4.1.p.1">The Update proxy should listen to mDNS service announcements (responses) on all interfaces it is proxying for. Multiple Update proxies can be active on the same IP subnet at the same time. See <a href="#RFC6762" class="xref">[RFC6762]</a> for more information on multicast DNS.</p>
+<h1 id="rfc.section.4.2">
+<a href="#rfc.section.4.2">4.2.</a> <a href="#service-caching-and-refresh" id="service-caching-and-refresh">Service caching and refresh</a>
+</h1>
+<p id="rfc.section.4.2.p.1">As specified in Section 8.3 of <a href="#RFC6762" class="xref">[RFC6762]</a> service announcements are sent multiple times for redundancy. However, there is no need to send duplicate Update messages to the authoritative unicast DNS server. Therefore, the Update proxy should cache service announcements and only send DNS Update messages when needed.</p>
+<p id="rfc.section.4.2.p.2">As described in Section 8.4 of <a href="#RFC6762" class="xref">[RFC6762]</a>, a host may send &#8220;goodbye&#8221; announcements by setting the TTL to 0. In this case, the record MUST be removed from the cache or otherwise marked as expired and a DNS Update should be sent to the authoritative unicast DNS server removing the record.</p>
+<p id="rfc.section.4.2.p.3">The Update proxy MUST also remove/expire old cache entries and remove the records from the unicast authoritative DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of <a href="#RFC6762" class="xref">[RFC6762]</a>.</p>
+<h1 id="rfc.section.4.3">
+<a href="#rfc.section.4.3">4.3.</a> <a href="#mdns-probing" id="mdns-probing">mDNS probing</a>
+</h1>
+<p id="rfc.section.4.3.p.1">While <a href="#RFC6762" class="xref">[RFC6762]</a> recommends all potential answers be included in mDNS probe queries, because these records haven&#8217;t gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.</p>
+<h1 id="rfc.section.4.4">
+<a href="#rfc.section.4.4">4.4.</a> <a href="#multiple-logical-ip-subnets" id="multiple-logical-ip-subnets">multiple logical IP subnets</a>
+</h1>
+<h1 id="rfc.section.4.5">
+<a href="#rfc.section.4.5">4.5.</a> <a href="#ipv6-and-ipv4-on-same-link" id="ipv6-and-ipv4-on-same-link">IPv6 and IPv4 on same link</a>
+</h1>
+<h1 id="rfc.section.4.6">
+<a href="#rfc.section.4.6">4.6.</a> <a href="#ipv6-addressing" id="ipv6-addressing">IPv6 addressing</a>
+</h1>
+<h1 id="rfc.section.4.7">
+<a href="#rfc.section.4.7">4.7.</a> <a href="#proxy-redundancy" id="proxy-redundancy">Proxy redundancy</a>
+</h1>
+<h1 id="rfc.section.4.8">
+<a href="#rfc.section.4.8">4.8.</a> <a href="#service-filtering-and-translation" id="service-filtering-and-translation">Service filtering and translation</a>
+</h1>
+<h1 id="rfc.section.5">
+<a href="#rfc.section.5">5.</a> <a href="#dns-update-messages" id="dns-update-messages">DNS update messages</a>
+</h1>
+<h1 id="rfc.section.5.1">
+<a href="#rfc.section.5.1">5.1.</a> <a href="#selection-of-unicast-authoritative-dns-server" id="selection-of-unicast-authoritative-dns-server">Selection of unicast authoritative DNS server</a>
+</h1>
+<h1 id="rfc.section.5.2">
+<a href="#rfc.section.5.2">5.2.</a> <a href="#dns-update-prerequisites" id="dns-update-prerequisites">DNS update prerequisites</a>
+</h1>
+<h1 id="rfc.section.5.3">
+<a href="#rfc.section.5.3">5.3.</a> <a href="#cryptographically-signed-update-messages" id="cryptographically-signed-update-messages">Cryptographically signed update messages</a>
+</h1>
+<h1 id="rfc.section.6">
+<a href="#rfc.section.6">6.</a> <a href="#dns-authoritative-server-behavior" id="dns-authoritative-server-behavior">DNS authoritative server behavior</a>
+</h1>
+<h1 id="rfc.section.6.1">
+<a href="#rfc.section.6.1">6.1.</a> <a href="#dnssec-compatibility" id="dnssec-compatibility">DNSSEC compatibility</a>
+</h1>
+<h1 id="rfc.section.6.2">
+<a href="#rfc.section.6.2">6.2.</a> <a href="#lease-lifetimes" id="lease-lifetimes">Lease lifetimes</a>
+</h1>
+<h1 id="rfc.section.6.3">
+<a href="#rfc.section.6.3">6.3.</a> <a href="#timeout-resource-records" id="timeout-resource-records">Timeout resource records</a>
+</h1>
+<h1 id="rfc.section.7">
+<a href="#rfc.section.7">7.</a> <a href="#comparison-to-discovery-proxy" id="comparison-to-discovery-proxy">Comparison to Discovery Proxy</a>
+</h1>
+<p id="rfc.section.7.p.1">The Update Proxy defined in this document is an alternative to the Discovery Proxy <a href="#I-D.ietf-dnssd-hybrid" class="xref">[I-D.ietf-dnssd-hybrid]</a> and the Discovery Relay <a href="#I-D.ietf-dnssd-mdns-relay" class="xref">[I-D.ietf-dnssd-mdns-relay]</a>. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer substantial advantages at a cost of increased state.</p>
+<p id="rfc.section.7.p.2">These advantages include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.</p>
 <h1 id="rfc.references">
-<a href="#rfc.references">5.</a> Normative References</h1>
+<a href="#rfc.references">8.</a> References</h1>
+<h1 id="rfc.references.1">
+<a href="#rfc.references.1">8.1.</a> Normative References</h1>
 <table><tbody>
 <tr>
 <td class="reference"><b id="RFC2119">[RFC2119]</b></td>
@@ -478,9 +625,38 @@
 <a>Bradner, S.</a>, "<a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>", BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997.</td>
 </tr>
 <tr>
+<td class="reference"><b id="RFC6762">[RFC6762]</b></td>
+<td class="top">
+<a>Cheshire, S.</a> and <a>M. Krochmal</a>, "<a href="https://tools.ietf.org/html/rfc6762">Multicast DNS</a>", RFC 6762, DOI 10.17487/RFC6762, February 2013.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC6763">[RFC6763]</b></td>
+<td class="top">
+<a>Cheshire, S.</a> and <a>M. Krochmal</a>, "<a href="https://tools.ietf.org/html/rfc6763">DNS-Based Service Discovery</a>", RFC 6763, DOI 10.17487/RFC6763, February 2013.</td>
+</tr>
+<tr>
 <td class="reference"><b id="RFC8174">[RFC8174]</b></td>
 <td class="top">
 <a>Leiba, B.</a>, "<a href="https://tools.ietf.org/html/rfc8174">Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</a>", BCP 14, RFC 8174, DOI 10.17487/RFC8174, May 2017.</td>
+</tr>
+</tbody></table>
+<h1 id="rfc.references.2">
+<a href="#rfc.references.2">8.2.</a> Informative References</h1>
+<table><tbody>
+<tr>
+<td class="reference"><b id="I-D.ietf-dnssd-hybrid">[I-D.ietf-dnssd-hybrid]</b></td>
+<td class="top">
+<a>Cheshire, S.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-dnssd-hybrid-08">Discovery Proxy for Multicast DNS-Based Service Discovery</a>", Internet-Draft draft-ietf-dnssd-hybrid-08, March 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.ietf-dnssd-mdns-relay">[I-D.ietf-dnssd-mdns-relay]</b></td>
+<td class="top">
+<a>Lemon, T.</a> and <a>S. Cheshire</a>, "<a href="https://tools.ietf.org/html/draft-ietf-dnssd-mdns-relay-01">Multicast DNS Discovery Relay</a>", Internet-Draft draft-ietf-dnssd-mdns-relay-01, July 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC7719">[RFC7719]</b></td>
+<td class="top">
+<a>Hoffman, P.</a>, <a>Sullivan, A.</a> and <a>K. Fujiwara</a>, "<a href="https://tools.ietf.org/html/rfc7719">DNS Terminology</a>", RFC 7719, DOI 10.17487/RFC7719, December 2015.</td>
 </tr>
 </tbody></table>
 <h1 id="rfc.authors"><a href="#rfc.authors">Author's Address</a></h1>
