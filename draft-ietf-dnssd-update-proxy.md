@@ -48,10 +48,7 @@ This document will explain how services on each .local domain will be mapped int
 
 Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browseable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of {{!RFC6763}} for more details about browsing. These subdomains are typically special use subdomains for mDNS mappings.
 
-## Domain name discovery
-
-
-## Subdomain naming
+## Subdomain naming {#subdomain}
 
 The browseable subdomain label is prepended to the domain name and seperated by a period. See {{?RFC7719}} for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency amoung redundant proxies:
 
@@ -67,7 +64,11 @@ The browseable subdomain label is prepended to the domain name and seperated by 
 
     If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to hexidecimal. This will give a 8 character unique string to use as a subdomain label.
 
+## Domain name discovery
 
+The base domain name to use for each subdomain also has to be discovered on a per IP subnet basis. In most cases, the domain name will be the same for all IP subnets because they are all contained in a single administrative domain. However, this is not required and a proxy administrator may need to span multiple administrative boundaries requiring different domain names on different IP subnets (and therefore, subdomains).
+
+There is not a direct query to discover a separate domain name but the domain name is included with the subdomain in the response to the PTR query above in {{subdomain}}. If the PTR query returns an empty response, then the domain name can be obtained from local proxy configuration and if no domain name is specified there, the default domain for the host should be used.
 
 ## Client service discovery
 
@@ -89,19 +90,37 @@ As described in Section 8.4 of {{!RFC6762}}, a host may send "goodbye" announcem
 
 The Update proxy MUST also remove/expire old cache entries and remove the records from the unicast authoritative DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of {{!RFC6762}}.
 
+<!-- Add text about refreshing entries before TTL expires -->
+
 ## mDNS probing
 
 While {{!RFC6762}} recommends all potential answers be included in mDNS probe queries, because these records haven't gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.
 
-## multiple logical IP subnets
+## Link-local addressing
 
+In the IPv6 case, the source address of the announcements is a link-local IPv6 address that will probably be different than the IP subnet that the service is being provided on. However, it is certainly possible that link-local addressing is used with IPv4 as well. This is not as common but exists in a zero-conf environment where no IPv4 addresses are assigned via DHCP or statically and the hosts revert to link-local IPv4 addresses (169.254/16), see {{!RFC3927}}.
 
+If the service SRV target resolves to only a link-local address, then the service is not eligble to be advertised outside of the link and shouldn't be sent to the authoritative unicast DNS server by the Update proxy.
+
+In general, the Update proxy needs to ensure that the service is reachable outside of the link it is announced on before sending an Update to the authoritative server for the subdomain.
 
 ## IPv6 and IPv4 on same link
 
-## IPv6 addressing
+Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 'A' records {{!RFC1035}} and IPv6 'AAAA' records {{!RFC3596}} are published for an SRV target {{!RFC2782}} name, the administrator should provide the service over both protocols.
+
+In some cases, this won't be possible. This will not incur any extra delays if clients attempt connections over both IPv4 and IPv6 protocols simultaneously but if one protocol is preferred over another, delays may occur.
+
+## multiple logical IP subnets
+
+Multiple IP subnets on the same link are just a more general case of IPv4 and IPv6 on the same link. When multiple IP subnets exist for the same protocol on the same link, they appear as separate interfaces to the Update proxy and require a separate subdomain name just as IPv4 and IPv6 do.
+
+This is required for a client on one logical IP subnet of an interface to communicate with a service provided by a host on a different IP subnet of the same link.
+
+If a SRV target resolves to addresses on multiple logical IP subnets of the same interface, the service can be included in multiple subdomains on the appropriate server(s) for those subdomains.
 
 ## Proxy redundancy
+
+T
 
 ## Service filtering and translation
 

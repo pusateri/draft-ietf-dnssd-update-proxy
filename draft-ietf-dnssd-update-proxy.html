@@ -377,16 +377,16 @@
 <link href="#rfc.section.1" rel="Chapter" title="1 Introduction">
 <link href="#rfc.section.2" rel="Chapter" title="2 Requirements Language">
 <link href="#rfc.section.3" rel="Chapter" title="3 DNS subdomain model">
-<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Domain name discovery">
-<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Subdomain naming">
+<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Subdomain naming">
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Domain name discovery">
 <link href="#rfc.section.3.3" rel="Chapter" title="3.3 Client service discovery">
 <link href="#rfc.section.4" rel="Chapter" title="4 Update proxy behavior">
 <link href="#rfc.section.4.1" rel="Chapter" title="4.1 mDNS service announcements">
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 Service caching and refresh">
 <link href="#rfc.section.4.3" rel="Chapter" title="4.3 mDNS probing">
-<link href="#rfc.section.4.4" rel="Chapter" title="4.4 multiple logical IP subnets">
+<link href="#rfc.section.4.4" rel="Chapter" title="4.4 Link-local addressing">
 <link href="#rfc.section.4.5" rel="Chapter" title="4.5 IPv6 and IPv4 on same link">
-<link href="#rfc.section.4.6" rel="Chapter" title="4.6 IPv6 addressing">
+<link href="#rfc.section.4.6" rel="Chapter" title="4.6 multiple logical IP subnets">
 <link href="#rfc.section.4.7" rel="Chapter" title="4.7 Proxy redundancy">
 <link href="#rfc.section.4.8" rel="Chapter" title="4.8 Service filtering and translation">
 <link href="#rfc.section.5" rel="Chapter" title="5 DNS update messages">
@@ -466,9 +466,9 @@
 </li>
 <li>3.   <a href="#rfc.section.3">DNS subdomain model</a>
 </li>
-<ul><li>3.1.   <a href="#rfc.section.3.1">Domain name discovery</a>
+<ul><li>3.1.   <a href="#rfc.section.3.1">Subdomain naming</a>
 </li>
-<li>3.2.   <a href="#rfc.section.3.2">Subdomain naming</a>
+<li>3.2.   <a href="#rfc.section.3.2">Domain name discovery</a>
 </li>
 <li>3.3.   <a href="#rfc.section.3.3">Client service discovery</a>
 </li>
@@ -480,11 +480,11 @@
 </li>
 <li>4.3.   <a href="#rfc.section.4.3">mDNS probing</a>
 </li>
-<li>4.4.   <a href="#rfc.section.4.4">multiple logical IP subnets</a>
+<li>4.4.   <a href="#rfc.section.4.4">Link-local addressing</a>
 </li>
 <li>4.5.   <a href="#rfc.section.4.5">IPv6 and IPv4 on same link</a>
 </li>
-<li>4.6.   <a href="#rfc.section.4.6">IPv6 addressing</a>
+<li>4.6.   <a href="#rfc.section.4.6">multiple logical IP subnets</a>
 </li>
 <li>4.7.   <a href="#rfc.section.4.7">Proxy redundancy</a>
 </li>
@@ -535,12 +535,9 @@
 </h1>
 <p id="rfc.section.3.p.1">Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browseable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of <a href="#RFC6763" class="xref">[RFC6763]</a> for more details about browsing. These subdomains are typically special use subdomains for mDNS mappings.</p>
 <h1 id="rfc.section.3.1">
-<a href="#rfc.section.3.1">3.1.</a> <a href="#domain-name-discovery" id="domain-name-discovery">Domain name discovery</a>
+<a href="#rfc.section.3.1">3.1.</a> <a href="#subdomain" id="subdomain">Subdomain naming</a>
 </h1>
-<h1 id="rfc.section.3.2">
-<a href="#rfc.section.3.2">3.2.</a> <a href="#subdomain-naming" id="subdomain-naming">Subdomain naming</a>
-</h1>
-<p id="rfc.section.3.2.p.1">The browseable subdomain label is prepended to the domain name and seperated by a period. See <a href="#RFC7719" class="xref">[RFC7719]</a> for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency amoung redundant proxies:</p>
+<p id="rfc.section.3.1.p.1">The browseable subdomain label is prepended to the domain name and seperated by a period. See <a href="#RFC7719" class="xref">[RFC7719]</a> for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency amoung redundant proxies:</p>
 <p></p>
 
 <ol>
@@ -548,6 +545,11 @@
 <li>proxy local configuration override  <br><br> If no answer is returned, the proxy may have local configuration containing a subdomain name for the network. If so, this subdomain should be used.</li>
 <li>algorithmic subdomain label generation  <br><br> If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to hexidecimal. This will give a 8 character unique string to use as a subdomain label.</li>
 </ol>
+<h1 id="rfc.section.3.2">
+<a href="#rfc.section.3.2">3.2.</a> <a href="#domain-name-discovery" id="domain-name-discovery">Domain name discovery</a>
+</h1>
+<p id="rfc.section.3.2.p.1">The base domain name to use for each subdomain also has to be discovered on a per IP subnet basis. In most cases, the domain name will be the same for all IP subnets because they are all contained in a single administrative domain. However, this is not required and a proxy administrator may need to span multiple administrative boundaries requiring different domain names on different IP subnets (and therefore, subdomains).</p>
+<p id="rfc.section.3.2.p.2">There is not a direct query to discover a separate domain name but the domain name is included with the subdomain in the response to the PTR query above in <a href="#subdomain" class="xref">Section 3.1</a>. If the PTR query returns an empty response, then the domain name can be obtained from local proxy configuration and if no domain name is specified there, the default domain for the host should be used.</p>
 <h1 id="rfc.section.3.3">
 <a href="#rfc.section.3.3">3.3.</a> <a href="#client-service-discovery" id="client-service-discovery">Client service discovery</a>
 </h1>
@@ -571,17 +573,26 @@
 </h1>
 <p id="rfc.section.4.3.p.1">While <a href="#RFC6762" class="xref">[RFC6762]</a> recommends all potential answers be included in mDNS probe queries, because these records haven&#8217;t gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.</p>
 <h1 id="rfc.section.4.4">
-<a href="#rfc.section.4.4">4.4.</a> <a href="#multiple-logical-ip-subnets" id="multiple-logical-ip-subnets">multiple logical IP subnets</a>
+<a href="#rfc.section.4.4">4.4.</a> <a href="#link-local-addressing" id="link-local-addressing">Link-local addressing</a>
 </h1>
+<p id="rfc.section.4.4.p.1">In the IPv6 case, the source address of the announcements is a link-local IPv6 address that will probably be different than the IP subnet that the service is being provided on. However, it is certainly possible that link-local addressing is used with IPv4 as well. This is not as common but exists in a zero-conf environment where no IPv4 addresses are assigned via DHCP or statically and the hosts revert to link-local IPv4 addresses (169.254/16), see <a href="#RFC3927" class="xref">[RFC3927]</a>.</p>
+<p id="rfc.section.4.4.p.2">If the service SRV target resolves to only a link-local address, then the service is not eligble to be advertised outside of the link and shouldn&#8217;t be sent to the authoritative unicast DNS server by the Update proxy.</p>
+<p id="rfc.section.4.4.p.3">In general, the Update proxy needs to ensure that the service is reachable outside of the link it is announced on before sending an Update to the authoritative server for the subdomain.</p>
 <h1 id="rfc.section.4.5">
 <a href="#rfc.section.4.5">4.5.</a> <a href="#ipv6-and-ipv4-on-same-link" id="ipv6-and-ipv4-on-same-link">IPv6 and IPv4 on same link</a>
 </h1>
+<p id="rfc.section.4.5.p.1">Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 &#8216;A&#8217; records <a href="#RFC1035" class="xref">[RFC1035]</a> and IPv6 &#8216;AAAA&#8217; records <a href="#RFC3596" class="xref">[RFC3596]</a> are published for an SRV target <a href="#RFC2782" class="xref">[RFC2782]</a> name, the administrator should provide the service over both protocols.</p>
+<p id="rfc.section.4.5.p.2">In some cases, this won&#8217;t be possible. This will not incur any extra delays if clients attempt connections over both IPv4 and IPv6 protocols simultaneously but if one protocol is preferred over another, delays may occur.</p>
 <h1 id="rfc.section.4.6">
-<a href="#rfc.section.4.6">4.6.</a> <a href="#ipv6-addressing" id="ipv6-addressing">IPv6 addressing</a>
+<a href="#rfc.section.4.6">4.6.</a> <a href="#multiple-logical-ip-subnets" id="multiple-logical-ip-subnets">multiple logical IP subnets</a>
 </h1>
+<p id="rfc.section.4.6.p.1">Multiple IP subnets on the same link are just a more general case of IPv4 and IPv6 on the same link. When multiple IP subnets exist for the same protocol on the same link, they appear as separate interfaces to the Update proxy and require a separate subdomain name just as IPv4 and IPv6 do.</p>
+<p id="rfc.section.4.6.p.2">This is required for a client on one logical IP subnet of an interface to communicate with a service provided by a host on a different IP subnet of the same link.</p>
+<p id="rfc.section.4.6.p.3">If a SRV target resolves to addresses on multiple logical IP subnets of the same interface, the service can be included in multiple subdomains on the appropriate server(s) for those subdomains.</p>
 <h1 id="rfc.section.4.7">
 <a href="#rfc.section.4.7">4.7.</a> <a href="#proxy-redundancy" id="proxy-redundancy">Proxy redundancy</a>
 </h1>
+<p id="rfc.section.4.7.p.1">T</p>
 <h1 id="rfc.section.4.8">
 <a href="#rfc.section.4.8">4.8.</a> <a href="#service-filtering-and-translation" id="service-filtering-and-translation">Service filtering and translation</a>
 </h1>
@@ -620,9 +631,29 @@
 <a href="#rfc.references.1">8.1.</a> Normative References</h1>
 <table><tbody>
 <tr>
+<td class="reference"><b id="RFC1035">[RFC1035]</b></td>
+<td class="top">
+<a>Mockapetris, P.</a>, "<a href="https://tools.ietf.org/html/rfc1035">Domain names - implementation and specification</a>", STD 13, RFC 1035, DOI 10.17487/RFC1035, November 1987.</td>
+</tr>
+<tr>
 <td class="reference"><b id="RFC2119">[RFC2119]</b></td>
 <td class="top">
 <a>Bradner, S.</a>, "<a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>", BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2782">[RFC2782]</b></td>
+<td class="top">
+<a>Gulbrandsen, A.</a>, <a>Vixie, P.</a> and <a>L. Esibov</a>, "<a href="https://tools.ietf.org/html/rfc2782">A DNS RR for specifying the location of services (DNS SRV)</a>", RFC 2782, DOI 10.17487/RFC2782, February 2000.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC3596">[RFC3596]</b></td>
+<td class="top">
+<a>Thomson, S.</a>, <a>Huitema, C.</a>, <a>Ksinant, V.</a> and <a>M. Souissi</a>, "<a href="https://tools.ietf.org/html/rfc3596">DNS Extensions to Support IP Version 6</a>", STD 88, RFC 3596, DOI 10.17487/RFC3596, October 2003.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC3927">[RFC3927]</b></td>
+<td class="top">
+<a>Cheshire, S.</a>, <a>Aboba, B.</a> and <a>E. Guttman</a>, "<a href="https://tools.ietf.org/html/rfc3927">Dynamic Configuration of IPv4 Link-Local Addresses</a>", RFC 3927, DOI 10.17487/RFC3927, May 2005.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC6762">[RFC6762]</b></td>

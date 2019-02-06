@@ -66,31 +66,31 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Requirements Language . . . . . . . . . . . . . . . . . . . .   3
    3.  DNS subdomain model . . . . . . . . . . . . . . . . . . . . .   3
-     3.1.  Domain name discovery . . . . . . . . . . . . . . . . . .   3
-     3.2.  Subdomain naming  . . . . . . . . . . . . . . . . . . . .   3
+     3.1.  Subdomain naming  . . . . . . . . . . . . . . . . . . . .   3
+     3.2.  Domain name discovery . . . . . . . . . . . . . . . . . .   4
      3.3.  Client service discovery  . . . . . . . . . . . . . . . .   4
-   4.  Update proxy behavior . . . . . . . . . . . . . . . . . . . .   4
-     4.1.  mDNS service announcements  . . . . . . . . . . . . . . .   4
+   4.  Update proxy behavior . . . . . . . . . . . . . . . . . . . .   5
+     4.1.  mDNS service announcements  . . . . . . . . . . . . . . .   5
      4.2.  Service caching and refresh . . . . . . . . . . . . . . .   5
      4.3.  mDNS probing  . . . . . . . . . . . . . . . . . . . . . .   5
-     4.4.  multiple logical IP subnets . . . . . . . . . . . . . . .   5
-     4.5.  IPv6 and IPv4 on same link  . . . . . . . . . . . . . . .   5
-     4.6.  IPv6 addressing . . . . . . . . . . . . . . . . . . . . .   5
-     4.7.  Proxy redundancy  . . . . . . . . . . . . . . . . . . . .   5
-     4.8.  Service filtering and translation . . . . . . . . . . . .   5
-   5.  DNS update messages . . . . . . . . . . . . . . . . . . . . .   5
-     5.1.  Selection of unicast authoritative DNS server . . . . . .   5
-     5.2.  DNS update prerequisites  . . . . . . . . . . . . . . . .   5
-     5.3.  Cryptographically signed update messages  . . . . . . . .   5
-   6.  DNS authoritative server behavior . . . . . . . . . . . . . .   6
-     6.1.  DNSSEC compatibility  . . . . . . . . . . . . . . . . . .   6
-     6.2.  Lease lifetimes . . . . . . . . . . . . . . . . . . . . .   6
-     6.3.  Timeout resource records  . . . . . . . . . . . . . . . .   6
-   7.  Comparison to Discovery Proxy . . . . . . . . . . . . . . . .   6
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .   6
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
+     4.4.  Link-local addressing . . . . . . . . . . . . . . . . . .   5
+     4.5.  IPv6 and IPv4 on same link  . . . . . . . . . . . . . . .   6
+     4.6.  multiple logical IP subnets . . . . . . . . . . . . . . .   6
+     4.7.  Proxy redundancy  . . . . . . . . . . . . . . . . . . . .   6
+     4.8.  Service filtering and translation . . . . . . . . . . . .   7
+   5.  DNS update messages . . . . . . . . . . . . . . . . . . . . .   7
+     5.1.  Selection of unicast authoritative DNS server . . . . . .   7
+     5.2.  DNS update prerequisites  . . . . . . . . . . . . . . . .   7
+     5.3.  Cryptographically signed update messages  . . . . . . . .   7
+   6.  DNS authoritative server behavior . . . . . . . . . . . . . .   7
+     6.1.  DNSSEC compatibility  . . . . . . . . . . . . . . . . . .   7
+     6.2.  Lease lifetimes . . . . . . . . . . . . . . . . . . . . .   7
+     6.3.  Timeout resource records  . . . . . . . . . . . . . . . .   7
+   7.  Comparison to Discovery Proxy . . . . . . . . . . . . . . . .   7
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .   8
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
 
 1.  Introduction
 
@@ -152,9 +152,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    details about browsing.  These subdomains are typically special use
    subdomains for mDNS mappings.
 
-3.1.  Domain name discovery
-
-3.2.  Subdomain naming
+3.1.  Subdomain naming
 
    The browseable subdomain label is prepended to the domain name and
    seperated by a period.  See [RFC7719] for more information on
@@ -162,6 +160,8 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    readable or have organizational significance.  End users will not be
    interacting with these labels.  The main requirement is that they be
    unique within the domain for each IP subnet.  Subdomain labels can be
+   obtained by the proxy in several ways.  The following methods should
+   be attempted in order to assure consistency amoung redundant proxies:
 
 
 
@@ -169,9 +169,6 @@ Pusateri                 Expires August 10, 2019                [Page 3]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
-
-   obtained by the proxy in several ways.  The following methods should
-   be attempted in order to assure consistency amoung redundant proxies:
 
    1.  PTR query for IP subnet through local resolver
 
@@ -197,12 +194,37 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
        portion all zeros) and convert it to hexidecimal.  This will give
        a 8 character unique string to use as a subdomain label.
 
+3.2.  Domain name discovery
+
+   The base domain name to use for each subdomain also has to be
+   discovered on a per IP subnet basis.  In most cases, the domain name
+   will be the same for all IP subnets because they are all contained in
+   a single administrative domain.  However, this is not required and a
+   proxy administrator may need to span multiple administrative
+   boundaries requiring different domain names on different IP subnets
+   (and therefore, subdomains).
+
+   There is not a direct query to discover a separate domain name but
+   the domain name is included with the subdomain in the response to the
+   PTR query above in Section 3.1.  If the PTR query returns an empty
+   response, then the domain name can be obtained from local proxy
+   configuration and if no domain name is specified there, the default
+   domain for the host should be used.
+
 3.3.  Client service discovery
 
    Fortunately, clients performing service discovery require no changes
    in order to work with the Update proxy.  Existing clients already
    support wide-area bonjour which specifies how to query search domains
    and subdomains for services.  See section 11 of [RFC6763].
+
+
+
+
+Pusateri                 Expires August 10, 2019                [Page 4]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
 
 4.  Update proxy behavior
 
@@ -218,13 +240,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    (responses) on all interfaces it is proxying for.  Multiple Update
    proxies can be active on the same IP subnet at the same time.  See
    [RFC6762] for more information on multicast DNS.
-
-
-
-Pusateri                 Expires August 10, 2019                [Page 4]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
 4.2.  Service caching and refresh
 
@@ -253,13 +268,75 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    Therefore, an Update proxy MUST NOT rely on information in any
    section of DNS query messages.
 
-4.4.  multiple logical IP subnets
+4.4.  Link-local addressing
+
+   In the IPv6 case, the source address of the announcements is a link-
+   local IPv6 address that will probably be different than the IP subnet
+   that the service is being provided on.  However, it is certainly
+   possible that link-local addressing is used with IPv4 as well.  This
+
+
+
+Pusateri                 Expires August 10, 2019                [Page 5]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
+   is not as common but exists in a zero-conf environment where no IPv4
+   addresses are assigned via DHCP or statically and the hosts revert to
+   link-local IPv4 addresses (169.254/16), see [RFC3927].
+
+   If the service SRV target resolves to only a link-local address, then
+   the service is not eligble to be advertised outside of the link and
+   shouldn't be sent to the authoritative unicast DNS server by the
+   Update proxy.
+
+   In general, the Update proxy needs to ensure that the service is
+   reachable outside of the link it is announced on before sending an
+   Update to the authoritative server for the subdomain.
 
 4.5.  IPv6 and IPv4 on same link
 
-4.6.  IPv6 addressing
+   Announced services may be available on IPv4, IPv6, or both on the
+   same link.  If both IPv4 'A' records [RFC1035] and IPv6 'AAAA'
+   records [RFC3596] are published for an SRV target [RFC2782] name, the
+   administrator should provide the service over both protocols.
+
+   In some cases, this won't be possible.  This will not incur any extra
+   delays if clients attempt connections over both IPv4 and IPv6
+   protocols simultaneously but if one protocol is preferred over
+   another, delays may occur.
+
+4.6.  multiple logical IP subnets
+
+   Multiple IP subnets on the same link are just a more general case of
+   IPv4 and IPv6 on the same link.  When multiple IP subnets exist for
+   the same protocol on the same link, they appear as separate
+   interfaces to the Update proxy and require a separate subdomain name
+   just as IPv4 and IPv6 do.
+
+   This is required for a client on one logical IP subnet of an
+   interface to communicate with a service provided by a host on a
+   different IP subnet of the same link.
+
+   If a SRV target resolves to addresses on multiple logical IP subnets
+   of the same interface, the service can be included in multiple
+   subdomains on the appropriate server(s) for those subdomains.
 
 4.7.  Proxy redundancy
+
+   T
+
+
+
+
+
+
+
+Pusateri                 Expires August 10, 2019                [Page 6]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
 
 4.8.  Service filtering and translation
 
@@ -270,17 +347,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 5.2.  DNS update prerequisites
 
 5.3.  Cryptographically signed update messages
-
-
-
-
-
-
-
-Pusateri                 Expires August 10, 2019                [Page 5]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
 6.  DNS authoritative server behavior
 
@@ -307,10 +373,36 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 8.1.  Normative References
 
+   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC2782]  Gulbrandsen, A., Vixie, P., and L. Esibov, "A DNS RR for
+              specifying the location of services (DNS SRV)", RFC 2782,
+              DOI 10.17487/RFC2782, February 2000,
+              <https://www.rfc-editor.org/info/rfc2782>.
+
+
+
+Pusateri                 Expires August 10, 2019                [Page 7]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
+   [RFC3596]  Thomson, S., Huitema, C., Ksinant, V., and M. Souissi,
+              "DNS Extensions to Support IP Version 6", STD 88,
+              RFC 3596, DOI 10.17487/RFC3596, October 2003,
+              <https://www.rfc-editor.org/info/rfc3596>.
+
+   [RFC3927]  Cheshire, S., Aboba, B., and E. Guttman, "Dynamic
+              Configuration of IPv4 Link-Local Addresses", RFC 3927,
+              DOI 10.17487/RFC3927, May 2005,
+              <https://www.rfc-editor.org/info/rfc3927>.
 
    [RFC6762]  Cheshire, S. and M. Krochmal, "Multicast DNS", RFC 6762,
               DOI 10.17487/RFC6762, February 2013,
@@ -330,13 +422,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               Cheshire, S., "Discovery Proxy for Multicast DNS-Based
               Service Discovery", draft-ietf-dnssd-hybrid-08 (work in
               progress), March 2018.
-
-
-
-Pusateri                 Expires August 10, 2019                [Page 6]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
    [I-D.ietf-dnssd-mdns-relay]
               Lemon, T. and S. Cheshire, "Multicast DNS Discovery
@@ -360,33 +445,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Pusateri                 Expires August 10, 2019                [Page 7]
+Pusateri                 Expires August 10, 2019                [Page 8]
