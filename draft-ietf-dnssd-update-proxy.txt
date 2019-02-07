@@ -95,7 +95,7 @@ Table of Contents
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
      8.2.  Informative References  . . . . . . . . . . . . . . . . .  10
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
 
 1.  Introduction
 
@@ -233,6 +233,12 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    support wide-area bonjour which specifies how to query search domains
    and subdomains for services.  See section 11 of [RFC6763].
 
+   In the future, authoritative unicast DNS servers may add support for
+   DNS Push Notifications [I-D.ietf-dnssd-push] which would allow
+   clients to maintain long lived subscriptions to services.  Clients
+   may also wish to add support for this feature to provide an efficient
+   alternative to polling.
+
 4.  Update proxy behavior
 
    Since no new protocols are defined, this document mostly describes
@@ -267,13 +273,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    flush bit is set on new announcements as described in Section 10.2 of
    [RFC6762].
 
-   A host providing a service may automatically refresh the TTL in the
-   announcement from time to time keeping the service valid based on
-   subsequent multicast queries it receives.  However, if no mDNS
-   clients are requesting the particular service for the length of the
-   TTL value, the service announcement could timeout naturally.  In
-   order to keep accurate information regarding all of the services on
-   the IP subnet, the Update proxy SHOULD send a unicast PTR query for
+
 
 
 
@@ -282,6 +282,13 @@ Pusateri                 Expires August 10, 2019                [Page 5]
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
+   A host providing a service may automatically refresh the TTL in the
+   announcement from time to time keeping the service valid based on
+   subsequent multicast queries it receives.  However, if no mDNS
+   clients are requesting the particular service for the length of the
+   TTL value, the service announcement could timeout naturally.  In
+   order to keep accurate information regarding all of the services on
+   the IP subnet, the Update proxy SHOULD send a unicast PTR query for
    the service name directly to the service provider and set the Unicast
    bit in the query to receive a unicast response back.  This query
    should be sent at a random time between 5 and 10 seconds before the
@@ -309,11 +316,11 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 4.3.  mDNS probing
 
-   While [RFC6762] recommends all potential answers be included in mDNS
-   probe queries, because these records haven't gone through conflict
-   resolution, they should not be regarded as announcements of services.
-   Therefore, an Update proxy MUST NOT rely on information in any
-   section of DNS query messages.
+   While Section 8.2 of [RFC6762] recommends all potential answers be
+   included in mDNS probe queries, because these records haven't gone
+   through conflict resolution, they should not be regarded as
+   announcements of services.  Therefore, an Update proxy MUST NOT rely
+   on information in any section of DNS query messages.
 
 4.4.  Link-local addressing
 
@@ -322,13 +329,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    that the service is being provided on.  However, it is certainly
    possible that link-local addressing is used with IPv4 as well.  This
    is not as common but exists in a zero-conf environment where no IPv4
-   addresses are assigned via DHCP or statically and the hosts revert to
-   link-local IPv4 addresses (169.254/16), see [RFC3927].
-
-   If the service SRV target resolves to only a link-local address, then
-   the service is not eligible to be advertised outside of the link and
-   shouldn't be sent to the authoritative unicast DNS server by the
-   Update proxy.
 
 
 
@@ -337,6 +337,14 @@ Pusateri                 Expires August 10, 2019                [Page 6]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
+
+   addresses are assigned via DHCP or statically and the hosts revert to
+   link-local IPv4 addresses (169.254/16), see [RFC3927].
+
+   If the service SRV target resolves to only a link-local address, then
+   the service is not eligible to be advertised outside of the link and
+   shouldn't be sent to the authoritative unicast DNS server by the
+   Update proxy.
 
    In general, the Update proxy needs to ensure that the service is
    reachable outside of the link it is announced on before sending an
@@ -354,7 +362,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    protocols simultaneously but if one protocol is preferred over
    another, delays may occur.
 
-   Future: Discuss NSEC records for non-existence of AAAA records
+   Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 
 4.6.  multiple logical IP subnets
 
@@ -379,20 +387,16 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    proxies needs to be aware of any of the other redundant proxies on an
    IP subnet.
 
-   Alternatives for ways to format DNS Update messages are defined below
-   in Section 5.3 where proxy redundancy is re-examined after discussing
-   the sections in an DNS Update message.
-
-
-
-
-
 
 
 Pusateri                 Expires August 10, 2019                [Page 7]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
+
+   Alternatives for ways to format DNS Update messages are defined below
+   in Section 5.3 where proxy redundancy is re-examined after discussing
+   the sections in an DNS Update message.
 
 4.8.  Service filtering and translation
 
@@ -438,10 +442,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    Another method is to just attempt to insert the records in the
    authoritative server.
 
-   Future: discuss deleting existing records and replacing them.
-
-   Future: discuss how to handle ping-pong Zone authority records (SOA)
-
 
 
 
@@ -449,6 +449,10 @@ Pusateri                 Expires August 10, 2019                [Page 8]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
+
+   Future: discuss deleting existing records and replacing them.
+
+   Future: discuss how to handle ping-pong Zone authority records (SOA)
 
 5.4.  Cryptographically signed update messages
 
@@ -491,10 +495,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               RFC 2136, DOI 10.17487/RFC2136, April 1997,
               <https://www.rfc-editor.org/info/rfc2136>.
 
-   [RFC2782]  Gulbrandsen, A., Vixie, P., and L. Esibov, "A DNS RR for
-              specifying the location of services (DNS SRV)", RFC 2782,
-              DOI 10.17487/RFC2782, February 2000,
-              <https://www.rfc-editor.org/info/rfc2782>.
 
 
 
@@ -505,6 +505,11 @@ Pusateri                 Expires August 10, 2019                [Page 9]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
+
+   [RFC2782]  Gulbrandsen, A., Vixie, P., and L. Esibov, "A DNS RR for
+              specifying the location of services (DNS SRV)", RFC 2782,
+              DOI 10.17487/RFC2782, February 2000,
+              <https://www.rfc-editor.org/info/rfc2782>.
 
    [RFC3596]  Thomson, S., Huitema, C., Ksinant, V., and M. Souissi,
               "DNS Extensions to Support IP Version 6", STD 88,
@@ -540,9 +545,22 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               Relay", draft-ietf-dnssd-mdns-relay-01 (work in progress),
               July 2018.
 
+   [I-D.ietf-dnssd-push]
+              Pusateri, T. and S. Cheshire, "DNS Push Notifications",
+              draft-ietf-dnssd-push-16 (work in progress), November
+              2018.
+
    [RFC7719]  Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
               2015, <https://www.rfc-editor.org/info/rfc7719>.
+
+
+
+
+Pusateri                 Expires August 10, 2019               [Page 10]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
 
 Author's Address
 
@@ -557,4 +575,42 @@ Author's Address
 
 
 
-Pusateri                 Expires August 10, 2019               [Page 10]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pusateri                 Expires August 10, 2019               [Page 11]

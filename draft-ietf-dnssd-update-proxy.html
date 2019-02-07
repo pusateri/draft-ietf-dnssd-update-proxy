@@ -569,6 +569,7 @@
 <a href="#rfc.section.3.3">3.3.</a> <a href="#client-service-discovery" id="client-service-discovery">Client service discovery</a>
 </h1>
 <p id="rfc.section.3.3.p.1">Fortunately, clients performing service discovery require no changes in order to work with the Update proxy. Existing clients already support wide-area bonjour which specifies how to query search domains and subdomains for services. See section 11 of <a href="#RFC6763" class="xref">[RFC6763]</a>.</p>
+<p id="rfc.section.3.3.p.2">In the future, authoritative unicast DNS servers may add support for DNS Push Notifications <a href="#I-D.ietf-dnssd-push" class="xref">[I-D.ietf-dnssd-push]</a> which would allow clients to maintain long lived subscriptions to services. Clients may also wish to add support for this feature to provide an efficient alternative to polling.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#update-proxy-behavior" id="update-proxy-behavior">Update proxy behavior</a>
 </h1>
@@ -589,7 +590,7 @@
 <h1 id="rfc.section.4.3">
 <a href="#rfc.section.4.3">4.3.</a> <a href="#mdns-probing" id="mdns-probing">mDNS probing</a>
 </h1>
-<p id="rfc.section.4.3.p.1">While <a href="#RFC6762" class="xref">[RFC6762]</a> recommends all potential answers be included in mDNS probe queries, because these records haven&#8217;t gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.</p>
+<p id="rfc.section.4.3.p.1">While Section 8.2 of <a href="#RFC6762" class="xref">[RFC6762]</a> recommends all potential answers be included in mDNS probe queries, because these records haven&#8217;t gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.</p>
 <h1 id="rfc.section.4.4">
 <a href="#rfc.section.4.4">4.4.</a> <a href="#link-local-addressing" id="link-local-addressing">Link-local addressing</a>
 </h1>
@@ -602,7 +603,7 @@
 <p id="rfc.section.4.5.p.1">Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 <samp>A</samp> records <a href="#RFC1035" class="xref">[RFC1035]</a> and IPv6 <samp>AAAA</samp> records <a href="#RFC3596" class="xref">[RFC3596]</a> are published for an SRV target <a href="#RFC2782" class="xref">[RFC2782]</a> name, the administrator should provide the service over both protocols.</p>
 <p id="rfc.section.4.5.p.2">In some cases, this won&#8217;t be possible. This will not incur any extra delays if clients attempt connections over both IPv4 and IPv6 protocols simultaneously but if one protocol is preferred over another, delays may occur.</p>
 <pre>
-Future: Discuss NSEC records for non-existence of AAAA records
+Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 </pre>
 <h1 id="rfc.section.4.6">
 <a href="#rfc.section.4.6">4.6.</a> <a href="#multiple-logical-ip-subnets" id="multiple-logical-ip-subnets">multiple logical IP subnets</a>
@@ -736,6 +737,11 @@ Future: discuss how to handle ping-pong Zone authority records (SOA)
 <td class="reference"><b id="I-D.ietf-dnssd-mdns-relay">[I-D.ietf-dnssd-mdns-relay]</b></td>
 <td class="top">
 <a>Lemon, T.</a> and <a>S. Cheshire</a>, "<a href="https://tools.ietf.org/html/draft-ietf-dnssd-mdns-relay-01">Multicast DNS Discovery Relay</a>", Internet-Draft draft-ietf-dnssd-mdns-relay-01, July 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.ietf-dnssd-push">[I-D.ietf-dnssd-push]</b></td>
+<td class="top">
+<a>Pusateri, T.</a> and <a>S. Cheshire</a>, "<a href="https://tools.ietf.org/html/draft-ietf-dnssd-push-16">DNS Push Notifications</a>", Internet-Draft draft-ietf-dnssd-push-16, November 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC7719">[RFC7719]</b></td>

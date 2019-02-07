@@ -74,6 +74,8 @@ There is not a direct query to discover a separate domain name but the domain na
 
 Fortunately, clients performing service discovery require no changes in order to work with the Update proxy. Existing clients already support wide-area bonjour which specifies how to query search domains and subdomains for services. See section 11 of {{!RFC6763}}.
 
+In the future, authoritative unicast DNS servers may add support for DNS Push Notifications {{?I-D.ietf-dnssd-push}} which would allow clients to maintain long lived subscriptions to services. Clients may also wish to add support for this feature to provide an efficient alternative to polling.
+
 # Update proxy behavior
 
 Since no new protocols are defined, this document mostly describes the expected behavior of the Update proxy and how it uses existing protocols to achieve multi IP subnet service discovery. The behavior is mostly intuitive but is described to ensure compatibility and completeness.
@@ -98,7 +100,7 @@ This was not the intended behavior of mDNS since local clients would just ask dy
 
 ## mDNS probing
 
-While {{!RFC6762}} recommends all potential answers be included in mDNS probe queries, because these records haven't gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.
+While Section 8.2 of {{!RFC6762}} recommends all potential answers be included in mDNS probe queries, because these records haven't gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.
 
 ## Link-local addressing
 
@@ -114,7 +116,7 @@ Announced services may be available on IPv4, IPv6, or both on the same link. If 
 
 In some cases, this won't be possible. This will not incur any extra delays if clients attempt connections over both IPv4 and IPv6 protocols simultaneously but if one protocol is preferred over another, delays may occur.
 
-    Future: Discuss NSEC records for non-existence of AAAA records
+    Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 
 ## multiple logical IP subnets
 
