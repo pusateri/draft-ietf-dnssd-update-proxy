@@ -46,11 +46,11 @@ This document will explain how services on each .local domain will be mapped int
 
 # DNS subdomain model
 
-Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browseable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of {{!RFC6763}} for more details about browsing. These subdomains are typically special use subdomains for mDNS mappings.
+Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browsable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of {{!RFC6763}} for more details about browsing. These subdomains are typically special use subdomains for mDNS mappings.
 
 ## Subdomain naming {#subdomain}
 
-The browseable subdomain label is prepended to the domain name and seperated by a period. See {{?RFC7719}} for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency amoung redundant proxies:
+The browseable subdomain label is prepended to the domain name and separated by a period. See {{?RFC7719}} for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency among redundant proxies:
 
 1. PTR query for IP subnet through local resolver
 
@@ -62,7 +62,7 @@ The browseable subdomain label is prepended to the domain name and seperated by 
 
 3. algorithmic subdomain label generation
 
-    If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to hexidecimal. This will give a 8 character unique string to use as a subdomain label.
+    If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to hexadecimal. This will give a 8 character unique string to use as a subdomain label.
 
 ## Domain name discovery
 
@@ -104,15 +104,17 @@ While {{!RFC6762}} recommends all potential answers be included in mDNS probe qu
 
 In the IPv6 case, the source address of the announcements is a link-local IPv6 address that will probably be different than the IP subnet that the service is being provided on. However, it is certainly possible that link-local addressing is used with IPv4 as well. This is not as common but exists in a zero-conf environment where no IPv4 addresses are assigned via DHCP or statically and the hosts revert to link-local IPv4 addresses (169.254/16), see {{!RFC3927}}.
 
-If the service SRV target resolves to only a link-local address, then the service is not eligble to be advertised outside of the link and shouldn't be sent to the authoritative unicast DNS server by the Update proxy.
+If the service SRV target resolves to only a link-local address, then the service is not eligible to be advertised outside of the link and shouldn't be sent to the authoritative unicast DNS server by the Update proxy.
 
 In general, the Update proxy needs to ensure that the service is reachable outside of the link it is announced on before sending an Update to the authoritative server for the subdomain.
 
 ## IPv6 and IPv4 on same link
 
-Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 'A' records {{!RFC1035}} and IPv6 'AAAA' records {{!RFC3596}} are published for an SRV target {{!RFC2782}} name, the administrator should provide the service over both protocols.
+Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 `A` records {{!RFC1035}} and IPv6 `AAAA` records {{!RFC3596}} are published for an SRV target {{!RFC2782}} name, the administrator should provide the service over both protocols.
 
 In some cases, this won't be possible. This will not incur any extra delays if clients attempt connections over both IPv4 and IPv6 protocols simultaneously but if one protocol is preferred over another, delays may occur.
+
+    Future: Discuss NSEC records for non-existence of AAAA records
 
 ## multiple logical IP subnets
 
@@ -126,6 +128,34 @@ If a SRV target resolves to addresses on multiple logical IP subnets of the same
 
 Providing redundant Update proxies for the same IP subnet can be easily achieved using the DNS Update protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.
 
+Alternatives for ways to format DNS Update messages are defined below in {{redundancy}} where proxy redundancy is re-examined after discussing the sections in an DNS Update message.
+
+## Service filtering and translation
+
+In the process of registering services with an authoritative unicast DNS server, the proxy can perform filtering and translation on the dynamically discovered services.
+
+As an example, suppose legacy printers are discovered that do not support the current AirPrint feature set. The proxy can alter the TXT record associated with the printer to add the necessary keys as well as any additional service records to allow AirPrint clients to discover and use the legacy printer.
+
+As another example, suppose there is a printer that is behind a locked door where students do not have access. In this case, the printer's resource records MAY be filtered by the proxy so it does not show up during a browse operation on the subnet.
+
+An Update proxy could have rulesets that define the translations it performs on the fly as is learns about matching services.
+
+# DNS update messages
+
+## Selection of authoritative unicast DNS server
+
+## DNS update sections
+
+### Zone section
+
+### Prerequisite section
+
+### Update section
+
+### Additional data section
+
+## Proxy redundancy (revisited) {#redundancy}
+
 One method is to apply section 2.4 of {{!RFC2136}} which describes the Prerequisite section which can be used by redundant proxies to pre-qualify the updates. If another Update proxy has already submitted the Update, subsequent Updates can be ignored.
 
 Another method is to just attempt to insert the records in the authoritative server.
@@ -133,14 +163,6 @@ Another method is to just attempt to insert the records in the authoritative ser
     Future: discuss deleting existing records and replacing them.
 
     Future: discuss how to handle ping-pong Zone authority records (SOA)
-
-## Service filtering and translation
-
-# DNS update messages
-
-## Selection of authoritative unicast DNS server
-
-## DNS update prerequisites
 
 ## Cryptographically signed update messages
 
