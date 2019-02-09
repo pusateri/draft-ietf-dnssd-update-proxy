@@ -144,7 +144,25 @@ An Update proxy could have rulesets that define the translations it performs on 
 
 # DNS update messages
 
+While DNS Update is well supported in authoritative DNS servers, it typically requires some form of authentication for the server to accept the update. The most common form is TSIG {{!RFC2845}},{{!RFC4635}} which is based on a shared secret and a one way hash over the contents of the record.
+
+The Update proxy doesn't dictate a method of privacy or authentication for communication to an authoritative DNS Update server. However, implementations SHOULD ensure some form exists and even refuse to operate in an environment without some form of authentication.
+
+The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be handled correctly by the authoritative DNS Update server as directed in {{!RFC3007}}.
+
 ## Selection of authoritative unicast DNS server
+
+The Update proxy should attempt to locate the authoritative DNS Update server for each subdomain in the following manner:
+
+1. An Update proxy should first send an SRV query for _dns-update._udp.&lt;subdomain&gt;.&lt;domain&gt;. If an answer is received, the target and port number will provide the parameters needed for where to send updates.
+
+    Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been registered with IANA. However, this should not stop an Update proxy from atttempting to connect to an authoritative DNS server via TLS/TCP or plain TCP. In fact, an SRV query for the TLS variant is encouraged and if no answers are returned but answers are returned for the _udp version, attempting to connect to the same target and the reserved port (853) for DNS over TLS as defined in Section 3.1 of {{!RFC7858}} is encouraged for privacy reasons.
+
+2. If no SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.
+
+3. If no local configuration exists for a DNS Update server, the Update proxy can query the NS records for the subdomain and try sending updates to the name server configured for the subdomain. Again, using TLS/TCP is encouraged if available.
+
+4. If DNS Updates are not accepted by the server(s) represented by the NS records, the the Update proxy can assume that DNS Updates are not available for the subdomain and it has no reason to listen for mDNS announcements on the IP subnet.
 
 ## DNS update sections
 
