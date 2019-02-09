@@ -4,8 +4,8 @@
 
 DNSSD Working Group                                          T. Pusateri
 Internet-Draft                                              Unaffiliated
-Intended status: Standards Track                        February 8, 2019
-Expires: August 12, 2019
+Intended status: Standards Track                        February 9, 2019
+Expires: August 13, 2019
 
 
                        DNS Update Proxy for mDNS
@@ -14,7 +14,7 @@ Expires: August 12, 2019
 Abstract
 
    This document describes a method to dynamically map multicast DNS
-   advertisements into the unicast DNS namespace for use by service
+   announcements into the unicast DNS namespace for use by service
    discovery clients.  It does not define any new protocols but uses
    existing DNS protocols in new ways.  This solves existing problems
    with service discovery across multiple IP subnets in a simple, yet
@@ -35,7 +35,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 12, 2019.
+   This Internet-Draft will expire on August 13, 2019.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Pusateri                 Expires August 12, 2019                [Page 1]
+Pusateri                 Expires August 13, 2019                [Page 1]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -78,7 +78,7 @@ Table of Contents
      4.6.  multiple logical IP subnets . . . . . . . . . . . . . . .   7
      4.7.  Proxy redundancy  . . . . . . . . . . . . . . . . . . . .   7
      4.8.  Service filtering and translation . . . . . . . . . . . .   8
-   5.  DNS update messages . . . . . . . . . . . . . . . . . . . . .   8
+   5.  DNS update  . . . . . . . . . . . . . . . . . . . . . . . . .   8
      5.1.  Selection of authoritative unicast DNS server . . . . . .   8
      5.2.  DNS update sections . . . . . . . . . . . . . . . . . . .   9
        5.2.1.  Zone section  . . . . . . . . . . . . . . . . . . . .   9
@@ -86,16 +86,14 @@ Table of Contents
        5.2.3.  Update section  . . . . . . . . . . . . . . . . . . .   9
        5.2.4.  Additional data section . . . . . . . . . . . . . . .   9
      5.3.  Proxy redundancy (revisited)  . . . . . . . . . . . . . .   9
-     5.4.  Cryptographically signed update messages  . . . . . . . .  10
    6.  DNS authoritative server behavior . . . . . . . . . . . . . .  10
      6.1.  DNSSEC compatibility  . . . . . . . . . . . . . . . . . .  10
-     6.2.  Lease lifetimes . . . . . . . . . . . . . . . . . . . . .  10
-     6.3.  Timeout resource records  . . . . . . . . . . . . . . . .  10
-   7.  Comparison to Discovery Proxy . . . . . . . . . . . . . . . .  10
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
+     6.2.  DNS Update record lifetimes . . . . . . . . . . . . . . .  10
+   7.  Comparison to Discovery Proxy . . . . . . . . . . . . . . . .  11
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
      8.2.  Informative References  . . . . . . . . . . . . . . . . .  12
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  13
 
 1.  Introduction
 
@@ -106,15 +104,16 @@ Table of Contents
    across all link types and can be problematic on 802.11 Wifi networks.
    Therefore, a solution is desired to contain legacy multicast DNS
    service discovery and transition to a unicast DNS service discovery
+   model.  By mapping the current mDNS discovered services into regular
 
 
 
-Pusateri                 Expires August 12, 2019                [Page 2]
+
+Pusateri                 Expires August 13, 2019                [Page 2]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
-   model.  By mapping the current mDNS discovered services into regular
    authoritative unicast DNS servers, clients from any IP subnet can
    make unicast queries through normal unicast DNS resolvers.
 
@@ -162,15 +161,15 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    separated by a period.  See [RFC7719] for more information on
    subdomains and labels.  It is not important that the label be human
    readable or have organizational significance.  End users will not be
+   interacting with these labels.  The main requirement is that they be
 
 
 
-Pusateri                 Expires August 12, 2019                [Page 3]
+Pusateri                 Expires August 13, 2019                [Page 3]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
-   interacting with these labels.  The main requirement is that they be
    unique within the domain for each IP subnet.  Subdomain labels can be
    obtained by the proxy in several ways.  The following methods should
    be attempted in order to assure consistency among redundant proxies:
@@ -221,7 +220,8 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
 
-Pusateri                 Expires August 12, 2019                [Page 4]
+
+Pusateri                 Expires August 13, 2019                [Page 4]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -277,7 +277,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
 
-Pusateri                 Expires August 12, 2019                [Page 5]
+Pusateri                 Expires August 13, 2019                [Page 5]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -333,7 +333,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
 
-Pusateri                 Expires August 12, 2019                [Page 6]
+Pusateri                 Expires August 13, 2019                [Page 6]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -389,7 +389,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
 
-Pusateri                 Expires August 12, 2019                [Page 7]
+Pusateri                 Expires August 13, 2019                [Page 7]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -418,7 +418,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    An Update proxy could have rulesets that define the translations it
    performs on the fly as is learns about matching services.
 
-5.  DNS update messages
+5.  DNS update
 
    While DNS Update is well supported in authoritative DNS servers, it
    typically requires some form of authentication for the server to
@@ -432,28 +432,23 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    even refuse to operate in an environment without some form of
    authentication.
 
-   The Update proxy will assume that DNS updates sent to zones with
-   DNSSEC enabled will be handled correctly by the authoritative DNS
-   Update server as directed in [RFC3007].
-
 5.1.  Selection of authoritative unicast DNS server
 
    The Update proxy should attempt to locate the authoritative DNS
    Update server for each subdomain in the following manner:
 
-
-
-
-
-Pusateri                 Expires August 12, 2019                [Page 8]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
-
    1.  An Update proxy should first send an SRV query for _dns-
        update._udp.<subdomain>.<domain>.  If an answer is received, the
        target and port number will provide the parameters needed for
        where to send updates.
+
+
+
+
+Pusateri                 Expires August 13, 2019                [Page 8]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
 
        Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been
        registered with IANA.  However, this should not stop an Update
@@ -499,26 +494,79 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    Another method is to just attempt to insert the records in the
    authoritative server.
 
-
-
-Pusateri                 Expires August 12, 2019                [Page 9]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
-
    Future: discuss deleting existing records and replacing them.
 
    Future: discuss how to handle ping-pong Zone authority records (SOA)
 
-5.4.  Cryptographically signed update messages
+
+
+
+Pusateri                 Expires August 13, 2019                [Page 9]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
 
 6.  DNS authoritative server behavior
 
 6.1.  DNSSEC compatibility
 
-6.2.  Lease lifetimes
+   Future: DNSSEC possible
 
-6.3.  Timeout resource records
+   The Update proxy will assume that DNS updates sent to zones with
+   DNSSEC enabled will be handled correctly by the authoritative DNS
+   Update server as directed in [RFC3007].
+
+6.2.  DNS Update record lifetimes
+
+   When the Update proxy sends an DNS Update message to an authoritative
+   unicast DNS server, it MAY include a lease lifetime to indicate how
+   long the Update server should keep the resource records active in the
+   zone.  This is different from the TTL which tells resolvers how long
+   to keep the records in their cache.  Lease lifetimes may be based on
+   different origin data.  For example, when an IP address is assigned
+   to a host via DHCP, the DHCP server will provide a time period for
+   which the address is assigned to the host.
+
+   There are several possibilities for how a DNS Update server may limit
+   the lifetime of records added via an update message.
+
+   1.  The DNS update server MAY be configured to automatically delete
+       the records after a certain fixed time period (such as 24 hours).
+       This is a failsafe mechanism in case the origin of the record
+       data goes offline and does not ever try to remove the records.
+
+   2.  A single lease lifetime can be communicated via an OPT record as
+       defined in Dynamic DNS Update Leases [I-D.sekar-dns-ul].  This
+       provides a timeout period for all of the records added in the
+       update message and is controlled by the sender of the update.
+       This is a work in progress and does not yet have widespread
+       adoption among authoritative unicast DNS server software.
+
+   3.  Invidual DNS TIMEOUT resource records
+       [I-D.pusateri-dnsop-update-timeout] can be added to the update
+       message to indicate the timeout value for one or any number of
+       the resource records contained in the update message.  This is
+       the most flexible but also does not have any adoption among
+       authoritative unicast DNS server software.  One advantage of the
+       TIMEOUT resource records is that they are stored in the
+       authoritative server like any other record and synchronized to
+       secondary servers as well.  Therefore, if the primary server were
+       to restart or experience an extended failure, the lease lifetime
+       would not be lost.
+
+
+
+
+Pusateri                 Expires August 13, 2019               [Page 10]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
+   Note that it is possible to use both the Dynamic DNS Update leases to
+   communicate the lease lifetime and for the authoritative unicast DNS
+   server to create TIMEOUT resource records on demand to achieve the
+   same result if the Update proxy does not include TIMEOUT resource
+   records natively.
 
 7.  Comparison to Discovery Proxy
 
@@ -551,17 +599,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               RFC 2136, DOI 10.17487/RFC2136, April 1997,
               <https://www.rfc-editor.org/info/rfc2136>.
 
-
-
-
-
-
-
-Pusateri                 Expires August 12, 2019               [Page 10]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
-
    [RFC2782]  Gulbrandsen, A., Vixie, P., and L. Esibov, "A DNS RR for
               specifying the location of services (DNS SRV)", RFC 2782,
               DOI 10.17487/RFC2782, February 2000,
@@ -571,6 +608,15 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               Wellington, "Secret Key Transaction Authentication for DNS
               (TSIG)", RFC 2845, DOI 10.17487/RFC2845, May 2000,
               <https://www.rfc-editor.org/info/rfc2845>.
+
+
+
+
+
+Pusateri                 Expires August 13, 2019               [Page 11]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
 
    [RFC3007]  Wellington, B., "Secure Domain Name System (DNS) Dynamic
               Update", RFC 3007, DOI 10.17487/RFC3007, November 2000,
@@ -608,16 +654,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
-
-
-
-
-
-Pusateri                 Expires August 12, 2019               [Page 11]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
-
 8.2.  Informative References
 
    [I-D.ietf-dnssd-hybrid]
@@ -630,10 +666,27 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               Relay", draft-ietf-dnssd-mdns-relay-01 (work in progress),
               July 2018.
 
+
+
+
+Pusateri                 Expires August 13, 2019               [Page 12]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
    [I-D.ietf-dnssd-push]
               Pusateri, T. and S. Cheshire, "DNS Push Notifications",
               draft-ietf-dnssd-push-16 (work in progress), November
               2018.
+
+   [I-D.pusateri-dnsop-update-timeout]
+              Pusateri, T. and T. Wattenberg, "DNS TIMEOUT Resource
+              Record", draft-pusateri-dnsop-update-timeout-00 (work in
+              progress), August 2018.
+
+   [I-D.sekar-dns-ul]
+              Cheshire, S. and T. Lemon, "Dynamic DNS Update Leases",
+              draft-sekar-dns-ul-02 (work in progress), August 2018.
 
    [RFC7719]  Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
@@ -669,4 +722,7 @@ Author's Address
 
 
 
-Pusateri                 Expires August 12, 2019               [Page 12]
+
+
+
+Pusateri                 Expires August 13, 2019               [Page 13]

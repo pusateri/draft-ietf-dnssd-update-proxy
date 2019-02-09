@@ -389,7 +389,7 @@
 <link href="#rfc.section.4.6" rel="Chapter" title="4.6 multiple logical IP subnets">
 <link href="#rfc.section.4.7" rel="Chapter" title="4.7 Proxy redundancy">
 <link href="#rfc.section.4.8" rel="Chapter" title="4.8 Service filtering and translation">
-<link href="#rfc.section.5" rel="Chapter" title="5 DNS update messages">
+<link href="#rfc.section.5" rel="Chapter" title="5 DNS update">
 <link href="#rfc.section.5.1" rel="Chapter" title="5.1 Selection of authoritative unicast DNS server">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 DNS update sections">
 <link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Zone section">
@@ -397,11 +397,9 @@
 <link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Update section">
 <link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Additional data section">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Proxy redundancy (revisited)">
-<link href="#rfc.section.5.4" rel="Chapter" title="5.4 Cryptographically signed update messages">
 <link href="#rfc.section.6" rel="Chapter" title="6 DNS authoritative server behavior">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 DNSSEC compatibility">
-<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Lease lifetimes">
-<link href="#rfc.section.6.3" rel="Chapter" title="6.3 Timeout resource records">
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 DNS Update record lifetimes">
 <link href="#rfc.section.7" rel="Chapter" title="7 Comparison to Discovery Proxy">
 <link href="#rfc.references" rel="Chapter" title="8 References">
 <link href="#rfc.references.1" rel="Chapter" title="8.1 Normative References">
@@ -414,9 +412,9 @@
 
   <meta name="dct.creator" content="Pusateri, T." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-dnssd-update-proxy-00" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-08" />
-  <meta name="dct.abstract" content="This document describes a method to dynamically map multicast DNS advertisements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
-  <meta name="description" content="This document describes a method to dynamically map multicast DNS advertisements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-09" />
+  <meta name="dct.abstract" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
+  <meta name="description" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
 
 </head>
 
@@ -435,10 +433,10 @@
 </tr>
 <tr>
 <td class="left">Intended status: Standards Track</td>
-<td class="right">February 8, 2019</td>
+<td class="right">February 9, 2019</td>
 </tr>
 <tr>
-<td class="left">Expires: August 12, 2019</td>
+<td class="left">Expires: August 13, 2019</td>
 <td class="right"></td>
 </tr>
 
@@ -450,12 +448,12 @@
   <span class="filename">draft-ietf-dnssd-update-proxy-00</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
-<p>This document describes a method to dynamically map multicast DNS advertisements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner.</p>
+<p>This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner.</p>
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 12, 2019.</p>
+<p>This Internet-Draft will expire on August 13, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -495,7 +493,7 @@
 </li>
 <li>4.8.   <a href="#rfc.section.4.8">Service filtering and translation</a>
 </li>
-</ul><li>5.   <a href="#rfc.section.5">DNS update messages</a>
+</ul><li>5.   <a href="#rfc.section.5">DNS update</a>
 </li>
 <ul><li>5.1.   <a href="#rfc.section.5.1">Selection of authoritative unicast DNS server</a>
 </li>
@@ -511,15 +509,11 @@
 </li>
 </ul><li>5.3.   <a href="#rfc.section.5.3">Proxy redundancy (revisited)</a>
 </li>
-<li>5.4.   <a href="#rfc.section.5.4">Cryptographically signed update messages</a>
-</li>
 </ul><li>6.   <a href="#rfc.section.6">DNS authoritative server behavior</a>
 </li>
 <ul><li>6.1.   <a href="#rfc.section.6.1">DNSSEC compatibility</a>
 </li>
-<li>6.2.   <a href="#rfc.section.6.2">Lease lifetimes</a>
-</li>
-<li>6.3.   <a href="#rfc.section.6.3">Timeout resource records</a>
+<li>6.2.   <a href="#rfc.section.6.2">DNS Update record lifetimes</a>
 </li>
 </ul><li>7.   <a href="#rfc.section.7">Comparison to Discovery Proxy</a>
 </li>
@@ -624,11 +618,10 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 <p id="rfc.section.4.8.p.3">As another example, suppose there is a printer that is behind a locked door where students do not have access. In this case, the printer&#8217;s resource records MAY be filtered by the proxy so it does not show up during a browse operation on the subnet.</p>
 <p id="rfc.section.4.8.p.4">An Update proxy could have rulesets that define the translations it performs on the fly as is learns about matching services.</p>
 <h1 id="rfc.section.5">
-<a href="#rfc.section.5">5.</a> <a href="#dns-update-messages" id="dns-update-messages">DNS update messages</a>
+<a href="#rfc.section.5">5.</a> <a href="#dns-update" id="dns-update">DNS update</a>
 </h1>
 <p id="rfc.section.5.p.1">While DNS Update is well supported in authoritative DNS servers, it typically requires some form of authentication for the server to accept the update. The most common form is TSIG <a href="#RFC2845" class="xref">[RFC2845]</a>,<a href="#RFC4635" class="xref">[RFC4635]</a> which is based on a shared secret and a one way hash over the contents of the record.</p>
 <p id="rfc.section.5.p.2">The Update proxy doesn&#8217;t dictate a method of privacy or authentication for communication to an authoritative DNS Update server. However, implementations SHOULD ensure some form exists and even refuse to operate in an environment without some form of authentication.</p>
-<p id="rfc.section.5.p.3">The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be handled correctly by the authoritative DNS Update server as directed in <a href="#RFC3007" class="xref">[RFC3007]</a>.</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#selection-of-authoritative-unicast-dns-server" id="selection-of-authoritative-unicast-dns-server">Selection of authoritative unicast DNS server</a>
 </h1>
@@ -666,21 +659,29 @@ Future: discuss deleting existing records and replacing them.
 
 Future: discuss how to handle ping-pong Zone authority records (SOA)
 </pre>
-<h1 id="rfc.section.5.4">
-<a href="#rfc.section.5.4">5.4.</a> <a href="#cryptographically-signed-update-messages" id="cryptographically-signed-update-messages">Cryptographically signed update messages</a>
-</h1>
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#dns-authoritative-server-behavior" id="dns-authoritative-server-behavior">DNS authoritative server behavior</a>
 </h1>
 <h1 id="rfc.section.6.1">
 <a href="#rfc.section.6.1">6.1.</a> <a href="#dnssec-compatibility" id="dnssec-compatibility">DNSSEC compatibility</a>
 </h1>
+<pre>
+Future: DNSSEC possible
+</pre>
+<p id="rfc.section.6.1.p.1">The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be handled correctly by the authoritative DNS Update server as directed in <a href="#RFC3007" class="xref">[RFC3007]</a>.</p>
 <h1 id="rfc.section.6.2">
-<a href="#rfc.section.6.2">6.2.</a> <a href="#lease-lifetimes" id="lease-lifetimes">Lease lifetimes</a>
+<a href="#rfc.section.6.2">6.2.</a> <a href="#dns-update-record-lifetimes" id="dns-update-record-lifetimes">DNS Update record lifetimes</a>
 </h1>
-<h1 id="rfc.section.6.3">
-<a href="#rfc.section.6.3">6.3.</a> <a href="#timeout-resource-records" id="timeout-resource-records">Timeout resource records</a>
-</h1>
+<p id="rfc.section.6.2.p.1">When the Update proxy sends an DNS Update message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the Update server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.</p>
+<p id="rfc.section.6.2.p.2">There are several possibilities for how a DNS Update server may limit the lifetime of records added via an update message.</p>
+<p></p>
+
+<ol>
+<li>The DNS update server MAY be configured to automatically delete the records after a certain fixed time period (such as 24 hours). This is a failsafe mechanism in case the origin of the record data goes offline and does not ever try to remove the records.</li>
+<li>A single lease lifetime can be communicated via an OPT record as defined in Dynamic DNS Update Leases <a href="#I-D.sekar-dns-ul" class="xref">[I-D.sekar-dns-ul]</a>. This provides a timeout period for all of the records added in the update message and is controlled by the sender of the update. This is a work in progress and does not yet have widespread adoption among authoritative unicast DNS server software.</li>
+<li>Invidual DNS TIMEOUT resource records <a href="#I-D.pusateri-dnsop-update-timeout" class="xref">[I-D.pusateri-dnsop-update-timeout]</a> can be added to the update message to indicate the timeout value for one or any number of the resource records contained in the update message. This is the most flexible but also does not have any adoption among authoritative unicast DNS server software. One advantage of the TIMEOUT resource records is that they are stored in the authoritative server like any other record and synchronized to secondary servers as well. Therefore, if the primary server were to restart or experience an extended failure, the lease lifetime would not be lost.</li>
+</ol>
+<p id="rfc.section.6.2.p.4">Note that it is possible to use both the Dynamic DNS Update leases to communicate the lease lifetime and for the authoritative unicast DNS server to create TIMEOUT resource records on demand to achieve the same result if the Update proxy does not include TIMEOUT resource records natively.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#comparison-to-discovery-proxy" id="comparison-to-discovery-proxy">Comparison to Discovery Proxy</a>
 </h1>
@@ -774,6 +775,16 @@ Future: discuss how to handle ping-pong Zone authority records (SOA)
 <td class="reference"><b id="I-D.ietf-dnssd-push">[I-D.ietf-dnssd-push]</b></td>
 <td class="top">
 <a>Pusateri, T.</a> and <a>S. Cheshire</a>, "<a href="https://tools.ietf.org/html/draft-ietf-dnssd-push-16">DNS Push Notifications</a>", Internet-Draft draft-ietf-dnssd-push-16, November 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.pusateri-dnsop-update-timeout">[I-D.pusateri-dnsop-update-timeout]</b></td>
+<td class="top">
+<a>Pusateri, T.</a> and <a>T. Wattenberg</a>, "<a href="https://tools.ietf.org/html/draft-pusateri-dnsop-update-timeout-00">DNS TIMEOUT Resource Record</a>", Internet-Draft draft-pusateri-dnsop-update-timeout-00, August 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.sekar-dns-ul">[I-D.sekar-dns-ul]</b></td>
+<td class="top">
+<a>Cheshire, S.</a> and <a>T. Lemon</a>, "<a href="https://tools.ietf.org/html/draft-sekar-dns-ul-02">Dynamic DNS Update Leases</a>", Internet-Draft draft-sekar-dns-ul-02, August 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC7719">[RFC7719]</b></td>

@@ -28,7 +28,7 @@ author:
 
 --- abstract
 
-This document describes a method to dynamically map multicast DNS advertisements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner.
+This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner.
 
 --- middle
 
@@ -142,13 +142,11 @@ As another example, suppose there is a printer that is behind a locked door wher
 
 An Update proxy could have rulesets that define the translations it performs on the fly as is learns about matching services.
 
-# DNS update messages
+# DNS update
 
 While DNS Update is well supported in authoritative DNS servers, it typically requires some form of authentication for the server to accept the update. The most common form is TSIG {{!RFC2845}},{{!RFC4635}} which is based on a shared secret and a one way hash over the contents of the record.
 
 The Update proxy doesn't dictate a method of privacy or authentication for communication to an authoritative DNS Update server. However, implementations SHOULD ensure some form exists and even refuse to operate in an environment without some form of authentication.
-
-The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be handled correctly by the authoritative DNS Update server as directed in {{!RFC3007}}.
 
 ## Selection of authoritative unicast DNS server
 
@@ -184,15 +182,27 @@ Another method is to just attempt to insert the records in the authoritative ser
 
     Future: discuss how to handle ping-pong Zone authority records (SOA)
 
-## Cryptographically signed update messages
-
 # DNS authoritative server behavior
 
 ## DNSSEC compatibility
 
-## Lease lifetimes
+    Future: DNSSEC possible
 
-## Timeout resource records
+The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be handled correctly by the authoritative DNS Update server as directed in {{!RFC3007}}.
+
+## DNS Update record lifetimes
+
+When the Update proxy sends an DNS Update message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the Update server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.
+
+There are several possibilities for how a DNS Update server may limit the lifetime of records added via an update message.
+
+1. The DNS update server MAY be configured to automatically delete the records after a certain fixed time period (such as 24 hours). This is a failsafe mechanism in case the origin of the record data goes offline and does not ever try to remove the records.
+
+2. A single lease lifetime can be communicated via an OPT record as defined in Dynamic DNS Update Leases {{?I-D.sekar-dns-ul}}. This provides a timeout period for all of the records added in the update message and is controlled by the sender of the update. This is a work in progress and does not yet have widespread adoption among authoritative unicast DNS server software.
+
+3. Invidual DNS TIMEOUT resource records {{?I-D.pusateri-dnsop-update-timeout}} can be added to the update message to indicate the timeout value for one or any number of the resource records contained in the update message. This is the most flexible but also does not have any adoption among authoritative unicast DNS server software. One advantage of the TIMEOUT resource records is that they are stored in the authoritative server like any other record and synchronized to secondary servers as well. Therefore, if the primary server were to restart or experience an extended failure, the lease lifetime would not be lost.
+
+Note that it is possible to use both the Dynamic DNS Update leases to communicate the lease lifetime and for the authoritative unicast DNS server to create TIMEOUT resource records on demand to achieve the same result if the Update proxy does not include TIMEOUT resource records natively.
 
 # Comparison to Discovery Proxy
 
