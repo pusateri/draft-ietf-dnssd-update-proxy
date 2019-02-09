@@ -1,6 +1,6 @@
 ---
 title: DNS Update Proxy for mDNS
-docname: draft-ietf-dnssd-update-proxy-00
+docname: draft-pusateri-dnssd-update-proxy-00
 date: 2019
 ipr: trust200902
 area: Internet
@@ -204,11 +204,14 @@ There are several possibilities for how a DNS Update server may limit the lifeti
 
 Note that it is possible to use both the Dynamic DNS Update leases to communicate the lease lifetime and for the authoritative unicast DNS server to create TIMEOUT resource records on demand to achieve the same result if the Update proxy does not include TIMEOUT resource records natively.
 
+# Security Considerations
+
+    Future: Taking somewhat untrustworthy mDNS data and signing it and vouching for it
+
+--- back
+
 # Comparison to Discovery Proxy
 
 The Update Proxy defined in this document is an alternative to the Discovery Proxy {{?I-D.ietf-dnssd-hybrid}} and the Discovery Relay {{?I-D.ietf-dnssd-mdns-relay}}. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer substantial advantages at a cost of increased state.
 
 These advantages include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.
-
-
---- back

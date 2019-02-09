@@ -400,10 +400,11 @@
 <link href="#rfc.section.6" rel="Chapter" title="6 DNS authoritative server behavior">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 DNSSEC compatibility">
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 DNS Update record lifetimes">
-<link href="#rfc.section.7" rel="Chapter" title="7 Comparison to Discovery Proxy">
+<link href="#rfc.section.7" rel="Chapter" title="7 Security Considerations">
 <link href="#rfc.references" rel="Chapter" title="8 References">
 <link href="#rfc.references.1" rel="Chapter" title="8.1 Normative References">
 <link href="#rfc.references.2" rel="Chapter" title="8.2 Informative References">
+<link href="#rfc.appendix.A" rel="Chapter" title="A Comparison to Discovery Proxy">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -411,7 +412,7 @@
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Pusateri, T." />
-  <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-dnssd-update-proxy-00" />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-pusateri-dnssd-update-proxy-00" />
   <meta name="dct.issued" scheme="ISO8601" content="2019-09" />
   <meta name="dct.abstract" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
   <meta name="description" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
@@ -445,7 +446,7 @@
   </table>
 
   <p class="title">DNS Update Proxy for mDNS<br />
-  <span class="filename">draft-ietf-dnssd-update-proxy-00</span></p>
+  <span class="filename">draft-pusateri-dnssd-update-proxy-00</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
 <p>This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner.</p>
@@ -515,7 +516,7 @@
 </li>
 <li>6.2.   <a href="#rfc.section.6.2">DNS Update record lifetimes</a>
 </li>
-</ul><li>7.   <a href="#rfc.section.7">Comparison to Discovery Proxy</a>
+</ul><li>7.   <a href="#rfc.section.7">Security Considerations</a>
 </li>
 <li>8.   <a href="#rfc.references">References</a>
 </li>
@@ -523,7 +524,9 @@
 </li>
 <li>8.2.   <a href="#rfc.references.2">Informative References</a>
 </li>
-</ul><li><a href="#rfc.authors">Author's Address</a>
+</ul><li>Appendix A.   <a href="#rfc.appendix.A">Comparison to Discovery Proxy</a>
+</li>
+<li><a href="#rfc.authors">Author's Address</a>
 </li>
 
 
@@ -683,10 +686,11 @@ Future: DNSSEC possible
 </ol>
 <p id="rfc.section.6.2.p.4">Note that it is possible to use both the Dynamic DNS Update leases to communicate the lease lifetime and for the authoritative unicast DNS server to create TIMEOUT resource records on demand to achieve the same result if the Update proxy does not include TIMEOUT resource records natively.</p>
 <h1 id="rfc.section.7">
-<a href="#rfc.section.7">7.</a> <a href="#comparison-to-discovery-proxy" id="comparison-to-discovery-proxy">Comparison to Discovery Proxy</a>
+<a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.7.p.1">The Update Proxy defined in this document is an alternative to the Discovery Proxy <a href="#I-D.ietf-dnssd-hybrid" class="xref">[I-D.ietf-dnssd-hybrid]</a> and the Discovery Relay <a href="#I-D.ietf-dnssd-mdns-relay" class="xref">[I-D.ietf-dnssd-mdns-relay]</a>. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer substantial advantages at a cost of increased state.</p>
-<p id="rfc.section.7.p.2">These advantages include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.</p>
+<pre>
+Future: Taking somewhat untrustworthy mDNS data and signing it and vouching for it
+</pre>
 <h1 id="rfc.references">
 <a href="#rfc.references">8.</a> References</h1>
 <h1 id="rfc.references.1">
@@ -792,6 +796,11 @@ Future: DNSSEC possible
 <a>Hoffman, P.</a>, <a>Sullivan, A.</a> and <a>K. Fujiwara</a>, "<a href="https://tools.ietf.org/html/rfc7719">DNS Terminology</a>", RFC 7719, DOI 10.17487/RFC7719, December 2015.</td>
 </tr>
 </tbody></table>
+<h1 id="rfc.appendix.A">
+<a href="#rfc.appendix.A">Appendix A.</a> <a href="#comparison-to-discovery-proxy" id="comparison-to-discovery-proxy">Comparison to Discovery Proxy</a>
+</h1>
+<p id="rfc.section.A.p.1">The Update Proxy defined in this document is an alternative to the Discovery Proxy <a href="#I-D.ietf-dnssd-hybrid" class="xref">[I-D.ietf-dnssd-hybrid]</a> and the Discovery Relay <a href="#I-D.ietf-dnssd-mdns-relay" class="xref">[I-D.ietf-dnssd-mdns-relay]</a>. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer substantial advantages at a cost of increased state.</p>
+<p id="rfc.section.A.p.2">These advantages include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.</p>
 <h1 id="rfc.authors"><a href="#rfc.authors">Author's Address</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
