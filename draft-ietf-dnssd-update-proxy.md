@@ -164,11 +164,25 @@ The Update proxy should attempt to locate the authoritative DNS Update server fo
 
 ## DNS update sections
 
+To reduce ambiguity, each section of the DNS Update message is discussed below.
+
 ### Zone section
+
+When an Update proxy is adding or removing services to/from a subdomain, the zone section MUST contain a single zone (ZOCOUNT = 1) and the ZNAME MUST be the subdomain being updated. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the records being added/removed.
+
+Updates to multiple subdomains MUST be perfomed in separate DNS Update messages with one subdomain per message.
+
+If a new subdomain is being created for a domain by the Update proxy, the subdomain's parent zone should be used for the ZNAME. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the subdomain's NS record CLASS that is going to be added. Similarly for removing a subdomain.
 
 ### Prerequisite section
 
+It is not necessary for the Update proxy to include any prerequisites when adding/removing records. However, if the Update proxy wants to have better error handling, it can add prerequisites to ensure the state of the authoritative server is consistent.
+
+Given that multiple Update proxies may exist for the same IP subnet (and subdomain), it is possible that similar records may be added or deleted to/from the authoritative server before the Update proxy's own messages are processed. This is not to be considered a fatal error and may happen during normal operation of redundant proxies. The use of prerequisities can be used to identify these cases if desired.
+
 ### Update section
+
+The Update section contains all of the records that the proxy wants to be added/removed in a single subdomain. If TIMEOUT resource records are being manually added to the authoritative server, they MUST be included as regular resource records in the Update section. See {{lifetimes}} below for more information.
 
 ### Additional data section
 
@@ -190,7 +204,7 @@ Another method is to just attempt to insert the records in the authoritative ser
 
 The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be handled correctly by the authoritative DNS Update server as directed in {{!RFC3007}}.
 
-## DNS Update record lifetimes
+## DNS Update record lifetimes {#lifetimes}
 
 When the Update proxy sends an DNS Update message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the Update server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.
 
@@ -206,7 +220,7 @@ Note that it is possible to use both the Dynamic DNS Update leases to communicat
 
 # Security Considerations
 
-    Future: Taking somewhat untrustworthy mDNS data and signing it and vouching for it
+    Future: vouching for untrustworthy mDNS data and signing it
 
 --- back
 

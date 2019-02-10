@@ -413,7 +413,7 @@
 
   <meta name="dct.creator" content="Pusateri, T." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-pusateri-dnssd-update-proxy-00" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-09" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-10" />
   <meta name="dct.abstract" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
   <meta name="description" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
 
@@ -434,10 +434,10 @@
 </tr>
 <tr>
 <td class="left">Intended status: Standards Track</td>
-<td class="right">February 9, 2019</td>
+<td class="right">February 10, 2019</td>
 </tr>
 <tr>
-<td class="left">Expires: August 13, 2019</td>
+<td class="left">Expires: August 14, 2019</td>
 <td class="right"></td>
 </tr>
 
@@ -454,7 +454,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 13, 2019.</p>
+<p>This Internet-Draft will expire on August 14, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -640,15 +640,22 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#dns-update-sections" id="dns-update-sections">DNS update sections</a>
 </h1>
+<p id="rfc.section.5.2.p.1">To reduce ambiguity, each section of the DNS Update message is discussed below.</p>
 <h1 id="rfc.section.5.2.1">
 <a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#zone-section" id="zone-section">Zone section</a>
 </h1>
+<p id="rfc.section.5.2.1.p.1">When an Update proxy is adding or removing services to/from a subdomain, the zone section MUST contain a single zone (ZOCOUNT = 1) and the ZNAME MUST be the subdomain being updated. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the records being added/removed.</p>
+<p id="rfc.section.5.2.1.p.2">Updates to multiple subdomains MUST be perfomed in separate DNS Update messages with one subdomain per message.</p>
+<p id="rfc.section.5.2.1.p.3">If a new subdomain is being created for a domain by the Update proxy, the subdomain&#8217;s parent zone should be used for the ZNAME. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the subdomain&#8217;s NS record CLASS that is going to be added. Similarly for removing a subdomain.</p>
 <h1 id="rfc.section.5.2.2">
 <a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#prerequisite-section" id="prerequisite-section">Prerequisite section</a>
 </h1>
+<p id="rfc.section.5.2.2.p.1">It is not necessary for the Update proxy to include any prerequisites when adding/removing records. However, if the Update proxy wants to have better error handling, it can add prerequisites to ensure the state of the authoritative server is consistent.</p>
+<p id="rfc.section.5.2.2.p.2">Given that multiple Update proxies may exist for the same IP subnet (and subdomain), it is possible that similar records may be added or deleted to/from the authoritative server before the Update proxy&#8217;s own messages are processed. This is not to be considered a fatal error and may happen during normal operation of redundant proxies. The use of prerequisities can be used to identify these cases if desired.</p>
 <h1 id="rfc.section.5.2.3">
 <a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#update-section" id="update-section">Update section</a>
 </h1>
+<p id="rfc.section.5.2.3.p.1">The Update section contains all of the records that the proxy wants to be added/removed in a single subdomain. If TIMEOUT resource records are being manually added to the authoritative server, they MUST be included as regular resource records in the Update section. See <a href="#lifetimes" class="xref">Section 6.2</a> below for more information.</p>
 <h1 id="rfc.section.5.2.4">
 <a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#additional-data-section" id="additional-data-section">Additional data section</a>
 </h1>
@@ -673,7 +680,7 @@ Future: DNSSEC possible
 </pre>
 <p id="rfc.section.6.1.p.1">The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be handled correctly by the authoritative DNS Update server as directed in <a href="#RFC3007" class="xref">[RFC3007]</a>.</p>
 <h1 id="rfc.section.6.2">
-<a href="#rfc.section.6.2">6.2.</a> <a href="#dns-update-record-lifetimes" id="dns-update-record-lifetimes">DNS Update record lifetimes</a>
+<a href="#rfc.section.6.2">6.2.</a> <a href="#lifetimes" id="lifetimes">DNS Update record lifetimes</a>
 </h1>
 <p id="rfc.section.6.2.p.1">When the Update proxy sends an DNS Update message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the Update server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.</p>
 <p id="rfc.section.6.2.p.2">There are several possibilities for how a DNS Update server may limit the lifetime of records added via an update message.</p>
@@ -689,7 +696,7 @@ Future: DNSSEC possible
 <a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
 <pre>
-Future: Taking somewhat untrustworthy mDNS data and signing it and vouching for it
+Future: vouching for untrustworthy mDNS data and signing it
 </pre>
 <h1 id="rfc.references">
 <a href="#rfc.references">8.</a> References</h1>
