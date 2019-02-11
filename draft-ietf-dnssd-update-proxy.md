@@ -200,6 +200,10 @@ The Update proxy may include additional data as needed. Instances where addition
 
 The Update proxy will rely on the authoritative server to update the SERIAL number for the zone after each update is completed.
 
+## DNS Push Notifications
+
+An authoritative unicast DNS server MAY support DNS Push notifications {{?I-D.ietf-dnssd-push}} for client queries in order to provide more timely and more efficient responses. While this is outside of the scope of the Update proxy, it is mentioned here for completeness.
+
 ## DNSSEC compatibility
 
 With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and Updated in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.
@@ -225,6 +229,8 @@ Note that it is possible to use both the Dynamic DNS Update leases to communicat
 When a secure DNS Update is sent to an authoritative server, it should not be construed that this information is any more reliable than the original mDNS announcement was for which it was based. Care should always be taken when receiving mDNS announcements to ensure they are source IP address is one that belongs to an IP subnet on the received interface of the Update proxy. In addition, the TTL of the received link local announcement MUST be 1 to ensure it was not forwarded from a remote network.
 
 Each Update proxy requires configuration of a shared secret for creation of the TSIG signature resource record contained as the last record in the Update message.
+
+----
 
 --- back
 

@@ -397,8 +397,9 @@
 <link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Update section">
 <link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Additional data section">
 <link href="#rfc.section.6" rel="Chapter" title="6 DNS authoritative server behavior">
-<link href="#rfc.section.6.1" rel="Chapter" title="6.1 DNSSEC compatibility">
-<link href="#rfc.section.6.2" rel="Chapter" title="6.2 DNS Update record lifetimes">
+<link href="#rfc.section.6.1" rel="Chapter" title="6.1 DNS Push Notifications">
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 DNSSEC compatibility">
+<link href="#rfc.section.6.3" rel="Chapter" title="6.3 DNS Update record lifetimes">
 <link href="#rfc.section.7" rel="Chapter" title="7 Security Considerations">
 <link href="#rfc.references" rel="Chapter" title="8 References">
 <link href="#rfc.references.1" rel="Chapter" title="8.1 Normative References">
@@ -509,9 +510,11 @@
 </li>
 </ul></ul><li>6.   <a href="#rfc.section.6">DNS authoritative server behavior</a>
 </li>
-<ul><li>6.1.   <a href="#rfc.section.6.1">DNSSEC compatibility</a>
+<ul><li>6.1.   <a href="#rfc.section.6.1">DNS Push Notifications</a>
 </li>
-<li>6.2.   <a href="#rfc.section.6.2">DNS Update record lifetimes</a>
+<li>6.2.   <a href="#rfc.section.6.2">DNSSEC compatibility</a>
+</li>
+<li>6.3.   <a href="#rfc.section.6.3">DNS Update record lifetimes</a>
 </li>
 </ul><li>7.   <a href="#rfc.section.7">Security Considerations</a>
 </li>
@@ -653,7 +656,7 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 <h1 id="rfc.section.5.2.3">
 <a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#update-section" id="update-section">Update section</a>
 </h1>
-<p id="rfc.section.5.2.3.p.1">The Update section contains all of the records that the proxy wants to be added/removed in a single subdomain. If TIMEOUT resource records are being manually added to the authoritative server, they MUST be included as regular resource records in the Update section. See <a href="#lifetimes" class="xref">Section 6.2</a> below for more information.</p>
+<p id="rfc.section.5.2.3.p.1">The Update section contains all of the records that the proxy wants to be added/removed in a single subdomain. If TIMEOUT resource records are being manually added to the authoritative server, they MUST be included as regular resource records in the Update section. See <a href="#lifetimes" class="xref">Section 6.3</a> below for more information.</p>
 <h1 id="rfc.section.5.2.4">
 <a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#additional-data-section" id="additional-data-section">Additional data section</a>
 </h1>
@@ -662,7 +665,7 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 
 <ol>
 <li>When creating a subdomain by adding new NS records to a domain, <samp>A</samp> or <samp>AAAA</samp> glue records MAY be needed. Though, in most cases, the same authoritative server name / IP addresses should be used as in the parent domain.</li>
-<li>If including a lease lifetime as discussed below in <a href="#lifetimes" class="xref">Section 6.2</a>, the OPT recording containing the Update lease will be sent in the additional data section.</li>
+<li>If including a lease lifetime as discussed below in <a href="#lifetimes" class="xref">Section 6.3</a>, the OPT recording containing the Update lease will be sent in the additional data section.</li>
 <li>The TSIG cryptographic signature of the DNS Update message should be the last resource record in the additional data section.</li>
 </ol>
 <h1 id="rfc.section.6">
@@ -670,15 +673,19 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 </h1>
 <p id="rfc.section.6.p.1">The Update proxy will rely on the authoritative server to update the SERIAL number for the zone after each update is completed.</p>
 <h1 id="rfc.section.6.1">
-<a href="#rfc.section.6.1">6.1.</a> <a href="#dnssec-compatibility" id="dnssec-compatibility">DNSSEC compatibility</a>
+<a href="#rfc.section.6.1">6.1.</a> <a href="#dns-push-notifications" id="dns-push-notifications">DNS Push Notifications</a>
 </h1>
-<p id="rfc.section.6.1.p.1">With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and Updated in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.</p>
-<p id="rfc.section.6.1.p.2">The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be updated as needed as specified in <a href="#RFC3007" class="xref">[RFC3007]</a>.</p>
+<p id="rfc.section.6.1.p.1">An authoritative unicast DNS server MAY support DNS Push notifications <a href="#I-D.ietf-dnssd-push" class="xref">[I-D.ietf-dnssd-push]</a> for client queries in order to provide more timely and more efficient responses. While this is outside of the scope of the Update proxy, it is mentioned here for completeness.</p>
 <h1 id="rfc.section.6.2">
-<a href="#rfc.section.6.2">6.2.</a> <a href="#lifetimes" id="lifetimes">DNS Update record lifetimes</a>
+<a href="#rfc.section.6.2">6.2.</a> <a href="#dnssec-compatibility" id="dnssec-compatibility">DNSSEC compatibility</a>
 </h1>
-<p id="rfc.section.6.2.p.1">When the Update proxy sends an DNS Update message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the Update server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.</p>
-<p id="rfc.section.6.2.p.2">There are several possibilities for how a DNS Update server may limit the lifetime of records added via an update message.</p>
+<p id="rfc.section.6.2.p.1">With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and Updated in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.</p>
+<p id="rfc.section.6.2.p.2">The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be updated as needed as specified in <a href="#RFC3007" class="xref">[RFC3007]</a>.</p>
+<h1 id="rfc.section.6.3">
+<a href="#rfc.section.6.3">6.3.</a> <a href="#lifetimes" id="lifetimes">DNS Update record lifetimes</a>
+</h1>
+<p id="rfc.section.6.3.p.1">When the Update proxy sends an DNS Update message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the Update server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.</p>
+<p id="rfc.section.6.3.p.2">There are several possibilities for how a DNS Update server may limit the lifetime of records added via an update message.</p>
 <p></p>
 
 <ol>
@@ -686,12 +693,13 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 <li>A single lease lifetime can be communicated via an OPT record as defined in Dynamic DNS Update Leases <a href="#I-D.sekar-dns-ul" class="xref">[I-D.sekar-dns-ul]</a>. This provides a timeout period for all of the records added in the update message and is controlled by the sender of the update. This is a work in progress and does not yet have widespread adoption among authoritative unicast DNS server software.</li>
 <li>Invidual DNS TIMEOUT resource records <a href="#I-D.pusateri-dnsop-update-timeout" class="xref">[I-D.pusateri-dnsop-update-timeout]</a> can be added to the update message to indicate the timeout value for one or any number of the resource records contained in the update message. This is the most flexible but also does not have any adoption among authoritative unicast DNS server software. One advantage of the TIMEOUT resource records is that they are stored in the authoritative server like any other record and synchronized to secondary servers as well. Therefore, if the primary server were to restart or experience an extended failure, the lease lifetime would not be lost.</li>
 </ol>
-<p id="rfc.section.6.2.p.4">Note that it is possible to use both the Dynamic DNS Update leases to communicate the lease lifetime and for the authoritative unicast DNS server to create TIMEOUT resource records on demand to achieve the same result if the Update proxy does not include TIMEOUT resource records natively.</p>
+<p id="rfc.section.6.3.p.4">Note that it is possible to use both the Dynamic DNS Update leases to communicate the lease lifetime and for the authoritative unicast DNS server to create TIMEOUT resource records on demand to achieve the same result if the Update proxy does not include TIMEOUT resource records natively.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
 <p id="rfc.section.7.p.1">When a secure DNS Update is sent to an authoritative server, it should not be construed that this information is any more reliable than the original mDNS announcement was for which it was based. Care should always be taken when receiving mDNS announcements to ensure they are source IP address is one that belongs to an IP subnet on the received interface of the Update proxy. In addition, the TTL of the received link local announcement MUST be 1 to ensure it was not forwarded from a remote network.</p>
 <p id="rfc.section.7.p.2">Each Update proxy requires configuration of a shared secret for creation of the TSIG signature resource record contained as the last record in the Update message.</p>
+<p></p>
 <h1 id="rfc.references">
 <a href="#rfc.references">8.</a> References</h1>
 <h1 id="rfc.references.1">
