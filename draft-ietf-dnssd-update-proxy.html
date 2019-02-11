@@ -396,7 +396,6 @@
 <link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Prerequisite section">
 <link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Update section">
 <link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Additional data section">
-<link href="#rfc.section.5.3" rel="Chapter" title="5.3 Proxy redundancy (revisited)">
 <link href="#rfc.section.6" rel="Chapter" title="6 DNS authoritative server behavior">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 DNSSEC compatibility">
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 DNS Update record lifetimes">
@@ -508,9 +507,7 @@
 </li>
 <li>5.2.4.   <a href="#rfc.section.5.2.4">Additional data section</a>
 </li>
-</ul><li>5.3.   <a href="#rfc.section.5.3">Proxy redundancy (revisited)</a>
-</li>
-</ul><li>6.   <a href="#rfc.section.6">DNS authoritative server behavior</a>
+</ul></ul><li>6.   <a href="#rfc.section.6">DNS authoritative server behavior</a>
 </li>
 <ul><li>6.1.   <a href="#rfc.section.6.1">DNSSEC compatibility</a>
 </li>
@@ -612,7 +609,7 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 <a href="#rfc.section.4.7">4.7.</a> <a href="#proxy-redundancy" id="proxy-redundancy">Proxy redundancy</a>
 </h1>
 <p id="rfc.section.4.7.p.1">Providing redundant Update proxies for the same IP subnet can be easily achieved using the DNS Update protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.</p>
-<p id="rfc.section.4.7.p.2">Alternatives for ways to format DNS Update messages are defined below in <a href="#redundancy" class="xref">Section 5.3</a> where proxy redundancy is re-examined after discussing the sections in an DNS Update message.</p>
+<p id="rfc.section.4.7.p.2">Alternatives for ways to format DNS Update messages are defined below in <a href="#prereq" class="xref">Section 5.2.2</a> as to possible uses of the Prerequisite section for use with redundant Update proxies.</p>
 <h1 id="rfc.section.4.8">
 <a href="#rfc.section.4.8">4.8.</a> <a href="#service-filtering-and-translation" id="service-filtering-and-translation">Service filtering and translation</a>
 </h1>
@@ -648,7 +645,7 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 <p id="rfc.section.5.2.1.p.2">Updates to multiple subdomains MUST be perfomed in separate DNS Update messages with one subdomain per message.</p>
 <p id="rfc.section.5.2.1.p.3">If a new subdomain is being created for a domain by the Update proxy, the subdomain&#8217;s parent zone should be used for the ZNAME. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the subdomain&#8217;s NS record CLASS that is going to be added. Similarly for removing a subdomain.</p>
 <h1 id="rfc.section.5.2.2">
-<a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#prerequisite-section" id="prerequisite-section">Prerequisite section</a>
+<a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#prereq" id="prereq">Prerequisite section</a>
 </h1>
 <p id="rfc.section.5.2.2.p.1">It is not necessary for the Update proxy to include any prerequisites when adding/removing records. However, if the Update proxy wants to have better error handling, it can add prerequisites to ensure the state of the authoritative server is consistent.</p>
 <p id="rfc.section.5.2.2.p.2">Given that multiple Update proxies may exist for the same IP subnet (and subdomain), it is possible that similar records may be added or deleted to/from the authoritative server before the Update proxy&#8217;s own messages are processed. This is not to be considered a fatal error and may happen during normal operation of redundant proxies. The use of prerequisities can be used to identify these cases if desired.</p>
@@ -659,16 +656,14 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 <h1 id="rfc.section.5.2.4">
 <a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#additional-data-section" id="additional-data-section">Additional data section</a>
 </h1>
-<h1 id="rfc.section.5.3">
-<a href="#rfc.section.5.3">5.3.</a> <a href="#redundancy" id="redundancy">Proxy redundancy (revisited)</a>
-</h1>
-<p id="rfc.section.5.3.p.1">One method is to apply section 2.4 of <a href="#RFC2136" class="xref">[RFC2136]</a> which describes the Prerequisite section which can be used by redundant proxies to pre-qualify the updates. If another Update proxy has already submitted the Update, subsequent Updates can be ignored.</p>
-<p id="rfc.section.5.3.p.2">Another method is to just attempt to insert the records in the authoritative server.</p>
-<pre>
-Future: discuss deleting existing records and replacing them.
+<p id="rfc.section.5.2.4.p.1">The Update proxy may include additional data as needed. Instances where additional data might be included are:</p>
+<p></p>
 
-Future: discuss how to handle ping-pong Zone authority records (SOA)
-</pre>
+<ol>
+<li>When creating a subdomain by adding new NS records to a domain, <samp>A</samp> or <samp>AAAA</samp> glue records MAY be needed. Though, in most cases, the same authoritative server name / IP addresses should be used as in the parent domain.</li>
+<li>If including a lease lifetime as discussed below in <a href="#lifetimes" class="xref">Section 6.2</a>, the OPT recording containing the Update lease will be sent in the additional data section.</li>
+<li>The TSIG cryptographic signature of the DNS Update message should be the last resource record in the additional data section.</li>
+</ol>
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#dns-authoritative-server-behavior" id="dns-authoritative-server-behavior">DNS authoritative server behavior</a>
 </h1>
@@ -695,9 +690,8 @@ Future: DNSSEC possible
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<pre>
-Future: vouching for untrustworthy mDNS data and signing it
-</pre>
+<p id="rfc.section.7.p.1">When a secure DNS Update is sent to an authoritative server, it should not be construed that this information is any more reliable than the original mDNS announcement was for which it was based. Care should always be taken when receiving mDNS announcements to ensure they are source IP address is one that belongs to an IP subnet on the received interface of the Update proxy. In addition, the TTL of the received link local announcement MUST be 1 to ensure it was not forwarded from a remote network.</p>
+<p id="rfc.section.7.p.2">Each Update proxy requires configuration of a shared secret for creation of the TSIG signature resource record contained as the last record in the Update message.</p>
 <h1 id="rfc.references">
 <a href="#rfc.references">8.</a> References</h1>
 <h1 id="rfc.references.1">

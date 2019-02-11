@@ -130,7 +130,7 @@ If a SRV target resolves to addresses on multiple logical IP subnets of the same
 
 Providing redundant Update proxies for the same IP subnet can be easily achieved using the DNS Update protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.
 
-Alternatives for ways to format DNS Update messages are defined below in {{redundancy}} where proxy redundancy is re-examined after discussing the sections in an DNS Update message.
+Alternatives for ways to format DNS Update messages are defined below in {{prereq}} as to possible uses of the Prerequisite section for use with redundant Update proxies.
 
 ## Service filtering and translation
 
@@ -174,7 +174,7 @@ Updates to multiple subdomains MUST be perfomed in separate DNS Update messages 
 
 If a new subdomain is being created for a domain by the Update proxy, the subdomain's parent zone should be used for the ZNAME. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the subdomain's NS record CLASS that is going to be added. Similarly for removing a subdomain.
 
-### Prerequisite section
+### Prerequisite section {#prereq}
 
 It is not necessary for the Update proxy to include any prerequisites when adding/removing records. However, if the Update proxy wants to have better error handling, it can add prerequisites to ensure the state of the authoritative server is consistent.
 
@@ -186,15 +186,13 @@ The Update section contains all of the records that the proxy wants to be added/
 
 ### Additional data section
 
-## Proxy redundancy (revisited) {#redundancy}
+The Update proxy may include additional data as needed. Instances where additional data might be included are:
 
-One method is to apply section 2.4 of {{!RFC2136}} which describes the Prerequisite section which can be used by redundant proxies to pre-qualify the updates. If another Update proxy has already submitted the Update, subsequent Updates can be ignored.
+1. When creating a subdomain by adding new NS records to a domain, `A` or `AAAA` glue records MAY be needed. Though, in most cases, the same authoritative server name / IP addresses should be used as in the parent domain.
 
-Another method is to just attempt to insert the records in the authoritative server.
+2. If including a lease lifetime as discussed below in {{lifetimes}}, the OPT recording containing the Update lease will be sent in the additional data section.
 
-    Future: discuss deleting existing records and replacing them.
-
-    Future: discuss how to handle ping-pong Zone authority records (SOA)
+3. The TSIG cryptographic signature of the DNS Update message should be the last resource record in the additional data section.
 
 # DNS authoritative server behavior
 
@@ -220,7 +218,9 @@ Note that it is possible to use both the Dynamic DNS Update leases to communicat
 
 # Security Considerations
 
-    Future: vouching for untrustworthy mDNS data and signing it
+When a secure DNS Update is sent to an authoritative server, it should not be construed that this information is any more reliable than the original mDNS announcement was for which it was based. Care should always be taken when receiving mDNS announcements to ensure they are source IP address is one that belongs to an IP subnet on the received interface of the Update proxy. In addition, the TTL of the received link local announcement MUST be 1 to ensure it was not forwarded from a remote network.
+
+Each Update proxy requires configuration of a shared secret for creation of the TSIG signature resource record contained as the last record in the Update message.
 
 --- back
 

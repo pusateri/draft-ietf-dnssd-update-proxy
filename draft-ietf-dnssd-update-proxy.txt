@@ -85,7 +85,6 @@ Table of Contents
        5.2.2.  Prerequisite section  . . . . . . . . . . . . . . . .  10
        5.2.3.  Update section  . . . . . . . . . . . . . . . . . . .  10
        5.2.4.  Additional data section . . . . . . . . . . . . . . .  10
-     5.3.  Proxy redundancy (revisited)  . . . . . . . . . . . . . .  10
    6.  DNS authoritative server behavior . . . . . . . . . . . . . .  10
      6.1.  DNSSEC compatibility  . . . . . . . . . . . . . . . . . .  10
      6.2.  DNS Update record lifetimes . . . . . . . . . . . . . . .  11
@@ -106,6 +105,7 @@ Table of Contents
    Therefore, a solution is desired to contain legacy multicast DNS
    service discovery and transition to a unicast DNS service discovery
    model.  By mapping the current mDNS discovered services into regular
+
 
 
 
@@ -395,8 +395,8 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
    Alternatives for ways to format DNS Update messages are defined below
-   in Section 5.3 where proxy redundancy is re-examined after discussing
-   the sections in an DNS Update message.
+   in Section 5.2.2 as to possible uses of the Prerequisite section for
+   use with redundant Update proxies.
 
 4.8.  Service filtering and translation
 
@@ -531,19 +531,20 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 5.2.4.  Additional data section
 
-5.3.  Proxy redundancy (revisited)
+   The Update proxy may include additional data as needed.  Instances
+   where additional data might be included are:
 
-   One method is to apply section 2.4 of [RFC2136] which describes the
-   Prerequisite section which can be used by redundant proxies to pre-
-   qualify the updates.  If another Update proxy has already submitted
-   the Update, subsequent Updates can be ignored.
+   1.  When creating a subdomain by adding new NS records to a domain,
+       "A" or "AAAA" glue records MAY be needed.  Though, in most cases,
+       the same authoritative server name / IP addresses should be used
+       as in the parent domain.
 
-   Another method is to just attempt to insert the records in the
-   authoritative server.
+   2.  If including a lease lifetime as discussed below in Section 6.2,
+       the OPT recording containing the Update lease will be sent in the
+       additional data section.
 
-   Future: discuss deleting existing records and replacing them.
-
-   Future: discuss how to handle ping-pong Zone authority records (SOA)
+   3.  The TSIG cryptographic signature of the DNS Update message should
+       be the last resource record in the additional data section.
 
 6.  DNS authoritative server behavior
 
@@ -551,9 +552,8 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
    Future: DNSSEC possible
 
-   The Update proxy will assume that DNS updates sent to zones with
-   DNSSEC enabled will be handled correctly by the authoritative DNS
-   Update server as directed in [RFC3007].
+
+
 
 
 
@@ -561,6 +561,10 @@ Pusateri                 Expires August 14, 2019               [Page 10]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
+
+   The Update proxy will assume that DNS updates sent to zones with
+   DNSSEC enabled will be handled correctly by the authoritative DNS
+   Update server as directed in [RFC3007].
 
 6.2.  DNS Update record lifetimes
 
@@ -609,10 +613,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
 
-
-
-
-
 Pusateri                 Expires August 14, 2019               [Page 11]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
@@ -620,7 +620,18 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 7.  Security Considerations
 
-   Future: vouching for untrustworthy mDNS data and signing it
+   When a secure DNS Update is sent to an authoritative server, it
+   should not be construed that this information is any more reliable
+   than the original mDNS announcement was for which it was based.  Care
+   should always be taken when receiving mDNS announcements to ensure
+   they are source IP address is one that belongs to an IP subnet on the
+   received interface of the Update proxy.  In addition, the TTL of the
+   received link local announcement MUST be 1 to ensure it was not
+   forwarded from a remote network.
+
+   Each Update proxy requires configuration of a shared secret for
+   creation of the TSIG signature resource record contained as the last
+   record in the Update message.
 
 8.  References
 
@@ -654,6 +665,15 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               Update", RFC 3007, DOI 10.17487/RFC3007, November 2000,
               <https://www.rfc-editor.org/info/rfc3007>.
 
+
+
+
+
+Pusateri                 Expires August 14, 2019               [Page 12]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
    [RFC3596]  Thomson, S., Huitema, C., Ksinant, V., and M. Souissi,
               "DNS Extensions to Support IP Version 6", STD 88,
               RFC 3596, DOI 10.17487/RFC3596, October 2003,
@@ -663,16 +683,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               Configuration of IPv4 Link-Local Addresses", RFC 3927,
               DOI 10.17487/RFC3927, May 2005,
               <https://www.rfc-editor.org/info/rfc3927>.
-
-
-
-
-
-
-Pusateri                 Expires August 14, 2019               [Page 12]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
    [RFC4635]  Eastlake 3rd, D., "HMAC SHA (Hashed Message Authentication
               Code, Secure Hash Algorithm) TSIG Algorithm Identifiers",
@@ -713,6 +723,13 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               draft-ietf-dnssd-push-16 (work in progress), November
               2018.
 
+
+
+Pusateri                 Expires August 14, 2019               [Page 13]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
    [I-D.pusateri-dnsop-update-timeout]
               Pusateri, T. and T. Wattenberg, "DNS TIMEOUT Resource
               Record", draft-pusateri-dnsop-update-timeout-00 (work in
@@ -721,14 +738,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    [I-D.sekar-dns-ul]
               Cheshire, S. and T. Lemon, "Dynamic DNS Update Leases",
               draft-sekar-dns-ul-02 (work in progress), August 2018.
-
-
-
-
-Pusateri                 Expires August 14, 2019               [Page 13]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
    [RFC7719]  Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
@@ -756,15 +765,6 @@ Author's Address
 
    Phone: +1 (919) 867-1330
    Email: pusateri@bangj.com
-
-
-
-
-
-
-
-
-
 
 
 
