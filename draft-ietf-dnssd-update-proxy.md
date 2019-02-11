@@ -156,7 +156,7 @@ The Update proxy should attempt to locate the authoritative DNS Update server fo
 
 1. An Update proxy should first send an SRV query for _dns-update._udp.&lt;subdomain&gt;.&lt;domain&gt;. If an answer is received, the target and port number will provide the parameters needed for where to send updates.
 
-    Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been registered with IANA. However, this should not stop an Update proxy from atttempting to connect to an authoritative DNS server via TLS/TCP or plain TCP. In fact, an SRV query for the TLS variant is encouraged and if no answers are returned but answers are returned for the _udp version, attempting to connect to the same target and the reserved port (853) for DNS over TLS as defined in Section 3.1 of {{!RFC7858}} is encouraged for privacy reasons.
+    Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been registered with IANA. However, this should not stop an Update proxy from attempting to connect to an authoritative DNS server via TLS/TCP or plain TCP. In fact, an SRV query for the TLS variant is encouraged and if no answers are returned but answers are returned for the _udp version, attempting to connect to the same target and the reserved port (853) for DNS over TLS as defined in Section 3.1 of {{!RFC7858}} is encouraged for privacy reasons.
 
 2. If no SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.
 
@@ -172,7 +172,7 @@ A DNS Update message contains four sections as specified in {{!RFC2136}}.
 
 When an Update proxy is adding or removing services to/from a subdomain, the zone section MUST contain a single zone (ZOCOUNT = 1) and the ZNAME MUST be the subdomain being updated. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the records being added/removed.
 
-Updates to multiple subdomains MUST be perfomed in separate DNS Update messages with one subdomain per message.
+Updates to multiple subdomains MUST be performed in separate DNS Update messages with one subdomain per message.
 
 If a new subdomain is being created for a domain by the Update proxy, the subdomain's parent zone should be used for the ZNAME. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the subdomain's NS record CLASS that is going to be added. Similarly for removing a subdomain.
 
@@ -180,7 +180,7 @@ If a new subdomain is being created for a domain by the Update proxy, the subdom
 
 It is not necessary for the Update proxy to include any prerequisites when adding/removing records. However, if the Update proxy wants to have better error handling, it can add prerequisites to ensure the state of the authoritative server is consistent.
 
-Given that multiple Update proxies may exist for the same IP subnet (and subdomain), it is possible that similar records may be added or deleted to/from the authoritative server before the Update proxy's own messages are processed. This is not to be considered a fatal error and may happen during normal operation of redundant proxies. The use of prerequisities can be used to identify these cases if desired.
+Given that multiple Update proxies may exist for the same IP subnet (and subdomain), it is possible that similar records may be added or deleted to/from the authoritative server before the Update proxy's own messages are processed. This is not to be considered a fatal error and may happen during normal operation of redundant proxies. The use of prerequisite can be used to identify these cases if desired.
 
 ### Update section
 
@@ -220,7 +220,7 @@ There are several possibilities for how a DNS Update server may limit the lifeti
 
 2. A single lease lifetime can be communicated via an OPT record as defined in Dynamic DNS Update Leases {{?I-D.sekar-dns-ul}}. This provides a timeout period for all of the records added in the update message and is controlled by the sender of the update. This is a work in progress and does not yet have widespread adoption among authoritative unicast DNS server software.
 
-3. Invidual DNS TIMEOUT resource records {{?I-D.pusateri-dnsop-update-timeout}} can be added to the update message to indicate the timeout value for one or any number of the resource records contained in the update message. This is the most flexible but also does not have any adoption among authoritative unicast DNS server software. One advantage of the TIMEOUT resource records is that they are stored in the authoritative server like any other record and synchronized to secondary servers as well. Therefore, if the primary server were to restart or experience an extended failure, the lease lifetime would not be lost.
+3. Individual DNS TIMEOUT resource records {{?I-D.pusateri-dnsop-update-timeout}} can be added to the update message to indicate the timeout value for one or any number of the resource records contained in the update message. This is the most flexible but also does not have any adoption among authoritative unicast DNS server software. One advantage of the TIMEOUT resource records is that they are stored in the authoritative server like any other record and synchronized to secondary servers as well. Therefore, if the primary server were to restart or experience an extended failure, the lease lifetime would not be lost.
 
 Note that it is possible to use both the Dynamic DNS Update leases to communicate the lease lifetime and for the authoritative unicast DNS server to create TIMEOUT resource records on demand to achieve the same result if the Update proxy does not include TIMEOUT resource records natively.
 
@@ -238,6 +238,6 @@ Each Update proxy requires configuration of a shared secret for creation of the 
 
 The Update Proxy defined in this document is an alternative to the Discovery Proxy {{?I-D.ietf-dnssd-hybrid}} and the Discovery Relay {{?I-D.ietf-dnssd-mdns-relay}}. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer some advantages at a cost of increased state.
 
-The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshihg them, and then inserting them into subdomains using DNS Update.
+The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshing them, and then inserting them into subdomains using DNS Update.
 
 The main advantages of the Update proxy include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.

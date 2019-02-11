@@ -462,7 +462,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
        Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been
        registered with IANA.  However, this should not stop an Update
-       proxy from atttempting to connect to an authoritative DNS server
+       proxy from attempting to connect to an authoritative DNS server
        via TLS/TCP or plain TCP.  In fact, an SRV query for the TLS
        variant is encouraged and if no answers are returned but answers
        are returned for the _udp version, attempting to connect to the
@@ -496,7 +496,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    and the ZNAME MUST be the subdomain being updated.  ZTYPE MUST be SOA
    and ZCLASS MUST be the same class as the records being added/removed.
 
-   Updates to multiple subdomains MUST be perfomed in separate DNS
+   Updates to multiple subdomains MUST be performed in separate DNS
    Update messages with one subdomain per message.
 
 
@@ -523,7 +523,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    deleted to/from the authoritative server before the Update proxy's
    own messages are processed.  This is not to be considered a fatal
    error and may happen during normal operation of redundant proxies.
-   The use of prerequisities can be used to identify these cases if
+   The use of prerequisite can be used to identify these cases if
    desired.
 
 5.2.3.  Update section
@@ -622,7 +622,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
        This is a work in progress and does not yet have widespread
        adoption among authoritative unicast DNS server software.
 
-   3.  Invidual DNS TIMEOUT resource records
+   3.  Individual DNS TIMEOUT resource records
        [I-D.pusateri-dnsop-update-timeout] can be added to the update
        message to indicate the timeout value for one or any number of
        the resource records contained in the update message.  This is
@@ -798,7 +798,7 @@ Appendix A.  Comparison to Discovery Proxy
    matching services on demand by querying over mDNS and collecting the
    announcements in response to client queries.  Whereas the Update
    proxy tries to build a complete list of services by listening for all
-   announcements, discovering and refreshihg them, and then inserting
+   announcements, discovering and refreshing them, and then inserting
    them into subdomains using DNS Update.
 
    The main advantages of the Update proxy include limiting further
