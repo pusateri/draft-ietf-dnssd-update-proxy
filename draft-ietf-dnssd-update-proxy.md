@@ -92,11 +92,13 @@ As described in Section 8.4 of {{!RFC6762}}, a host may send "goodbye" announcem
 
 The Update proxy MUST also remove/expire old cache entries and remove the records from the authoritative unicast DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of {{!RFC6762}}.
 
-A host providing a service may automatically refresh the TTL in the announcement from time to time keeping the service valid based on subsequent multicast queries it receives. However, if no mDNS clients are requesting the particular service for the length of the TTL value, the service announcement could timeout naturally. In order to keep accurate information regarding all of the services on the IP subnet, the Update proxy SHOULD send a unicast PTR query for the service name directly to the service provider and set the Unicast bit in the query to receive a unicast response back. This query should be sent at a random time between 5 and 10 seconds before the TTL value indicates the announcement will expire.
+A host providing a service may automatically refresh the TTL in the announcement from time to time keeping the service valid based on subsequent multicast queries it receives. However, if no mDNS clients are requesting the particular service for the length of the TTL value, the service announcement could timeout naturally. In order to keep accurate information regarding all of the services on the IP subnet, the Update proxy SHOULD send a unicast PTR query for the service name directly to the host announcing the service. This query should be sent at a random time between 5 and 10 seconds before the TTL value indicates the announcement will expire.
 
 As described in Section 11 of {{!RFC6762}}, the Update proxy should use an IP source address of the IP subnet of the interface it is transmitting over and that is on the same IP subnet as the service provider. It is also permissible to use a link-local IP address in the IPv6 case as long as the service itself is available on an IPv6 address that is reachable from outside the local link.
 
-This was not the intended behavior of mDNS since local clients would just ask dynamically when they needed to know all of the providers of a service name but keeping this information up to date in the authoritative server provides benefits to remote clients such as faster response times and ability to use DNSSEC validation that were not previously possible with multicast DNS. These benefits are provided at the additional cost of a slight increase in network activity and processing time by the service providers. However, if the Update proxy uses unicast to query the service providers directly, other clients are not affected by these refresh queries and do not have to turn their radios on for queries/responses that they have no interest in.
+In order for the Update proxy to discover as many services available on each IP subnet as possible, it should periodically send a PTR multicast query for `_services._dns-sd._udp.local` on each subnet. The unicast response bit SHOULD be set in the query in order to force unicast responses to the Update proxy. As PTR responses are received, The Update proxy can then send Service Instance Enumeration PTR queries (also with the unicast response bit set) for each service.
+
+This was not the intended behavior of mDNS since local clients would just ask dynamically when they needed to know all of the providers of a service name but keeping this information up to date in the authoritative server provides benefits to remote clients such as faster response times and ability to use DNSSEC validation that were not previously possible with multicast DNS. These benefits are provided at the additional cost of a slight increase in network activity and processing time by the hosts announcing services. However, if the Update proxy uses unicast to query the service providers directly, other clients are not affected by these refresh queries and do not have to turn their radios on for queries/responses that they have no interest in.
 
 ## mDNS probing
 
@@ -164,7 +166,7 @@ The Update proxy should attempt to locate the authoritative DNS Update server fo
 
 ## DNS update sections
 
-To reduce ambiguity, each section of the DNS Update message is discussed below.
+A DNS Update message contains four sections as specified in {{!RFC2136}}.
 
 ### Zone section
 
@@ -196,11 +198,13 @@ The Update proxy may include additional data as needed. Instances where addition
 
 # DNS authoritative server behavior
 
+The Update proxy will rely on the authoritative server to update the SERIAL number for the zone after each update is completed.
+
 ## DNSSEC compatibility
 
-    Future: DNSSEC possible
+With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and Updated in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.
 
-The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be handled correctly by the authoritative DNS Update server as directed in {{!RFC3007}}.
+The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be updated as needed as specified in {{!RFC3007}}.
 
 ## DNS Update record lifetimes {#lifetimes}
 
@@ -226,6 +230,8 @@ Each Update proxy requires configuration of a shared secret for creation of the 
 
 # Comparison to Discovery Proxy
 
-The Update Proxy defined in this document is an alternative to the Discovery Proxy {{?I-D.ietf-dnssd-hybrid}} and the Discovery Relay {{?I-D.ietf-dnssd-mdns-relay}}. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer substantial advantages at a cost of increased state.
+The Update Proxy defined in this document is an alternative to the Discovery Proxy {{?I-D.ietf-dnssd-hybrid}} and the Discovery Relay {{?I-D.ietf-dnssd-mdns-relay}}. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer some advantages at a cost of increased state.
 
-These advantages include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.
+The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshihg them, and then inserting them into subdomains using DNS Update.
+
+The main advantages of the Update proxy include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.

@@ -4,8 +4,8 @@
 
 DNSSD Working Group                                          T. Pusateri
 Internet-Draft                                              Unaffiliated
-Intended status: Standards Track                       February 10, 2019
-Expires: August 14, 2019
+Intended status: Standards Track                       February 11, 2019
+Expires: August 15, 2019
 
 
                        DNS Update Proxy for mDNS
@@ -35,7 +35,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 14, 2019.
+   This Internet-Draft will expire on August 15, 2019.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Pusateri                 Expires August 14, 2019                [Page 1]
+Pusateri                 Expires August 15, 2019                [Page 1]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -73,27 +73,27 @@ Table of Contents
      4.1.  mDNS service announcements  . . . . . . . . . . . . . . .   5
      4.2.  Service caching and refresh . . . . . . . . . . . . . . .   5
      4.3.  mDNS probing  . . . . . . . . . . . . . . . . . . . . . .   6
-     4.4.  Link-local addressing . . . . . . . . . . . . . . . . . .   6
+     4.4.  Link-local addressing . . . . . . . . . . . . . . . . . .   7
      4.5.  IPv6 and IPv4 on same link  . . . . . . . . . . . . . . .   7
      4.6.  multiple logical IP subnets . . . . . . . . . . . . . . .   7
-     4.7.  Proxy redundancy  . . . . . . . . . . . . . . . . . . . .   7
+     4.7.  Proxy redundancy  . . . . . . . . . . . . . . . . . . . .   8
      4.8.  Service filtering and translation . . . . . . . . . . . .   8
    5.  DNS update  . . . . . . . . . . . . . . . . . . . . . . . . .   8
-     5.1.  Selection of authoritative unicast DNS server . . . . . .   8
+     5.1.  Selection of authoritative unicast DNS server . . . . . .   9
      5.2.  DNS update sections . . . . . . . . . . . . . . . . . . .   9
        5.2.1.  Zone section  . . . . . . . . . . . . . . . . . . . .   9
        5.2.2.  Prerequisite section  . . . . . . . . . . . . . . . .  10
        5.2.3.  Update section  . . . . . . . . . . . . . . . . . . .  10
        5.2.4.  Additional data section . . . . . . . . . . . . . . .  10
-   6.  DNS authoritative server behavior . . . . . . . . . . . . . .  10
-     6.1.  DNSSEC compatibility  . . . . . . . . . . . . . . . . . .  10
+   6.  DNS authoritative server behavior . . . . . . . . . . . . . .  11
+     6.1.  DNSSEC compatibility  . . . . . . . . . . . . . . . . . .  11
      6.2.  DNS Update record lifetimes . . . . . . . . . . . . . . .  11
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .  12
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .  13
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .  14
    Appendix A.  Comparison to Discovery Proxy  . . . . . . . . . . .  14
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
 
 1.  Introduction
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Pusateri                 Expires August 14, 2019                [Page 2]
+Pusateri                 Expires August 15, 2019                [Page 2]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -165,7 +165,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
 
-Pusateri                 Expires August 14, 2019                [Page 3]
+Pusateri                 Expires August 15, 2019                [Page 3]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -221,7 +221,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
 
-Pusateri                 Expires August 14, 2019                [Page 4]
+Pusateri                 Expires August 15, 2019                [Page 4]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -277,7 +277,7 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
 
-Pusateri                 Expires August 14, 2019                [Page 5]
+Pusateri                 Expires August 15, 2019                [Page 5]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
@@ -289,10 +289,9 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    TTL value, the service announcement could timeout naturally.  In
    order to keep accurate information regarding all of the services on
    the IP subnet, the Update proxy SHOULD send a unicast PTR query for
-   the service name directly to the service provider and set the Unicast
-   bit in the query to receive a unicast response back.  This query
-   should be sent at a random time between 5 and 10 seconds before the
-   TTL value indicates the announcement will expire.
+   the service name directly to the host announcing the service.  This
+   query should be sent at a random time between 5 and 10 seconds before
+   the TTL value indicates the announcement will expire.
 
    As described in Section 11 of [RFC6762], the Update proxy should use
    an IP source address of the IP subnet of the interface it is
@@ -301,6 +300,15 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    the IPv6 case as long as the service itself is available on an IPv6
    address that is reachable from outside the local link.
 
+   In order for the Update proxy to discover as many services available
+   on each IP subnet as possible, it should periodically send a PTR
+   multicast query for "_services._dns-sd._udp.local" on each subnet.
+   The unicast response bit SHOULD be set in the query in order to force
+   unicast responses to the Update proxy.  As PTR responses are
+   received, The Update proxy can then send Service Instance Enumeration
+   PTR queries (also with the unicast response bit set) for each
+   service.
+
    This was not the intended behavior of mDNS since local clients would
    just ask dynamically when they needed to know all of the providers of
    a service name but keeping this information up to date in the
@@ -308,11 +316,11 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    faster response times and ability to use DNSSEC validation that were
    not previously possible with multicast DNS.  These benefits are
    provided at the additional cost of a slight increase in network
-   activity and processing time by the service providers.  However, if
-   the Update proxy uses unicast to query the service providers
-   directly, other clients are not affected by these refresh queries and
-   do not have to turn their radios on for queries/responses that they
-   have no interest in.
+   activity and processing time by the hosts announcing services.
+   However, if the Update proxy uses unicast to query the service
+   providers directly, other clients are not affected by these refresh
+   queries and do not have to turn their radios on for queries/responses
+   that they have no interest in.
 
 4.3.  mDNS probing
 
@@ -322,6 +330,14 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    announcements of services.  Therefore, an Update proxy MUST NOT rely
    on information in any section of DNS query messages.
 
+
+
+
+Pusateri                 Expires August 15, 2019                [Page 6]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
 4.4.  Link-local addressing
 
    In the IPv6 case, the source address of the announcements is a link-
@@ -329,15 +345,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    that the service is being provided on.  However, it is certainly
    possible that link-local addressing is used with IPv4 as well.  This
    is not as common but exists in a zero-conf environment where no IPv4
-
-
-
-
-Pusateri                 Expires August 14, 2019                [Page 6]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
-
    addresses are assigned via DHCP or statically and the hosts revert to
    link-local IPv4 addresses (169.254/16), see [RFC3927].
 
@@ -380,19 +387,19 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    of the same interface, the service can be included in multiple
    subdomains on the appropriate server(s) for those subdomains.
 
+
+
+Pusateri                 Expires August 15, 2019                [Page 7]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
 4.7.  Proxy redundancy
 
    Providing redundant Update proxies for the same IP subnet can be
    easily achieved using the DNS Update protocol.  None of the redundant
    proxies needs to be aware of any of the other redundant proxies on an
    IP subnet.
-
-
-
-Pusateri                 Expires August 14, 2019                [Page 7]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
    Alternatives for ways to format DNS Update messages are defined below
    in Section 5.2.2 as to possible uses of the Prerequisite section for
@@ -432,6 +439,17 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    even refuse to operate in an environment without some form of
    authentication.
 
+
+
+
+
+
+
+Pusateri                 Expires August 15, 2019                [Page 8]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
 5.1.  Selection of authoritative unicast DNS server
 
    The Update proxy should attempt to locate the authoritative DNS
@@ -441,14 +459,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
        update._udp.<subdomain>.<domain>.  If an answer is received, the
        target and port number will provide the parameters needed for
        where to send updates.
-
-
-
-
-Pusateri                 Expires August 14, 2019                [Page 8]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
        Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been
        registered with IANA.  However, this should not stop an Update
@@ -476,8 +486,8 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 5.2.  DNS update sections
 
-   To reduce ambiguity, each section of the DNS Update message is
-   discussed below.
+   A DNS Update message contains four sections as specified in
+   [RFC2136].
 
 5.2.1.  Zone section
 
@@ -489,22 +499,17 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    Updates to multiple subdomains MUST be perfomed in separate DNS
    Update messages with one subdomain per message.
 
+
+
+Pusateri                 Expires August 15, 2019                [Page 9]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
    If a new subdomain is being created for a domain by the Update proxy,
    the subdomain's parent zone should be used for the ZNAME.  ZTYPE MUST
    be SOA and ZCLASS MUST be the same class as the subdomain's NS record
    CLASS that is going to be added.  Similarly for removing a subdomain.
-
-
-
-
-
-
-
-
-Pusateri                 Expires August 14, 2019                [Page 9]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
 5.2.2.  Prerequisite section
 
@@ -546,25 +551,34 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    3.  The TSIG cryptographic signature of the DNS Update message should
        be the last resource record in the additional data section.
 
-6.  DNS authoritative server behavior
-
-6.1.  DNSSEC compatibility
-
-   Future: DNSSEC possible
 
 
 
 
 
 
-Pusateri                 Expires August 14, 2019               [Page 10]
+Pusateri                 Expires August 15, 2019               [Page 10]
 
 Internet-Draft          DNS Update Proxy for mDNS          February 2019
 
 
+6.  DNS authoritative server behavior
+
+   The Update proxy will rely on the authoritative server to update the
+   SERIAL number for the zone after each update is completed.
+
+6.1.  DNSSEC compatibility
+
+   With mDNS, the next domain name field in an NSEC record could not
+   reference the next record in the zone because it was not possible to
+   know all of the records in the zone.  By mapping all known records
+   into a unicast subdomain, the NSEC next domain name field can contain
+   the next known record as defined.  As new services are discovered and
+   Updated in the authoritative unicast DNS server, the NSEC records can
+   be kept up to date by the authoritative server.
+
    The Update proxy will assume that DNS updates sent to zones with
-   DNSSEC enabled will be handled correctly by the authoritative DNS
-   Update server as directed in [RFC3007].
+   DNSSEC enabled will be updated as needed as specified in [RFC3007].
 
 6.2.  DNS Update record lifetimes
 
@@ -596,6 +610,14 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
        [I-D.pusateri-dnsop-update-timeout] can be added to the update
        message to indicate the timeout value for one or any number of
        the resource records contained in the update message.  This is
+
+
+
+Pusateri                 Expires August 15, 2019               [Page 11]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
        the most flexible but also does not have any adoption among
        authoritative unicast DNS server software.  One advantage of the
        TIMEOUT resource records is that they are stored in the
@@ -609,14 +631,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    server to create TIMEOUT resource records on demand to achieve the
    same result if the Update proxy does not include TIMEOUT resource
    records natively.
-
-
-
-
-Pusateri                 Expires August 14, 2019               [Page 11]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
 7.  Security Considerations
 
@@ -651,6 +665,15 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               RFC 2136, DOI 10.17487/RFC2136, April 1997,
               <https://www.rfc-editor.org/info/rfc2136>.
 
+
+
+
+
+Pusateri                 Expires August 15, 2019               [Page 12]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
    [RFC2782]  Gulbrandsen, A., Vixie, P., and L. Esibov, "A DNS RR for
               specifying the location of services (DNS SRV)", RFC 2782,
               DOI 10.17487/RFC2782, February 2000,
@@ -664,15 +687,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
    [RFC3007]  Wellington, B., "Secure Domain Name System (DNS) Dynamic
               Update", RFC 3007, DOI 10.17487/RFC3007, November 2000,
               <https://www.rfc-editor.org/info/rfc3007>.
-
-
-
-
-
-Pusateri                 Expires August 14, 2019               [Page 12]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
    [RFC3596]  Thomson, S., Huitema, C., Ksinant, V., and M. Souissi,
               "DNS Extensions to Support IP Version 6", STD 88,
@@ -706,6 +720,16 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
+
+
+
+
+
+Pusateri                 Expires August 15, 2019               [Page 13]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
 8.2.  Informative References
 
    [I-D.ietf-dnssd-hybrid]
@@ -722,13 +746,6 @@ Internet-Draft          DNS Update Proxy for mDNS          February 2019
               Pusateri, T. and S. Cheshire, "DNS Push Notifications",
               draft-ietf-dnssd-push-16 (work in progress), November
               2018.
-
-
-
-Pusateri                 Expires August 14, 2019               [Page 13]
-
-Internet-Draft          DNS Update Proxy for mDNS          February 2019
-
 
    [I-D.pusateri-dnsop-update-timeout]
               Pusateri, T. and T. Wattenberg, "DNS TIMEOUT Resource
@@ -748,13 +765,29 @@ Appendix A.  Comparison to Discovery Proxy
    The Update Proxy defined in this document is an alternative to the
    Discovery Proxy [I-D.ietf-dnssd-hybrid] and the Discovery Relay
    [I-D.ietf-dnssd-mdns-relay].  This solution makes different trade-
-   offs than the ones made by the Discovery Proxy which offer
-   substantial advantages at a cost of increased state.
+   offs than the ones made by the Discovery Proxy which offer some
+   advantages at a cost of increased state.
 
-   These advantages include limiting further propagation of IP multicast
-   across the campus, providing a pathway to eliminate multicast
-   entirely, faster response time to client queries, and the ability to
-   provide DNSSEC signed security responses for client queries.
+   The main difference is that the Discovery Proxy builds the list of
+   matching services on demand by querying over mDNS and collecting the
+   announcements in response to client queries.  Whereas the Update
+   proxy tries to build a complete list of services by listening for all
+   announcements, discovering and refreshihg them, and then inserting
+   them into subdomains using DNS Update.
+
+   The main advantages of the Update proxy include limiting further
+   propagation of IP multicast across the campus, providing a pathway to
+   eliminate multicast entirely, faster response time to client queries,
+
+
+
+Pusateri                 Expires August 15, 2019               [Page 14]
+
+Internet-Draft          DNS Update Proxy for mDNS          February 2019
+
+
+   and the ability to provide DNSSEC signed security responses for
+   client queries.
 
 Author's Address
 
@@ -781,4 +814,27 @@ Author's Address
 
 
 
-Pusateri                 Expires August 14, 2019               [Page 14]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pusateri                 Expires August 15, 2019               [Page 15]
