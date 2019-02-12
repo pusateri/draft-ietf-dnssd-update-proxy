@@ -36,9 +36,11 @@ This document describes a method to dynamically map multicast DNS announcements 
 
 Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn't designed to traverse across multi-subnet campus networks. Second, IP multicast doesn't work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular authoritative unicast DNS servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.
 
-There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages {{!RFC2136}} directly to an authoritative unicast DNS server. While it is possible for each service advertiser to send it's own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.
+There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages {{!RFC2136}} directly to an authoritative unicast DNS server. While it is possible for each host providing a service to send it's own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.
 
 This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update Proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.
+
+An Update proxy is an ideal service to run on routers and/or switches to map local services into a larger network infrastructure.
 
 # Requirements Language
 
@@ -52,9 +54,25 @@ Each .local domain which logically maps to an IP subnet is modeled as a separate
 
 The browseable subdomain label is prepended to the domain name and separated by a period. See {{?RFC7719}} for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency among redundant proxies:
 
-1. PTR query for IP subnet through local resolver
+1. address-derived domain enumeration through local resolver
 
-    As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the proxy would issue a PTR query for 0.113.0.203.in-addr.arpa. If a response is returned with an answer, then the name in the answer should be the subdomain name including the domain name for the network.
+    The proxy issues a PTR query for the registration or browse domains based on IP subnet. Since the Update proxy will be registering services with DNS Update, it should begin querying for registration domains and fallback to browse domains if no registration domains are configured.
+
+    As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the base domain name to query would be established as 0.113.0.203.in-addr.arpa. The proxy would issue a PTR query for the following names in order to find the subdomain for the IP subnet:
+
+    `dr._dns-sd._udp.0.113.0.203.in-addr.arpa.`
+    
+    `r._dns-sd._udp.0.113.0.203.in-addr.arpa.`
+    
+    `db._dns-sd._udp.0.113.0.203.in-addr.arpa.`
+    
+    `b._dns-sd._udp.0.113.0.203.in-addr.arpa.`
+    
+    `lb._dns-sd._udp.0.113.0.203.in-addr.arpa.`
+
+    The first response with an answer should be the subdomain name including the domain name for the network and this process should be stopped. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.
+
+    The Update proxy should periodically rediscover the subdomain name at approximately 5 minutes intervals for each IP subnet adding appropriate random jitter across IP subnets so as to prevent synchronization.
 
 2. proxy local configuration override
 
@@ -73,6 +91,8 @@ There is not a direct query to discover a separate domain name but the domain na
 ## Client service discovery
 
 Fortunately, clients performing service discovery require no changes in order to work with the Update proxy. Existing clients already support wide-area bonjour which specifies how to query search domains and subdomains for services. See section 11 of {{!RFC6763}}.
+
+However, in order for clients to discover the subdomain for each IP subnet, the subdomain MUST be browseable and a browse record for the domain must enumerate all of the subdomains. If the domain records do not exist, the Update proxy MUST create them in the domain and must ensure each subdomain is browseable.
 
 In the future, authoritative unicast DNS servers may add support for DNS Push Notifications {{?I-D.ietf-dnssd-push}} which would allow clients to maintain long lived subscriptions to services. Clients may also wish to add support for this feature to provide an efficient alternative to polling.
 
@@ -241,3 +261,6 @@ The Update Proxy defined in this document is an alternative to the Discovery Pro
 The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshing them, and then inserting them into subdomains using DNS Update.
 
 The main advantages of the Update proxy include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.
+
+Another key difference is that the Update proxy never becomes an authoritative unicast DNS server for the attached subdomain. It simply updates the existing authoritative server for the domain. Therefore, the administrator is free to use existing authoritative DNS server infrastructure.
+

@@ -413,7 +413,7 @@
 
   <meta name="dct.creator" content="Pusateri, T." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-pusateri-dnssd-update-proxy-00" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-11" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-12" />
   <meta name="dct.abstract" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
   <meta name="description" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
 
@@ -434,10 +434,10 @@
 </tr>
 <tr>
 <td class="left">Intended status: Standards Track</td>
-<td class="right">February 11, 2019</td>
+<td class="right">February 12, 2019</td>
 </tr>
 <tr>
-<td class="left">Expires: August 15, 2019</td>
+<td class="left">Expires: August 16, 2019</td>
 <td class="right"></td>
 </tr>
 
@@ -454,7 +454,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 15, 2019.</p>
+<p>This Internet-Draft will expire on August 16, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -536,8 +536,9 @@
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
 <p id="rfc.section.1.p.1">Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn&#8217;t designed to traverse across multi-subnet campus networks. Second, IP multicast doesn&#8217;t work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular authoritative unicast DNS servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.</p>
-<p id="rfc.section.1.p.2">There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages <a href="#RFC2136" class="xref">[RFC2136]</a> directly to an authoritative unicast DNS server. While it is possible for each service advertiser to send it&#8217;s own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.</p>
+<p id="rfc.section.1.p.2">There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages <a href="#RFC2136" class="xref">[RFC2136]</a> directly to an authoritative unicast DNS server. While it is possible for each host providing a service to send it&#8217;s own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.</p>
 <p id="rfc.section.1.p.3">This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update Proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.</p>
+<p id="rfc.section.1.p.4">An Update proxy is an ideal service to run on routers and/or switches to map local services into a larger network infrastructure.</p>
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#requirements-language" id="requirements-language">Requirements Language</a>
 </h1>
@@ -553,7 +554,7 @@
 <p></p>
 
 <ol>
-<li>PTR query for IP subnet through local resolver  <br><br> As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the proxy would issue a PTR query for 0.113.0.203.in-addr.arpa. If a response is returned with an answer, then the name in the answer should be the subdomain name including the domain name for the network.</li>
+<li>address-derived domain enumeration through local resolver  <br><br> The proxy issues a PTR query for the registration or browse domains based on IP subnet. Since the Update proxy will be registering services with DNS Update, it should begin querying for registration domains and fallback to browse domains if no registration domains are configured.  <br><br> As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the base domain name to query would be established as 0.113.0.203.in-addr.arpa. The proxy would issue a PTR query for the following names in order to find the subdomain for the IP subnet:  <br><br> <samp>dr._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> <samp>r._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> <samp>db._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> <samp>b._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> <samp>lb._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> The first response with an answer should be the subdomain name including the domain name for the network and this process should be stopped. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.  <br><br> The Update proxy should periodically rediscover the subdomain name at approximately 5 minutes intervals for each IP subnet adding appropriate random jitter across IP subnets so as to prevent synchronization.</li>
 <li>proxy local configuration override  <br><br> If no answer is returned, the proxy may have local configuration containing a subdomain name for the network. If so, this subdomain should be used.</li>
 <li>algorithmic subdomain label generation  <br><br> If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to hexadecimal. This will give a 8 character unique string to use as a subdomain label.</li>
 </ol>
@@ -566,7 +567,8 @@
 <a href="#rfc.section.3.3">3.3.</a> <a href="#client-service-discovery" id="client-service-discovery">Client service discovery</a>
 </h1>
 <p id="rfc.section.3.3.p.1">Fortunately, clients performing service discovery require no changes in order to work with the Update proxy. Existing clients already support wide-area bonjour which specifies how to query search domains and subdomains for services. See section 11 of <a href="#RFC6763" class="xref">[RFC6763]</a>.</p>
-<p id="rfc.section.3.3.p.2">In the future, authoritative unicast DNS servers may add support for DNS Push Notifications <a href="#I-D.ietf-dnssd-push" class="xref">[I-D.ietf-dnssd-push]</a> which would allow clients to maintain long lived subscriptions to services. Clients may also wish to add support for this feature to provide an efficient alternative to polling.</p>
+<p id="rfc.section.3.3.p.2">However, in order for clients to discover the subdomain for each IP subnet, the subdomain MUST be browseable and a browse record for the domain must enumerate all of the subdomains. If the domain records do not exist, the Update proxy MUST create them in the domain and must ensure each subdomain is browseable.</p>
+<p id="rfc.section.3.3.p.3">In the future, authoritative unicast DNS servers may add support for DNS Push Notifications <a href="#I-D.ietf-dnssd-push" class="xref">[I-D.ietf-dnssd-push]</a> which would allow clients to maintain long lived subscriptions to services. Clients may also wish to add support for this feature to provide an efficient alternative to polling.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#update-proxy-behavior" id="update-proxy-behavior">Update proxy behavior</a>
 </h1>
@@ -811,6 +813,7 @@ Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
 <p id="rfc.section.A.p.1">The Update Proxy defined in this document is an alternative to the Discovery Proxy <a href="#I-D.ietf-dnssd-hybrid" class="xref">[I-D.ietf-dnssd-hybrid]</a> and the Discovery Relay <a href="#I-D.ietf-dnssd-mdns-relay" class="xref">[I-D.ietf-dnssd-mdns-relay]</a>. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer some advantages at a cost of increased state.</p>
 <p id="rfc.section.A.p.2">The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshing them, and then inserting them into subdomains using DNS Update.</p>
 <p id="rfc.section.A.p.3">The main advantages of the Update proxy include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.</p>
+<p id="rfc.section.A.p.4">Another key difference is that the Update proxy never becomes an authoritative unicast DNS server for the attached subdomain. It simply updates the existing authoritative server for the domain. Therefore, the administrator is free to use existing authoritative DNS server infrastructure.</p>
 <h1 id="rfc.authors"><a href="#rfc.authors">Author's Address</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
