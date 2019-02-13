@@ -48,7 +48,7 @@ An Update proxy is an ideal service to run on routers and/or switches to map loc
 
 # DNS subdomain model
 
-Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browsable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of {{!RFC6763}} for more details about browsing. These subdomains are typically special use subdomains for mDNS mappings.
+Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browsable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of {{!RFC6763}} for more details about browsing. In the context of the Update proxy, these subdomains are typically special use subdomains for mDNS mappings.
 
 ## Subdomain naming {#subdomain}
 
@@ -56,9 +56,9 @@ The browseable subdomain label is prepended to the domain name and separated by 
 
 1. address-derived domain enumeration through local resolver
 
-    The proxy issues a PTR query for the registration or browse domains based on IP subnet. Since the Update proxy will be registering services with DNS Update, it should begin querying for registration domains and fallback to browse domains if no registration domains are configured.
+    The proxy issues a PTR query for the registration or browse domains based on the IP subnet. Separate queries are performed for IPv4 and IPv6 on the same link since they are different IP subnets. Since the Update proxy will be registering services with DNS Update, it should begin querying for registration domains and fallback to browse domains if no registration domains are configured.
 
-    As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the base domain name to query would be established as 0.113.0.203.in-addr.arpa. The proxy would issue a PTR query for the following names in order to find the subdomain for the IP subnet:
+    As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the base domain name to query would be derived as 0.113.0.203.in-addr.arpa. The proxy would issue a PTR query for the following names in order to find the subdomain for the IP subnet:
 
     `dr._dns-sd._udp.0.113.0.203.in-addr.arpa.`
     
@@ -70,9 +70,9 @@ The browseable subdomain label is prepended to the domain name and separated by 
     
     `lb._dns-sd._udp.0.113.0.203.in-addr.arpa.`
 
-    The first response with an answer should be the subdomain name including the domain name for the network and this process should be stopped. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.
+    The first response with an answer should be the subdomain name including the domain name for the network and further queries through this list are not needed. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.
 
-    The Update proxy should periodically rediscover the subdomain name at approximately 5 minutes intervals for each IP subnet adding appropriate random jitter across IP subnets so as to prevent synchronization.
+    The Update proxy should periodically rediscover the subdomain name at approximately 5 minute intervals for each IP subnet adding appropriate random jitter across IP subnets so as to prevent synchronization.
 
 2. proxy local configuration override
 
@@ -80,7 +80,7 @@ The browseable subdomain label is prepended to the domain name and separated by 
 
 3. algorithmic subdomain label generation
 
-    If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to hexadecimal. This will give a 8 character unique string to use as a subdomain label.
+    If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to a hexadecimal string. This will give a 8 character unique string to use as a subdomain label. For the example above, this label would be cb007100.
 
 ## Domain name discovery
 
@@ -92,7 +92,7 @@ There is not a direct query to discover a separate domain name but the domain na
 
 Fortunately, clients performing service discovery require no changes in order to work with the Update proxy. Existing clients already support wide-area bonjour which specifies how to query search domains and subdomains for services. See section 11 of {{!RFC6763}}.
 
-However, in order for clients to discover the subdomain for each IP subnet, the subdomain MUST be browseable and a browse record for the domain must enumerate all of the subdomains. If the domain records do not exist, the Update proxy MUST create them in the domain and must ensure each subdomain is browseable.
+However, in order for clients to discover the subdomain for each IP subnet, the subdomain MUST be browseable and a browse record for the domain must enumerate all of the subdomains. If the domain records do not exist, the Update proxy MUST create them in the domain and MUST ensure each subdomain is browseable.
 
 In the future, authoritative unicast DNS servers may add support for DNS Push Notifications {{?I-D.ietf-dnssd-push}} which would allow clients to maintain long lived subscriptions to services. Clients may also wish to add support for this feature to provide an efficient alternative to polling.
 
@@ -106,7 +106,7 @@ The Update proxy should listen to mDNS service announcements (responses) on all 
 
 ## Service caching and refresh
 
-As specified in Section 8.3 of {{!RFC6762}} service announcements are sent multiple times for redundancy. However, there is no need to send duplicate Update messages to the authoritative unicast DNS server. Therefore, the Update proxy should cache service announcements and only send DNS Update messages when needed.
+As specified in Section 8.3 of {{!RFC6762}}, service announcements are sent multiple times for redundancy. However, there is no need to send duplicate Update messages to the authoritative unicast DNS server. Therefore, the Update proxy should cache service announcements and only send DNS Update messages when needed.
 
 As described in Section 8.4 of {{!RFC6762}}, a host may send "goodbye" announcements by setting the TTL to 0. In this case, the record MUST be removed from the cache or otherwise marked as expired and a DNS Update should be sent to the authoritative unicast DNS server removing the record.
 
@@ -138,11 +138,9 @@ Announced services may be available on IPv4, IPv6, or both on the same link. If 
 
 In some cases, this won't be possible. This will not incur any extra delays if clients attempt connections over both IPv4 and IPv6 protocols simultaneously but if one protocol is preferred over another, delays may occur.
 
-    Future: Discuss NSEC for non-existence of AAAA RFC6762 Appendix E
-
 ## multiple logical IP subnets
 
-Multiple IP subnets on the same link are just a more general case of IPv4 and IPv6 on the same link. When multiple IP subnets exist for the same protocol on the same link, they appear as separate interfaces to the Update proxy and require a separate subdomain name just as IPv4 and IPv6 do.
+Multiple IP subnets on the same link is just a more general case of IPv4 and IPv6 on the same link. When multiple IP subnets exist for the same protocol on the same link, they appear as separate interfaces to the Update proxy and require a separate subdomain name just as IPv4 and IPv6 do.
 
 This is required for a client on one logical IP subnet of an interface to communicate with a service provided by a host on a different IP subnet of the same link.
 
@@ -168,7 +166,7 @@ An Update proxy could have rulesets that define the translations it performs on 
 
 While DNS Update is well supported in authoritative DNS servers, it typically requires some form of authentication for the server to accept the update. The most common form is TSIG {{!RFC2845}},{{!RFC4635}} which is based on a shared secret and a one way hash over the contents of the record.
 
-The Update proxy doesn't dictate a method of privacy or authentication for communication to an authoritative DNS Update server. However, implementations SHOULD ensure some form exists and even refuse to operate in an environment without some form of authentication.
+The Update proxy doesn't dictate a method of privacy or authentication for communication to an authoritative DNS Update server. However, implementations SHOULD ensure some form of authentication exists and even refuse to operate in an environment without authentication.
 
 ## Selection of authoritative unicast DNS server
 
@@ -178,11 +176,13 @@ The Update proxy should attempt to locate the authoritative DNS Update server fo
 
     Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been registered with IANA. However, this should not stop an Update proxy from attempting to connect to an authoritative DNS server via TLS/TCP or plain TCP. In fact, an SRV query for the TLS variant is encouraged and if no answers are returned but answers are returned for the _udp version, attempting to connect to the same target and the reserved port (853) for DNS over TLS as defined in Section 3.1 of {{!RFC7858}} is encouraged for privacy reasons.
 
-2. If no SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.
+2. The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn't returned: _dns-update._udp.&lt;domain&gt;.
 
-3. If no local configuration exists for a DNS Update server, the Update proxy can query the NS records for the subdomain and try sending updates to the name server configured for the subdomain. Again, using TLS/TCP is encouraged if available.
+3. If no SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.
 
-4. If DNS Updates are not accepted by the server(s) represented by the NS records, the the Update proxy can assume that DNS Updates are not available for the subdomain and it has no reason to listen for mDNS announcements on the IP subnet.
+4. If no local configuration exists for a DNS Update server, the Update proxy can query the NS records for the subdomain and try sending updates to the name server configured for the subdomain or for the domain. Again, using TLS/TCP is encouraged if available.
+
+5. If DNS Updates are not accepted by the server(s) represented by the NS records, the the Update proxy can assume that DNS Updates are not available for the subdomain and it has no reason to listen for mDNS announcements on the IP subnet.
 
 ## DNS update sections
 
@@ -226,7 +226,7 @@ An authoritative unicast DNS server MAY support DNS Push notifications {{?I-D.ie
 
 ## DNSSEC compatibility
 
-With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and Updated in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.
+With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone a priori. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and Updated in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.
 
 The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be updated as needed as specified in {{!RFC3007}}.
 
@@ -238,7 +238,7 @@ There are several possibilities for how a DNS Update server may limit the lifeti
 
 1. The DNS update server MAY be configured to automatically delete the records after a certain fixed time period (such as 24 hours). This is a failsafe mechanism in case the origin of the record data goes offline and does not ever try to remove the records.
 
-2. A single lease lifetime can be communicated via an OPT record as defined in Dynamic DNS Update Leases {{?I-D.sekar-dns-ul}}. This provides a timeout period for all of the records added in the update message and is controlled by the sender of the update. This is a work in progress and does not yet have widespread adoption among authoritative unicast DNS server software.
+2. A lease lifetime can be communicated via an OPT record as defined in Dynamic DNS Update Leases {{?I-D.sekar-dns-ul}}. This provides a timeout period for all of the records added in the update message and is controlled by the sender of the update. This is a work in progress and does not yet have widespread adoption among authoritative unicast DNS server software.
 
 3. Individual DNS TIMEOUT resource records {{?I-D.pusateri-dnsop-update-timeout}} can be added to the update message to indicate the timeout value for one or any number of the resource records contained in the update message. This is the most flexible but also does not have any adoption among authoritative unicast DNS server software. One advantage of the TIMEOUT resource records is that they are stored in the authoritative server like any other record and synchronized to secondary servers as well. Therefore, if the primary server were to restart or experience an extended failure, the lease lifetime would not be lost.
 
