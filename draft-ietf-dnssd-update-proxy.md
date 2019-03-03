@@ -7,6 +7,7 @@ area: Internet
 wg: DNSSD Working Group
 kw: Internet-Draft
 cat: std
+stand_alone: true
 
 coding: utf-8
 pi:
@@ -178,11 +179,11 @@ The Update proxy should attempt to locate the authoritative DNS Update server fo
 
 2. The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn't returned: _dns-update._udp.&lt;domain&gt;.
 
-3. If no SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.
+3. If no matching SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.
 
-4. If no local configuration exists for a DNS Update server, the Update proxy can query the NS records for the subdomain and try sending updates to the name server configured for the subdomain or for the domain. Again, using TLS/TCP is encouraged if available.
+4. If no local configuration exists for a DNS Update server, the Update proxy can query the SOA records for the subdomain and try sending updates to the MNAME master server configured for the subdomain. Again, using TLS/TCP is encouraged if available.
 
-5. If DNS Updates are not accepted by the server(s) represented by the NS records, the the Update proxy can assume that DNS Updates are not available for the subdomain and it has no reason to listen for mDNS announcements on the IP subnet.
+5. If DNS Updates are not accepted by the server(s) represented by the SOA MNAME master server, then the Update proxy can assume that DNS Updates are not available for the subdomain and listening to mDNS announcements on the IP subnet would be unproductive.
 
 ## DNS update sections
 
