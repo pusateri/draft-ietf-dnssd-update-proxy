@@ -5,7 +5,7 @@
 <head profile="http://www.w3.org/2006/03/hcard http://dublincore.org/documents/2008/08/04/dc-html/">
   <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
 
-  <title>DNS Update Proxy for mDNS</title>
+  <title>DNS Update Proxy for Service Discovery</title>
 
   <style type="text/css" title="Xml2Rfc (sans serif)">
   /*<![CDATA[*/
@@ -412,8 +412,8 @@
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Pusateri, T." />
-  <meta name="dct.identifier" content="urn:ietf:id:draft-pusateri-dnssd-update-proxy-00" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-03" />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-pusateri-dnssd-update-proxy-01" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-04" />
   <meta name="dct.abstract" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
   <meta name="description" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
 
@@ -434,10 +434,10 @@
 </tr>
 <tr>
 <td class="left">Intended status: Standards Track</td>
-<td class="right">March 3, 2019</td>
+<td class="right">March 4, 2019</td>
 </tr>
 <tr>
-<td class="left">Expires: September 4, 2019</td>
+<td class="left">Expires: September 5, 2019</td>
 <td class="right"></td>
 </tr>
 
@@ -445,8 +445,8 @@
     </tbody>
   </table>
 
-  <p class="title">DNS Update Proxy for mDNS<br />
-  <span class="filename">draft-pusateri-dnssd-update-proxy-00</span></p>
+  <p class="title">DNS Update Proxy for Service Discovery<br />
+  <span class="filename">draft-pusateri-dnssd-update-proxy-01</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
 <p>This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner.</p>
@@ -454,7 +454,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 4, 2019.</p>
+<p>This Internet-Draft will expire on September 5, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -632,8 +632,8 @@
 <p></p>
 
 <ol>
-<li>An Update proxy should first send an SRV query for _dns-update._udp.&lt;subdomain&gt;.&lt;domain&gt;. If an answer is received, the target and port number will provide the parameters needed for where to send updates.  <br><br> Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been registered with IANA. However, this should not stop an Update proxy from attempting to connect to an authoritative DNS server via TLS/TCP or plain TCP. In fact, an SRV query for the TLS variant is encouraged and if no answers are returned but answers are returned for the _udp version, attempting to connect to the same target and the reserved port (853) for DNS over TLS as defined in Section 3.1 of <a href="#RFC7858" class="xref">[RFC7858]</a> is encouraged for privacy reasons.</li>
-<li>The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn&#8217;t returned: _dns-update._udp.&lt;domain&gt;.</li>
+<li>An Update proxy should first send an SRV query for _dns-update-tls._tcp.&lt;subdomain&gt;.&lt;domain&gt;. If an answer is received, the target and port number will provide the parameters needed for where to send updates. The proxy can also try the TCP and UDP variants of this service name _dns-update._tcp and _dns-update._udp if the TLS variant does not exist. If no TLS variant is found, the proxy can still attempt a TLS connection on the SRV port of the TCP or UDP variant. The proxy can also attempt to connect to the target on the reserved port (853) for DNS over TLS as defined in Section 3.1 of <a href="#RFC7858" class="xref">[RFC7858]</a>.</li>
+<li>The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn&#8217;t returned: _dns-update-tls._tcp.&lt;domain&gt; as well as the TCP and UDP variants.</li>
 <li>If no matching SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.</li>
 <li>If no local configuration exists for a DNS Update server, the Update proxy can query the SOA records for the subdomain and try sending updates to the MNAME master server configured for the subdomain. Again, using TLS/TCP is encouraged if available.</li>
 <li>If DNS Updates are not accepted by the server(s) represented by the SOA MNAME master server, then the Update proxy can assume that DNS Updates are not available for the subdomain and listening to mDNS announcements on the IP subnet would be unproductive.</li>
@@ -792,7 +792,7 @@
 <tr>
 <td class="reference"><b id="I-D.pusateri-dnsop-update-timeout">[I-D.pusateri-dnsop-update-timeout]</b></td>
 <td class="top">
-<a>Pusateri, T.</a> and <a>T. Wattenberg</a>, "<a href="https://tools.ietf.org/html/draft-pusateri-dnsop-update-timeout-01">DNS TIMEOUT Resource Record</a>", Internet-Draft draft-pusateri-dnsop-update-timeout-01, February 2019.</td>
+<a>Pusateri, T.</a> and <a>T. Wattenberg</a>, "<a href="https://tools.ietf.org/html/draft-pusateri-dnsop-update-timeout-02">DNS TIMEOUT Resource Record</a>", Internet-Draft draft-pusateri-dnsop-update-timeout-02, March 2019.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.sekar-dns-ul">[I-D.sekar-dns-ul]</b></td>

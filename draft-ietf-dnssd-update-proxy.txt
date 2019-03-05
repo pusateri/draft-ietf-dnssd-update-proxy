@@ -4,12 +4,12 @@
 
 DNSSD Working Group                                          T. Pusateri
 Internet-Draft                                              Unaffiliated
-Intended status: Standards Track                           March 3, 2019
-Expires: September 4, 2019
+Intended status: Standards Track                           March 4, 2019
+Expires: September 5, 2019
 
 
-                       DNS Update Proxy for mDNS
-                  draft-pusateri-dnssd-update-proxy-00
+                 DNS Update Proxy for Service Discovery
+                  draft-pusateri-dnssd-update-proxy-01
 
 Abstract
 
@@ -35,7 +35,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 4, 2019.
+   This Internet-Draft will expire on September 5, 2019.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Pusateri                Expires September 4, 2019               [Page 1]
+Pusateri                Expires September 5, 2019               [Page 1]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
    the Trust Legal Provisions and are provided without warranty as
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Pusateri                Expires September 4, 2019               [Page 2]
+Pusateri                Expires September 5, 2019               [Page 2]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
    authoritative unicast DNS servers, clients from any IP subnet can
@@ -165,9 +165,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019               [Page 3]
+Pusateri                Expires September 5, 2019               [Page 3]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
 3.1.  Subdomain naming
@@ -221,9 +221,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019               [Page 4]
+Pusateri                Expires September 5, 2019               [Page 4]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
        adding appropriate random jitter across IP subnets so as to
@@ -277,9 +277,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019               [Page 5]
+Pusateri                Expires September 5, 2019               [Page 5]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
    In the future, authoritative unicast DNS servers may add support for
@@ -333,9 +333,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019               [Page 6]
+Pusateri                Expires September 5, 2019               [Page 6]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
    query should be sent at a random time between 5 and 10 seconds before
@@ -389,9 +389,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019               [Page 7]
+Pusateri                Expires September 5, 2019               [Page 7]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
    addresses are assigned via DHCP or statically and the hosts revert to
@@ -445,9 +445,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019               [Page 8]
+Pusateri                Expires September 5, 2019               [Page 8]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
    Alternatives for ways to format DNS Update messages are defined below
@@ -493,32 +493,28 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
    The Update proxy should attempt to locate the authoritative DNS
    Update server for each subdomain in the following manner:
 
-   1.  An Update proxy should first send an SRV query for _dns-
-       update._udp.<subdomain>.<domain>.  If an answer is received, the
+   1.  An Update proxy should first send an SRV query for _dns-update-
+       tls._tcp.<subdomain>.<domain>.  If an answer is received, the
        target and port number will provide the parameters needed for
-       where to send updates.
+       where to send updates.  The proxy can also try the TCP and UDP
+       variants of this service name _dns-update._tcp and _dns-
 
 
 
-
-Pusateri                Expires September 4, 2019               [Page 9]
+Pusateri                Expires September 5, 2019               [Page 9]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
-       Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been
-       registered with IANA.  However, this should not stop an Update
-       proxy from attempting to connect to an authoritative DNS server
-       via TLS/TCP or plain TCP.  In fact, an SRV query for the TLS
-       variant is encouraged and if no answers are returned but answers
-       are returned for the _udp version, attempting to connect to the
-       same target and the reserved port (853) for DNS over TLS as
-       defined in Section 3.1 of [RFC7858] is encouraged for privacy
-       reasons.
+       update._udp if the TLS variant does not exist.  If no TLS variant
+       is found, the proxy can still attempt a TLS connection on the SRV
+       port of the TCP or UDP variant.  The proxy can also attempt to
+       connect to the target on the reserved port (853) for DNS over TLS
+       as defined in Section 3.1 of [RFC7858].
 
    2.  The Update proxy can make a similar query for the same service in
        the domain if a subdomain specific answer isn't returned: _dns-
-       update._udp.<domain>.
+       update-tls._tcp.<domain> as well as the TCP and UDP variants.
 
    3.  If no matching SRV records are returned, the Update proxy SHOULD
        consult local configuration policy to see if an DNS Update server
@@ -557,9 +553,13 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019              [Page 10]
+
+
+
+
+Pusateri                Expires September 5, 2019              [Page 10]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
 5.2.2.  Prerequisite section
@@ -613,9 +613,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019              [Page 11]
+Pusateri                Expires September 5, 2019              [Page 11]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
 6.1.  DNS Push Notifications
@@ -669,9 +669,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019              [Page 12]
+Pusateri                Expires September 5, 2019              [Page 12]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
    3.  Individual DNS TIMEOUT resource records
@@ -725,9 +725,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019              [Page 13]
+Pusateri                Expires September 5, 2019              [Page 13]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
 8.  References
@@ -781,9 +781,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019              [Page 14]
+Pusateri                Expires September 5, 2019              [Page 14]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
    [RFC6762]  Cheshire, S. and M. Krochmal, "Multicast DNS", RFC 6762,
@@ -822,8 +822,8 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
    [I-D.pusateri-dnsop-update-timeout]
               Pusateri, T. and T. Wattenberg, "DNS TIMEOUT Resource
-              Record", draft-pusateri-dnsop-update-timeout-01 (work in
-              progress), February 2019.
+              Record", draft-pusateri-dnsop-update-timeout-02 (work in
+              progress), March 2019.
 
    [I-D.sekar-dns-ul]
               Cheshire, S. and T. Lemon, "Dynamic DNS Update Leases",
@@ -837,9 +837,9 @@ Internet-Draft          DNS Update Proxy for mDNS             March 2019
 
 
 
-Pusateri                Expires September 4, 2019              [Page 15]
+Pusateri                Expires September 5, 2019              [Page 15]
 
-Internet-Draft          DNS Update Proxy for mDNS             March 2019
+Internet-Draft   DNS Update Proxy for Service Discovery       March 2019
 
 
 Appendix A.  Comparison to Discovery Proxy
@@ -893,4 +893,4 @@ Author's Address
 
 
 
-Pusateri                Expires September 4, 2019              [Page 16]
+Pusateri                Expires September 5, 2019              [Page 16]
