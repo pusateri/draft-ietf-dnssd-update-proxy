@@ -1,6 +1,6 @@
 ---
-title: DNS Update Proxy for mDNS
-docname: draft-pusateri-dnssd-update-proxy-00
+title: DNS Update Proxy for Service Discovery
+docname: draft-pusateri-dnssd-update-proxy-01
 date: 2019
 ipr: trust200902
 area: Internet
@@ -173,11 +173,9 @@ The Update proxy doesn't dictate a method of privacy or authentication for commu
 
 The Update proxy should attempt to locate the authoritative DNS Update server for each subdomain in the following manner:
 
-1. An Update proxy should first send an SRV query for _dns-update._udp.&lt;subdomain&gt;.&lt;domain&gt;. If an answer is received, the target and port number will provide the parameters needed for where to send updates.
+1. An Update proxy should first send an SRV query for _dns-update-tls._tcp.&lt;subdomain&gt;.&lt;domain&gt;. If an answer is received, the target and port number will provide the parameters needed for where to send updates. The proxy can also try the TCP and UDP variants of this service name _dns-update._tcp and _dns-update._udp if the TLS variant does not exist. If no TLS variant is found, the proxy can still attempt a TLS connection on the SRV port of the TCP or UDP variant. The proxy can also attempt to connect to the target on the reserved port (853) for DNS over TLS as defined in Section 3.1 of {{!RFC7858}}.
 
-    Note: _dns-update._tcp and _dns-update._tls-tcp have not yet been registered with IANA. However, this should not stop an Update proxy from attempting to connect to an authoritative DNS server via TLS/TCP or plain TCP. In fact, an SRV query for the TLS variant is encouraged and if no answers are returned but answers are returned for the _udp version, attempting to connect to the same target and the reserved port (853) for DNS over TLS as defined in Section 3.1 of {{!RFC7858}} is encouraged for privacy reasons.
-
-2. The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn't returned: _dns-update._udp.&lt;domain&gt;.
+2. The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn't returned: _dns-update-tls._tcp.&lt;domain&gt; as well as the TCP and UDP variants.
 
 3. If no matching SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.
 
