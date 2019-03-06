@@ -376,34 +376,35 @@
   <link href="#rfc.toc" rel="Contents">
 <link href="#rfc.section.1" rel="Chapter" title="1 Introduction">
 <link href="#rfc.section.2" rel="Chapter" title="2 Requirements Language">
-<link href="#rfc.section.3" rel="Chapter" title="3 DNS subdomain model">
-<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Subdomain naming">
-<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Domain name discovery">
-<link href="#rfc.section.3.3" rel="Chapter" title="3.3 Client service discovery">
-<link href="#rfc.section.4" rel="Chapter" title="4 Update proxy behavior">
-<link href="#rfc.section.4.1" rel="Chapter" title="4.1 mDNS service announcements">
-<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Service caching and refresh">
-<link href="#rfc.section.4.3" rel="Chapter" title="4.3 mDNS probing">
-<link href="#rfc.section.4.4" rel="Chapter" title="4.4 Link-local addressing">
-<link href="#rfc.section.4.5" rel="Chapter" title="4.5 IPv6 and IPv4 on same link">
-<link href="#rfc.section.4.6" rel="Chapter" title="4.6 multiple logical IP subnets">
-<link href="#rfc.section.4.7" rel="Chapter" title="4.7 Proxy redundancy">
-<link href="#rfc.section.4.8" rel="Chapter" title="4.8 Service filtering and translation">
-<link href="#rfc.section.5" rel="Chapter" title="5 DNS update">
-<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Selection of authoritative unicast DNS server">
-<link href="#rfc.section.5.2" rel="Chapter" title="5.2 DNS update sections">
-<link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Zone section">
-<link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Prerequisite section">
-<link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Update section">
-<link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Additional data section">
-<link href="#rfc.section.6" rel="Chapter" title="6 DNS authoritative server behavior">
+<link href="#rfc.section.3" rel="Chapter" title="3 DNS Subdomain Model">
+<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Subdomain Naming">
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Domain Name Discovery">
+<link href="#rfc.section.3.3" rel="Chapter" title="3.3 Client Service Discovery">
+<link href="#rfc.section.4" rel="Chapter" title="4 Update Proxy Behavior">
+<link href="#rfc.section.4.1" rel="Chapter" title="4.1 mDNS Service Announcements">
+<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Service Caching and Refresh">
+<link href="#rfc.section.4.3" rel="Chapter" title="4.3 mDNS Probing">
+<link href="#rfc.section.4.4" rel="Chapter" title="4.4 Link-local Addressing">
+<link href="#rfc.section.4.5" rel="Chapter" title="4.5 IPv6 and IPv4 on Same Link">
+<link href="#rfc.section.4.6" rel="Chapter" title="4.6 Multiple Logical IP Subnets">
+<link href="#rfc.section.4.7" rel="Chapter" title="4.7 Proxy Redundancy">
+<link href="#rfc.section.4.8" rel="Chapter" title="4.8 Service Filtering and Translation">
+<link href="#rfc.section.5" rel="Chapter" title="5 DNS UPDATE">
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Selection of Authoritative Unicast DNS Server">
+<link href="#rfc.section.5.2" rel="Chapter" title="5.2 DNS UPDATE Sections">
+<link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Zone Section">
+<link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Prerequisite Section">
+<link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Update Section">
+<link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Additional Data Section">
+<link href="#rfc.section.6" rel="Chapter" title="6 DNS Authoritative Server Behavior">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 DNS Push Notifications">
-<link href="#rfc.section.6.2" rel="Chapter" title="6.2 DNSSEC compatibility">
-<link href="#rfc.section.6.3" rel="Chapter" title="6.3 DNS Update record lifetimes">
-<link href="#rfc.section.7" rel="Chapter" title="7 Security Considerations">
-<link href="#rfc.references" rel="Chapter" title="8 References">
-<link href="#rfc.references.1" rel="Chapter" title="8.1 Normative References">
-<link href="#rfc.references.2" rel="Chapter" title="8.2 Informative References">
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 DNSSEC Compatibility">
+<link href="#rfc.section.6.3" rel="Chapter" title="6.3 DNS Update Record Lifetimes">
+<link href="#rfc.section.7" rel="Chapter" title="7 Transitioning to Unicast">
+<link href="#rfc.section.8" rel="Chapter" title="8 Security Considerations">
+<link href="#rfc.references" rel="Chapter" title="9 References">
+<link href="#rfc.references.1" rel="Chapter" title="9.1 Normative References">
+<link href="#rfc.references.2" rel="Chapter" title="9.2 Informative References">
 <link href="#rfc.appendix.A" rel="Chapter" title="A Comparison to Discovery Proxy">
 <link href="#rfc.authors" rel="Chapter">
 
@@ -413,7 +414,7 @@
 
   <meta name="dct.creator" content="Pusateri, T." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-pusateri-dnssd-update-proxy-01" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-04" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-06" />
   <meta name="dct.abstract" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
   <meta name="description" content="This document describes a method to dynamically map multicast DNS announcements into the unicast DNS namespace for use by service discovery clients. It does not define any new protocols but uses existing DNS protocols in new ways. This solves existing problems with service discovery across multiple IP subnets in a simple, yet efficient, manner." />
 
@@ -434,10 +435,10 @@
 </tr>
 <tr>
 <td class="left">Intended status: Standards Track</td>
-<td class="right">March 4, 2019</td>
+<td class="right">March 6, 2019</td>
 </tr>
 <tr>
-<td class="left">Expires: September 5, 2019</td>
+<td class="left">Expires: September 7, 2019</td>
 <td class="right"></td>
 </tr>
 
@@ -454,7 +455,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 5, 2019.</p>
+<p>This Internet-Draft will expire on September 7, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -468,61 +469,63 @@
 </li>
 <li>2.   <a href="#rfc.section.2">Requirements Language</a>
 </li>
-<li>3.   <a href="#rfc.section.3">DNS subdomain model</a>
+<li>3.   <a href="#rfc.section.3">DNS Subdomain Model</a>
 </li>
-<ul><li>3.1.   <a href="#rfc.section.3.1">Subdomain naming</a>
+<ul><li>3.1.   <a href="#rfc.section.3.1">Subdomain Naming</a>
 </li>
-<li>3.2.   <a href="#rfc.section.3.2">Domain name discovery</a>
+<li>3.2.   <a href="#rfc.section.3.2">Domain Name Discovery</a>
 </li>
-<li>3.3.   <a href="#rfc.section.3.3">Client service discovery</a>
+<li>3.3.   <a href="#rfc.section.3.3">Client Service Discovery</a>
 </li>
-</ul><li>4.   <a href="#rfc.section.4">Update proxy behavior</a>
+</ul><li>4.   <a href="#rfc.section.4">Update Proxy Behavior</a>
 </li>
-<ul><li>4.1.   <a href="#rfc.section.4.1">mDNS service announcements</a>
+<ul><li>4.1.   <a href="#rfc.section.4.1">mDNS Service Announcements</a>
 </li>
-<li>4.2.   <a href="#rfc.section.4.2">Service caching and refresh</a>
+<li>4.2.   <a href="#rfc.section.4.2">Service Caching and Refresh</a>
 </li>
-<li>4.3.   <a href="#rfc.section.4.3">mDNS probing</a>
+<li>4.3.   <a href="#rfc.section.4.3">mDNS Probing</a>
 </li>
-<li>4.4.   <a href="#rfc.section.4.4">Link-local addressing</a>
+<li>4.4.   <a href="#rfc.section.4.4">Link-local Addressing</a>
 </li>
-<li>4.5.   <a href="#rfc.section.4.5">IPv6 and IPv4 on same link</a>
+<li>4.5.   <a href="#rfc.section.4.5">IPv6 and IPv4 on Same Link</a>
 </li>
-<li>4.6.   <a href="#rfc.section.4.6">multiple logical IP subnets</a>
+<li>4.6.   <a href="#rfc.section.4.6">Multiple Logical IP Subnets</a>
 </li>
-<li>4.7.   <a href="#rfc.section.4.7">Proxy redundancy</a>
+<li>4.7.   <a href="#rfc.section.4.7">Proxy Redundancy</a>
 </li>
-<li>4.8.   <a href="#rfc.section.4.8">Service filtering and translation</a>
+<li>4.8.   <a href="#rfc.section.4.8">Service Filtering and Translation</a>
 </li>
-</ul><li>5.   <a href="#rfc.section.5">DNS update</a>
+</ul><li>5.   <a href="#rfc.section.5">DNS UPDATE</a>
 </li>
-<ul><li>5.1.   <a href="#rfc.section.5.1">Selection of authoritative unicast DNS server</a>
+<ul><li>5.1.   <a href="#rfc.section.5.1">Selection of Authoritative Unicast DNS Server</a>
 </li>
-<li>5.2.   <a href="#rfc.section.5.2">DNS update sections</a>
+<li>5.2.   <a href="#rfc.section.5.2">DNS UPDATE Sections</a>
 </li>
-<ul><li>5.2.1.   <a href="#rfc.section.5.2.1">Zone section</a>
+<ul><li>5.2.1.   <a href="#rfc.section.5.2.1">Zone Section</a>
 </li>
-<li>5.2.2.   <a href="#rfc.section.5.2.2">Prerequisite section</a>
+<li>5.2.2.   <a href="#rfc.section.5.2.2">Prerequisite Section</a>
 </li>
-<li>5.2.3.   <a href="#rfc.section.5.2.3">Update section</a>
+<li>5.2.3.   <a href="#rfc.section.5.2.3">Update Section</a>
 </li>
-<li>5.2.4.   <a href="#rfc.section.5.2.4">Additional data section</a>
+<li>5.2.4.   <a href="#rfc.section.5.2.4">Additional Data Section</a>
 </li>
-</ul></ul><li>6.   <a href="#rfc.section.6">DNS authoritative server behavior</a>
+</ul></ul><li>6.   <a href="#rfc.section.6">DNS Authoritative Server Behavior</a>
 </li>
 <ul><li>6.1.   <a href="#rfc.section.6.1">DNS Push Notifications</a>
 </li>
-<li>6.2.   <a href="#rfc.section.6.2">DNSSEC compatibility</a>
+<li>6.2.   <a href="#rfc.section.6.2">DNSSEC Compatibility</a>
 </li>
-<li>6.3.   <a href="#rfc.section.6.3">DNS Update record lifetimes</a>
+<li>6.3.   <a href="#rfc.section.6.3">DNS Update Record Lifetimes</a>
 </li>
-</ul><li>7.   <a href="#rfc.section.7">Security Considerations</a>
+</ul><li>7.   <a href="#rfc.section.7">Transitioning to Unicast</a>
 </li>
-<li>8.   <a href="#rfc.references">References</a>
+<li>8.   <a href="#rfc.section.8">Security Considerations</a>
 </li>
-<ul><li>8.1.   <a href="#rfc.references.1">Normative References</a>
+<li>9.   <a href="#rfc.references">References</a>
 </li>
-<li>8.2.   <a href="#rfc.references.2">Informative References</a>
+<ul><li>9.1.   <a href="#rfc.references.1">Normative References</a>
+</li>
+<li>9.2.   <a href="#rfc.references.2">Informative References</a>
 </li>
 </ul><li>Appendix A.   <a href="#rfc.appendix.A">Comparison to Discovery Proxy</a>
 </li>
@@ -536,140 +539,142 @@
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
 <p id="rfc.section.1.p.1">Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn&#8217;t designed to traverse across multi-subnet campus networks. Second, IP multicast doesn&#8217;t work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular authoritative unicast DNS servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.</p>
-<p id="rfc.section.1.p.2">There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages <a href="#RFC2136" class="xref">[RFC2136]</a> directly to an authoritative unicast DNS server. While it is possible for each host providing a service to send it&#8217;s own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.</p>
-<p id="rfc.section.1.p.3">This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update Proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.</p>
+<p id="rfc.section.1.p.2">There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS UPDATE messages <a href="#RFC2136" class="xref">[RFC2136]</a> directly to an authoritative unicast DNS server. While it is possible for each host providing a service to send it&#8217;s own DNS UPDATE, key management has prevented widespread deployment of DNS UPDATEs across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS UPDATEs on a larger scale is needed.</p>
+<p id="rfc.section.1.p.3">This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.</p>
 <p id="rfc.section.1.p.4">An Update proxy is an ideal service to run on routers and/or switches to map local services into a larger network infrastructure.</p>
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#requirements-language" id="requirements-language">Requirements Language</a>
 </h1>
 <p id="rfc.section.2.p.1">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP&#160;14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.  These words may also appear in this document in lower case as plain English words, absent their normative meanings.</p>
 <h1 id="rfc.section.3">
-<a href="#rfc.section.3">3.</a> <a href="#dns-subdomain-model" id="dns-subdomain-model">DNS subdomain model</a>
+<a href="#rfc.section.3">3.</a> <a href="#dns-subdomain-model" id="dns-subdomain-model">DNS Subdomain Model</a>
 </h1>
-<p id="rfc.section.3.p.1">Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browsable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of <a href="#RFC6763" class="xref">[RFC6763]</a> for more details about browsing. In the context of the Update proxy, these subdomains are typically special use subdomains for mDNS mappings.</p>
+<p id="rfc.section.3.p.1">Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browsable (respond to PTR queries for <samp>b._dns-sd._udp.&lt;subdomain&gt;.</samp>). See Section 11 of <a href="#RFC6763" class="xref">[RFC6763]</a> for more details about browsing. In the context of the Update proxy, these subdomains are typically special use subdomains for mDNS mappings.</p>
 <h1 id="rfc.section.3.1">
-<a href="#rfc.section.3.1">3.1.</a> <a href="#subdomain" id="subdomain">Subdomain naming</a>
+<a href="#rfc.section.3.1">3.1.</a> <a href="#subdomain" id="subdomain">Subdomain Naming</a>
 </h1>
 <p id="rfc.section.3.1.p.1">The browseable subdomain label is prepended to the domain name and separated by a period. See <a href="#RFC7719" class="xref">[RFC7719]</a> for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency among redundant proxies:</p>
 <p></p>
 
 <ol>
-<li>address-derived domain enumeration through local resolver  <br><br> The proxy issues a PTR query for the registration or browse domains based on the IP subnet. Separate queries are performed for IPv4 and IPv6 on the same link since they are different IP subnets. Since the Update proxy will be registering services with DNS Update, it should begin querying for registration domains and fallback to browse domains if no registration domains are configured.  <br><br> As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the base domain name to query would be derived as 0.113.0.203.in-addr.arpa. The proxy would issue a PTR query for the following names in order to find the subdomain for the IP subnet:  <br><br> <samp>dr._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> <samp>r._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> <samp>db._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> <samp>b._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> <samp>lb._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> The first response with an answer should be the subdomain name including the domain name for the network and further queries through this list are not needed. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.  <br><br> The Update proxy should periodically rediscover the subdomain name at approximately 5 minute intervals for each IP subnet adding appropriate random jitter across IP subnets so as to prevent synchronization.</li>
+<li>address-derived domain enumeration through local resolver  <br><br> The proxy issues a PTR query for the registration or browse domains based on the IP subnet. Separate queries are performed for IPv4 and IPv6 on the same link since they are different IP subnets. Since the Update proxy will be registering services with DNS UPDATE, it should begin querying for registration domains and fallback to browse domains if no registration domains are configured.  <br><br> As an example, suppose a proxy was connected to IPv4 subnet <samp>203.0.113.0/24</samp>. In order to determine if there was a subdomain name for this subnet, the base domain name to query would be derived as <samp>0.113.0.203.in-addr.arpa.</samp> The proxy would issue a PTR query for the following names in order to find the subdomain for the IP subnet:  <br><br> <samp>dr._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp> <br> <samp>r._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp> <br> <samp>db._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp> <br> <samp>b._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp> <br> <samp>lb._dns-sd._udp.0.113.0.203.in-addr.arpa.</samp>  <br><br> The first response with an answer should be the subdomain name including the domain name for the network and further queries through this list are not needed. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.  <br><br> The Update proxy should periodically rediscover the subdomain name at approximately 5 minute intervals for each IP subnet adding appropriate random jitter across IP subnets so as to prevent synchronization.</li>
 <li>proxy local configuration override  <br><br> If no answer is returned, the proxy may have local configuration containing a subdomain name for the network. If so, this subdomain should be used.</li>
-<li>algorithmic subdomain label generation  <br><br> If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to a hexadecimal string. This will give a 8 character unique string to use as a subdomain label. For the example above, this label would be cb007100.</li>
+<li>algorithmic subdomain label generation  <br><br> If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to a hexadecimal string. This will give a 8 character unique string to use as a subdomain label. For the example above, this label would be <samp>cb007100</samp>.</li>
 </ol>
+<p id="rfc.section.3.1.p.3">In the cases where through either local configuration or algorithmic generation of subdomain names, a subdomain name is known by the proxy but cannot be address derived through a PTR query, the Update proxy SHOULD register the appropriate address-derived enumeration records through an UPDATE to the zone master. If the IP subnet is removed or becomes inactive on the Update proxy, the proxy MUST attempt to remove these records.</p>
 <h1 id="rfc.section.3.2">
-<a href="#rfc.section.3.2">3.2.</a> <a href="#domain-name-discovery" id="domain-name-discovery">Domain name discovery</a>
+<a href="#rfc.section.3.2">3.2.</a> <a href="#domain-name-discovery" id="domain-name-discovery">Domain Name Discovery</a>
 </h1>
 <p id="rfc.section.3.2.p.1">The base domain name to use for each subdomain also has to be discovered on a per IP subnet basis. In most cases, the domain name will be the same for all IP subnets because they are all contained in a single administrative domain. However, this is not required and a proxy administrator may need to span multiple administrative boundaries requiring different domain names on different IP subnets (and therefore, subdomains).</p>
 <p id="rfc.section.3.2.p.2">There is not a direct query to discover a separate domain name but the domain name is included with the subdomain in the response to the PTR query above in <a href="#subdomain" class="xref">Section 3.1</a>. If the PTR query returns an empty response, then the domain name can be obtained from local proxy configuration and if no domain name is specified there, the default domain for the host should be used.</p>
 <h1 id="rfc.section.3.3">
-<a href="#rfc.section.3.3">3.3.</a> <a href="#client-service-discovery" id="client-service-discovery">Client service discovery</a>
+<a href="#rfc.section.3.3">3.3.</a> <a href="#client-service-discovery" id="client-service-discovery">Client Service Discovery</a>
 </h1>
 <p id="rfc.section.3.3.p.1">Fortunately, clients performing service discovery require no changes in order to work with the Update proxy. Existing clients already support wide-area bonjour which specifies how to query search domains and subdomains for services. See section 11 of <a href="#RFC6763" class="xref">[RFC6763]</a>.</p>
 <p id="rfc.section.3.3.p.2">However, in order for clients to discover the subdomain for each IP subnet, the subdomain MUST be browseable and a browse record for the domain must enumerate all of the subdomains. If the domain records do not exist, the Update proxy MUST create them in the domain and MUST ensure each subdomain is browseable.</p>
 <p id="rfc.section.3.3.p.3">In the future, authoritative unicast DNS servers may add support for DNS Push Notifications <a href="#I-D.ietf-dnssd-push" class="xref">[I-D.ietf-dnssd-push]</a> which would allow clients to maintain long lived subscriptions to services. Clients may also wish to add support for this feature to provide an efficient alternative to polling.</p>
 <h1 id="rfc.section.4">
-<a href="#rfc.section.4">4.</a> <a href="#update-proxy-behavior" id="update-proxy-behavior">Update proxy behavior</a>
+<a href="#rfc.section.4">4.</a> <a href="#update-proxy-behavior" id="update-proxy-behavior">Update Proxy Behavior</a>
 </h1>
 <p id="rfc.section.4.p.1">Since no new protocols are defined, this document mostly describes the expected behavior of the Update proxy and how it uses existing protocols to achieve multi IP subnet service discovery. The behavior is mostly intuitive but is described to ensure compatibility and completeness.</p>
 <h1 id="rfc.section.4.1">
-<a href="#rfc.section.4.1">4.1.</a> <a href="#mdns-service-announcements" id="mdns-service-announcements">mDNS service announcements</a>
+<a href="#rfc.section.4.1">4.1.</a> <a href="#mdns-service-announcements" id="mdns-service-announcements">mDNS Service Announcements</a>
 </h1>
 <p id="rfc.section.4.1.p.1">The Update proxy should listen to mDNS service announcements (responses) on all interfaces it is proxying for. Multiple Update proxies can be active on the same IP subnet at the same time. See <a href="#RFC6762" class="xref">[RFC6762]</a> for more information on multicast DNS.</p>
 <h1 id="rfc.section.4.2">
-<a href="#rfc.section.4.2">4.2.</a> <a href="#service-caching-and-refresh" id="service-caching-and-refresh">Service caching and refresh</a>
+<a href="#rfc.section.4.2">4.2.</a> <a href="#service-caching-and-refresh" id="service-caching-and-refresh">Service Caching and Refresh</a>
 </h1>
-<p id="rfc.section.4.2.p.1">As specified in Section 8.3 of <a href="#RFC6762" class="xref">[RFC6762]</a>, service announcements are sent multiple times for redundancy. However, there is no need to send duplicate Update messages to the authoritative unicast DNS server. Therefore, the Update proxy should cache service announcements and only send DNS Update messages when needed.</p>
-<p id="rfc.section.4.2.p.2">As described in Section 8.4 of <a href="#RFC6762" class="xref">[RFC6762]</a>, a host may send &#8220;goodbye&#8221; announcements by setting the TTL to 0. In this case, the record MUST be removed from the cache or otherwise marked as expired and a DNS Update should be sent to the authoritative unicast DNS server removing the record.</p>
+<p id="rfc.section.4.2.p.1">As specified in Section 8.3 of <a href="#RFC6762" class="xref">[RFC6762]</a>, service announcements are sent multiple times for redundancy. However, there is no need to send duplicate UPDATE messages to the authoritative unicast DNS server. Therefore, the Update proxy should cache service announcements and only send DNS UPDATE messages when needed.</p>
+<p id="rfc.section.4.2.p.2">As described in Section 8.4 of <a href="#RFC6762" class="xref">[RFC6762]</a>, a host may send &#8220;goodbye&#8221; announcements by setting the TTL to 0. In this case, the record MUST be removed from the cache or otherwise marked as expired and a DNS UPDATE should be sent to the authoritative unicast DNS server removing the record.</p>
 <p id="rfc.section.4.2.p.3">The Update proxy MUST also remove/expire old cache entries and remove the records from the authoritative unicast DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of <a href="#RFC6762" class="xref">[RFC6762]</a>.</p>
 <p id="rfc.section.4.2.p.4">A host providing a service may automatically refresh the TTL in the announcement from time to time keeping the service valid based on subsequent multicast queries it receives. However, if no mDNS clients are requesting the particular service for the length of the TTL value, the service announcement could timeout naturally. In order to keep accurate information regarding all of the services on the IP subnet, the Update proxy SHOULD send a unicast PTR query for the service name directly to the host announcing the service. This query should be sent at a random time between 5 and 10 seconds before the TTL value indicates the announcement will expire.</p>
 <p id="rfc.section.4.2.p.5">As described in Section 11 of <a href="#RFC6762" class="xref">[RFC6762]</a>, the Update proxy should use an IP source address of the IP subnet of the interface it is transmitting over and that is on the same IP subnet as the service provider. It is also permissible to use a link-local IP address in the IPv6 case as long as the service itself is available on an IPv6 address that is reachable from outside the local link.</p>
-<p id="rfc.section.4.2.p.6">In order for the Update proxy to discover as many services available on each IP subnet as possible, it should periodically send a PTR multicast query for <samp>_services._dns-sd._udp.local</samp> on each subnet. The unicast response bit SHOULD be set in the query in order to force unicast responses to the Update proxy. As PTR responses are received, The Update proxy can then send Service Instance Enumeration PTR queries (also with the unicast response bit set) for each service.</p>
+<p id="rfc.section.4.2.p.6">In order for the Update proxy to discover as many services available on each IP subnet as possible, it should periodically send a PTR multicast query for <samp>_services._dns-sd._udp.local.</samp> on each subnet. The unicast response bit SHOULD be set in the query in order to force unicast responses to the Update proxy. As PTR responses are received, The Update proxy can then send Service Instance Enumeration PTR queries (also with the unicast response bit set) for each service.</p>
 <p id="rfc.section.4.2.p.7">This was not the intended behavior of mDNS since local clients would just ask dynamically when they needed to know all of the providers of a service name but keeping this information up to date in the authoritative server provides benefits to remote clients such as faster response times and ability to use DNSSEC validation that were not previously possible with multicast DNS. These benefits are provided at the additional cost of a slight increase in network activity and processing time by the hosts announcing services. However, if the Update proxy uses unicast to query the service providers directly, other clients are not affected by these refresh queries and do not have to turn their radios on for queries/responses that they have no interest in.</p>
 <h1 id="rfc.section.4.3">
-<a href="#rfc.section.4.3">4.3.</a> <a href="#mdns-probing" id="mdns-probing">mDNS probing</a>
+<a href="#rfc.section.4.3">4.3.</a> <a href="#mdns-probing" id="mdns-probing">mDNS Probing</a>
 </h1>
 <p id="rfc.section.4.3.p.1">While Section 8.2 of <a href="#RFC6762" class="xref">[RFC6762]</a> recommends all potential answers be included in mDNS probe queries, because these records haven&#8217;t gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.</p>
 <h1 id="rfc.section.4.4">
-<a href="#rfc.section.4.4">4.4.</a> <a href="#link-local-addressing" id="link-local-addressing">Link-local addressing</a>
+<a href="#rfc.section.4.4">4.4.</a> <a href="#link-local-addressing" id="link-local-addressing">Link-local Addressing</a>
 </h1>
-<p id="rfc.section.4.4.p.1">In the IPv6 case, the source address of the announcements is a link-local IPv6 address that will probably be different than the IP subnet that the service is being provided on. However, it is certainly possible that link-local addressing is used with IPv4 as well. This is not as common but exists in a zero-conf environment where no IPv4 addresses are assigned via DHCP or statically and the hosts revert to link-local IPv4 addresses (169.254/16), see <a href="#RFC3927" class="xref">[RFC3927]</a>.</p>
+<p id="rfc.section.4.4.p.1">In the IPv6 case, the source address of the announcements is a link-local IPv6 address that will probably be different than the IP subnet that the service is being provided on. However, it is certainly possible that link-local addressing is used with IPv4 as well. This is not as common but exists in a zero-conf environment where no IPv4 addresses are assigned via DHCP or statically and the hosts revert to link-local IPv4 addresses (<samp>169.254/16</samp>), see <a href="#RFC3927" class="xref">[RFC3927]</a>.</p>
 <p id="rfc.section.4.4.p.2">If the service SRV target resolves to only a link-local address, then the service is not eligible to be advertised outside of the link and shouldn&#8217;t be sent to the authoritative unicast DNS server by the Update proxy.</p>
-<p id="rfc.section.4.4.p.3">In general, the Update proxy needs to ensure that the service is reachable outside of the link it is announced on before sending an Update to the authoritative server for the subdomain.</p>
+<p id="rfc.section.4.4.p.3">In general, the Update proxy needs to ensure that the service is reachable outside of the link it is announced on before sending an UPDATE to the authoritative server for the subdomain.</p>
 <h1 id="rfc.section.4.5">
-<a href="#rfc.section.4.5">4.5.</a> <a href="#ipv6-and-ipv4-on-same-link" id="ipv6-and-ipv4-on-same-link">IPv6 and IPv4 on same link</a>
+<a href="#rfc.section.4.5">4.5.</a> <a href="#ipv6-and-ipv4-on-same-link" id="ipv6-and-ipv4-on-same-link">IPv6 and IPv4 on Same Link</a>
 </h1>
-<p id="rfc.section.4.5.p.1">Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 <samp>A</samp> records <a href="#RFC1035" class="xref">[RFC1035]</a> and IPv6 <samp>AAAA</samp> records <a href="#RFC3596" class="xref">[RFC3596]</a> are published for an SRV target <a href="#RFC2782" class="xref">[RFC2782]</a> name, the administrator should provide the service over both protocols.</p>
+<p id="rfc.section.4.5.p.1">Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 A records <a href="#RFC1035" class="xref">[RFC1035]</a> and IPv6 AAAA records <a href="#RFC3596" class="xref">[RFC3596]</a> are published for an SRV target <a href="#RFC2782" class="xref">[RFC2782]</a> name, the administrator should provide the service over both protocols.</p>
 <p id="rfc.section.4.5.p.2">In some cases, this won&#8217;t be possible. This will not incur any extra delays if clients attempt connections over both IPv4 and IPv6 protocols simultaneously but if one protocol is preferred over another, delays may occur.</p>
 <h1 id="rfc.section.4.6">
-<a href="#rfc.section.4.6">4.6.</a> <a href="#multiple-logical-ip-subnets" id="multiple-logical-ip-subnets">multiple logical IP subnets</a>
+<a href="#rfc.section.4.6">4.6.</a> <a href="#multiple-logical-ip-subnets" id="multiple-logical-ip-subnets">Multiple Logical IP Subnets</a>
 </h1>
 <p id="rfc.section.4.6.p.1">Multiple IP subnets on the same link is just a more general case of IPv4 and IPv6 on the same link. When multiple IP subnets exist for the same protocol on the same link, they appear as separate interfaces to the Update proxy and require a separate subdomain name just as IPv4 and IPv6 do.</p>
 <p id="rfc.section.4.6.p.2">This is required for a client on one logical IP subnet of an interface to communicate with a service provided by a host on a different IP subnet of the same link.</p>
 <p id="rfc.section.4.6.p.3">If a SRV target resolves to addresses on multiple logical IP subnets of the same interface, the service can be included in multiple subdomains on the appropriate server(s) for those subdomains.</p>
 <h1 id="rfc.section.4.7">
-<a href="#rfc.section.4.7">4.7.</a> <a href="#proxy-redundancy" id="proxy-redundancy">Proxy redundancy</a>
+<a href="#rfc.section.4.7">4.7.</a> <a href="#proxy-redundancy" id="proxy-redundancy">Proxy Redundancy</a>
 </h1>
-<p id="rfc.section.4.7.p.1">Providing redundant Update proxies for the same IP subnet can be easily achieved using the DNS Update protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.</p>
-<p id="rfc.section.4.7.p.2">Alternatives for ways to format DNS Update messages are defined below in <a href="#prereq" class="xref">Section 5.2.2</a> as to possible uses of the Prerequisite section for use with redundant Update proxies.</p>
+<p id="rfc.section.4.7.p.1">Providing redundant Update proxies for the same IP subnet can be easily achieved by virtue of the DNS UPDATE protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.</p>
+<p id="rfc.section.4.7.p.2">Alternatives for ways to format DNS UPDATE messages are defined below in <a href="#prereq" class="xref">Section 5.2.2</a> as to possible uses of the Prerequisite section for use with redundant Update proxies.</p>
+<p id="rfc.section.4.7.p.3">Alternatively, a proxy MAY choose to hibernate when it discovers another active Update proxy as described below in <a href="#unicast" class="xref">Section 7</a>.</p>
 <h1 id="rfc.section.4.8">
-<a href="#rfc.section.4.8">4.8.</a> <a href="#service-filtering-and-translation" id="service-filtering-and-translation">Service filtering and translation</a>
+<a href="#rfc.section.4.8">4.8.</a> <a href="#service-filtering-and-translation" id="service-filtering-and-translation">Service Filtering and Translation</a>
 </h1>
 <p id="rfc.section.4.8.p.1">In the process of registering services with an authoritative unicast DNS server, the proxy can perform filtering and translation on the dynamically discovered services.</p>
 <p id="rfc.section.4.8.p.2">As an example, suppose legacy printers are discovered that do not support the current AirPrint feature set. The proxy can alter the TXT record associated with the printer to add the necessary keys as well as any additional service records to allow AirPrint clients to discover and use the legacy printer.</p>
 <p id="rfc.section.4.8.p.3">As another example, suppose there is a printer that is behind a locked door where students do not have access. In this case, the printer&#8217;s resource records MAY be filtered by the proxy so it does not show up during a browse operation on the subnet.</p>
 <p id="rfc.section.4.8.p.4">An Update proxy could have rulesets that define the translations it performs on the fly as is learns about matching services.</p>
 <h1 id="rfc.section.5">
-<a href="#rfc.section.5">5.</a> <a href="#dns-update" id="dns-update">DNS update</a>
+<a href="#rfc.section.5">5.</a> <a href="#dns-update" id="dns-update">DNS UPDATE</a>
 </h1>
-<p id="rfc.section.5.p.1">While DNS Update is well supported in authoritative DNS servers, it typically requires some form of authentication for the server to accept the update. The most common form is TSIG <a href="#RFC2845" class="xref">[RFC2845]</a>,<a href="#RFC4635" class="xref">[RFC4635]</a> which is based on a shared secret and a one way hash over the contents of the record.</p>
-<p id="rfc.section.5.p.2">The Update proxy doesn&#8217;t dictate a method of privacy or authentication for communication to an authoritative DNS Update server. However, implementations SHOULD ensure some form of authentication exists and even refuse to operate in an environment without authentication.</p>
+<p id="rfc.section.5.p.1">While DNS UPDATE is well supported in authoritative DNS servers, it typically requires some form of authentication for the server to accept the update. The most common form is TSIG <a href="#RFC2845" class="xref">[RFC2845]</a>,<a href="#RFC4635" class="xref">[RFC4635]</a> which is based on a shared secret and a one way hash over the contents of the record.</p>
+<p id="rfc.section.5.p.2">The Update proxy doesn&#8217;t dictate a method of privacy or authentication for communication to an authoritative DNS UPDATE server. However, implementations SHOULD ensure some form of authentication exists and even refuse to operate in an environment without authentication.</p>
 <h1 id="rfc.section.5.1">
-<a href="#rfc.section.5.1">5.1.</a> <a href="#selection-of-authoritative-unicast-dns-server" id="selection-of-authoritative-unicast-dns-server">Selection of authoritative unicast DNS server</a>
+<a href="#rfc.section.5.1">5.1.</a> <a href="#selection-of-authoritative-unicast-dns-server" id="selection-of-authoritative-unicast-dns-server">Selection of Authoritative Unicast DNS Server</a>
 </h1>
-<p id="rfc.section.5.1.p.1">The Update proxy should attempt to locate the authoritative DNS Update server for each subdomain in the following manner:</p>
+<p id="rfc.section.5.1.p.1">The Update proxy should attempt to locate the authoritative DNS UPDATE server for each subdomain in the following manner:</p>
 <p></p>
 
 <ol>
-<li>An Update proxy should first send an SRV query for _dns-update-tls._tcp.&lt;subdomain&gt;.&lt;domain&gt;. If an answer is received, the target and port number will provide the parameters needed for where to send updates. The proxy can also try the TCP and UDP variants of this service name _dns-update._tcp and _dns-update._udp if the TLS variant does not exist. If no TLS variant is found, the proxy can still attempt a TLS connection on the SRV port of the TCP or UDP variant. The proxy can also attempt to connect to the target on the reserved port (853) for DNS over TLS as defined in Section 3.1 of <a href="#RFC7858" class="xref">[RFC7858]</a>.</li>
-<li>The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn&#8217;t returned: _dns-update-tls._tcp.&lt;domain&gt; as well as the TCP and UDP variants.</li>
-<li>If no matching SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.</li>
-<li>If no local configuration exists for a DNS Update server, the Update proxy can query the SOA records for the subdomain and try sending updates to the MNAME master server configured for the subdomain. Again, using TLS/TCP is encouraged if available.</li>
-<li>If DNS Updates are not accepted by the server(s) represented by the SOA MNAME master server, then the Update proxy can assume that DNS Updates are not available for the subdomain and listening to mDNS announcements on the IP subnet would be unproductive.</li>
+<li>An Update proxy should first send an SRV query for <samp>_dns-update-tls._tcp.&lt;subdomain&gt;.</samp> If an answer is received, the target and port number will provide the parameters needed for where to send updates. The proxy can also try the TCP and UDP variants of this service name <samp>_dns-update._tcp</samp> and <samp>_dns-update._udp</samp> if the TLS variant does not exist. If no TLS variant is found, the proxy can still attempt a TLS connection on the SRV port of the TCP or UDP variant. The proxy can also attempt to connect to the target on the reserved port (853) for DNS over TLS as defined in Section 3.1 of <a href="#RFC7858" class="xref">[RFC7858]</a>.</li>
+<li>The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn&#8217;t returned: <samp>_dns-update-tls._tcp.&lt;domain&gt;.</samp> as well as the TCP and UDP variants.</li>
+<li>If no matching SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS UPDATE server has been configured.</li>
+<li>If no local configuration exists for a DNS UPDATE server, the Update proxy can query the SOA records for the subdomain and try sending updates to the MNAME master server configured for the subdomain. Again, using TLS/TCP is encouraged if available.</li>
+<li>If DNS UPDATEs are not accepted by the server(s) represented by the SOA MNAME master server, then the Update proxy can assume that DNS UPDATEs are not available for the subdomain and listening to mDNS announcements on the IP subnet would be unproductive.</li>
 </ol>
 <h1 id="rfc.section.5.2">
-<a href="#rfc.section.5.2">5.2.</a> <a href="#dns-update-sections" id="dns-update-sections">DNS update sections</a>
+<a href="#rfc.section.5.2">5.2.</a> <a href="#dns-update-sections" id="dns-update-sections">DNS UPDATE Sections</a>
 </h1>
-<p id="rfc.section.5.2.p.1">A DNS Update message contains four sections as specified in <a href="#RFC2136" class="xref">[RFC2136]</a>.</p>
+<p id="rfc.section.5.2.p.1">A DNS UPDATE message contains four sections as specified in <a href="#RFC2136" class="xref">[RFC2136]</a>.</p>
 <h1 id="rfc.section.5.2.1">
-<a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#zone-section" id="zone-section">Zone section</a>
+<a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#zone-section" id="zone-section">Zone Section</a>
 </h1>
 <p id="rfc.section.5.2.1.p.1">When an Update proxy is adding or removing services to/from a subdomain, the zone section MUST contain a single zone (ZOCOUNT = 1) and the ZNAME MUST be the subdomain being updated. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the records being added/removed.</p>
-<p id="rfc.section.5.2.1.p.2">Updates to multiple subdomains MUST be performed in separate DNS Update messages with one subdomain per message.</p>
+<p id="rfc.section.5.2.1.p.2">DNS UPDATEs to multiple subdomains MUST be performed in separate DNS UPDATE messages with one subdomain per message.</p>
 <p id="rfc.section.5.2.1.p.3">If a new subdomain is being created for a domain by the Update proxy, the subdomain&#8217;s parent zone should be used for the ZNAME. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the subdomain&#8217;s NS record CLASS that is going to be added. Similarly for removing a subdomain.</p>
 <h1 id="rfc.section.5.2.2">
-<a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#prereq" id="prereq">Prerequisite section</a>
+<a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#prereq" id="prereq">Prerequisite Section</a>
 </h1>
 <p id="rfc.section.5.2.2.p.1">It is not necessary for the Update proxy to include any prerequisites when adding/removing records. However, if the Update proxy wants to have better error handling, it can add prerequisites to ensure the state of the authoritative server is consistent.</p>
 <p id="rfc.section.5.2.2.p.2">Given that multiple Update proxies may exist for the same IP subnet (and subdomain), it is possible that similar records may be added or deleted to/from the authoritative server before the Update proxy&#8217;s own messages are processed. This is not to be considered a fatal error and may happen during normal operation of redundant proxies. The use of prerequisite can be used to identify these cases if desired.</p>
 <h1 id="rfc.section.5.2.3">
-<a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#update-section" id="update-section">Update section</a>
+<a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#update-section" id="update-section">Update Section</a>
 </h1>
 <p id="rfc.section.5.2.3.p.1">The Update section contains all of the records that the proxy wants to be added/removed in a single subdomain. If TIMEOUT resource records are being manually added to the authoritative server, they MUST be included as regular resource records in the Update section. See <a href="#lifetimes" class="xref">Section 6.3</a> below for more information.</p>
 <h1 id="rfc.section.5.2.4">
-<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#additional-data-section" id="additional-data-section">Additional data section</a>
+<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#additional-data-section" id="additional-data-section">Additional Data Section</a>
 </h1>
 <p id="rfc.section.5.2.4.p.1">The Update proxy may include additional data as needed. Instances where additional data might be included are:</p>
 <p></p>
 
 <ol>
-<li>When creating a subdomain by adding new NS records to a domain, <samp>A</samp> or <samp>AAAA</samp> glue records MAY be needed. Though, in most cases, the same authoritative server name / IP addresses should be used as in the parent domain.</li>
+<li>When creating a subdomain by adding new NS records to a domain, A or AAAA glue records MAY be needed. Though, in most cases, the same authoritative server name / IP addresses should be used as in the parent domain.</li>
 <li>If including a lease lifetime as discussed below in <a href="#lifetimes" class="xref">Section 6.3</a>, the OPT recording containing the Update lease will be sent in the additional data section.</li>
-<li>The TSIG cryptographic signature of the DNS Update message should be the last resource record in the additional data section.</li>
+<li>The TSIG cryptographic signature of the DNS UPDATE message should be the last resource record in the additional data section.</li>
 </ol>
 <h1 id="rfc.section.6">
-<a href="#rfc.section.6">6.</a> <a href="#dns-authoritative-server-behavior" id="dns-authoritative-server-behavior">DNS authoritative server behavior</a>
+<a href="#rfc.section.6">6.</a> <a href="#dns-authoritative-server-behavior" id="dns-authoritative-server-behavior">DNS Authoritative Server Behavior</a>
 </h1>
 <p id="rfc.section.6.p.1">The Update proxy will rely on the authoritative server to update the SERIAL number for the zone after each update is completed.</p>
 <h1 id="rfc.section.6.1">
@@ -677,15 +682,15 @@
 </h1>
 <p id="rfc.section.6.1.p.1">An authoritative unicast DNS server MAY support DNS Push notifications <a href="#I-D.ietf-dnssd-push" class="xref">[I-D.ietf-dnssd-push]</a> for client queries in order to provide more timely and more efficient responses. While this is outside of the scope of the Update proxy, it is mentioned here for completeness.</p>
 <h1 id="rfc.section.6.2">
-<a href="#rfc.section.6.2">6.2.</a> <a href="#dnssec-compatibility" id="dnssec-compatibility">DNSSEC compatibility</a>
+<a href="#rfc.section.6.2">6.2.</a> <a href="#dnssec-compatibility" id="dnssec-compatibility">DNSSEC Compatibility</a>
 </h1>
-<p id="rfc.section.6.2.p.1">With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone a priori. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and Updated in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.</p>
+<p id="rfc.section.6.2.p.1">With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone a priori. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and UPDATEd in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.</p>
 <p id="rfc.section.6.2.p.2">The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be updated as needed as specified in <a href="#RFC3007" class="xref">[RFC3007]</a>.</p>
 <h1 id="rfc.section.6.3">
-<a href="#rfc.section.6.3">6.3.</a> <a href="#lifetimes" id="lifetimes">DNS Update record lifetimes</a>
+<a href="#rfc.section.6.3">6.3.</a> <a href="#lifetimes" id="lifetimes">DNS Update Record Lifetimes</a>
 </h1>
-<p id="rfc.section.6.3.p.1">When the Update proxy sends an DNS Update message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the Update server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.</p>
-<p id="rfc.section.6.3.p.2">There are several possibilities for how a DNS Update server may limit the lifetime of records added via an update message.</p>
+<p id="rfc.section.6.3.p.1">When the Update proxy sends an DNS UPDATE message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the UPDATE server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.</p>
+<p id="rfc.section.6.3.p.2">There are several possibilities for how a DNS UPDATE server may limit the lifetime of records added via an update message.</p>
 <p></p>
 
 <ol>
@@ -695,15 +700,24 @@
 </ol>
 <p id="rfc.section.6.3.p.4">Note that it is possible to use both the Dynamic DNS Update leases to communicate the lease lifetime and for the authoritative unicast DNS server to create TIMEOUT resource records on demand to achieve the same result if the Update proxy does not include TIMEOUT resource records natively.</p>
 <h1 id="rfc.section.7">
-<a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
+<a href="#rfc.section.7">7.</a> <a href="#unicast" id="unicast">Transitioning to Unicast</a>
 </h1>
-<p id="rfc.section.7.p.1">When a secure DNS Update is sent to an authoritative server, it should not be construed that this information is any more reliable than the original mDNS announcement was for which it was based. Care should always be taken when receiving mDNS announcements to ensure they are source IP address is one that belongs to an IP subnet on the received interface of the Update proxy. In addition, the TTL of the received link local announcement MUST be 1 to ensure it was not forwarded from a remote network.</p>
-<p id="rfc.section.7.p.2">Each Update proxy requires configuration of a shared secret for creation of the TSIG signature resource record contained as the last record in the Update message.</p>
+<p id="rfc.section.7.p.1">The design of the Update proxy is intended to work within the existing mDNS model and allow it to scale to multiple subnets using existing unicast DNS infrastructure. It is careful not to increase the amount of multicast traffic used for service discovery but it is also capable of providing a transition path to actually reduce multicast usage incrementally. Hosts have generally not been able to directly register their own services through DNS UPDATE because of the security scaling problem of shared passwords needed by TSIG.</p>
+<p id="rfc.section.7.p.2">By creating trusted infrastructure in the form of an Update proxy, services can now be registered through the Update proxy directly via unicast. This alleviates the need to advertise over mDNS at all.</p>
+<p id="rfc.section.7.p.3">Therefore, if we allow service providers to discover the Update proxy using either unicast or multicast queries, we can then perform all subsequent communication over unicast. This greatly reduces the multicast usage and the need for every host on the network to wake up and listen to multicast responses and periodic announcements.</p>
+<p id="rfc.section.7.p.4">In order to accomodate this transition, the Update proxy MAY announce and respond to PTR queries for the update proxy service using service name <samp>_dns-updateproxy-tls._tcp.local.</samp> pointing to a local instance name. As host implementations are updated to locate an Update proxy, they can switch entirely to unicast for all of the services they provide. The SRV record for the instance name can provide a target name and port for which the service provider can connect directly using TLS and send unicast registrations for all of its services. The TXT record for the instance name can contain vendor specific information associated with the Update proxy if desired. There are no required keys in the TXT record and while the record MUST exist (see Section 6 of <a href="#RFC6763" class="xref">[RFC6763]</a>), it can consist of a single zero length byte. Multiple announcements can be sent across a single TLS connection. There are no responses expected from the Update proxy after sending the announcements. However, Update proxies MUST only announce this service if they intend to provide a unicast interface for service providers on the local subnet.</p>
+<p id="rfc.section.7.p.5">Discovery of the Update proxy can also be entirely using unicast for service providers that prefer or are not multicast capable. The service provider would use address-derived domain enumeration as described in <a href="#subdomain" class="xref">Section 3.1</a> to determine the subdomain name of the local link and then perform a normal unicast PTR query through the local resolver for <samp>_dns-updateproxy-tls._tcp.&lt;subdomain&gt;.</samp> to find the Update proxy instance. In the case of redundant proxies, multiple PTR records with different instance names may exist. The SRV records priority and weight fields can be used to determine the preferred Update proxy.</p>
+<p id="rfc.section.7.p.6">Once these services are initially registered with the Update proxy, the proxy may occasionally sent unicast queries to confirm these services are still active. A 60 second interval with appropriate jitter is recommended for confirmation. If, in the meantime, the service is discontinued, the service provider SHOULD reconnect to the Update proxy and send &#8220;goodbye&#8221; announcements with TTL 0 as normally would be done with mDNS to expire the services as described in Section 8.4 of <a href="#RFC6762" class="xref">[RFC6762]</a>. The Update proxy will not send any response to these &#8220;goodbye&#8221; announcements, therefore, the connection MUST be closed gracefully to ensure proper delivery.</p>
+<h1 id="rfc.section.8">
+<a href="#rfc.section.8">8.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
+</h1>
+<p id="rfc.section.8.p.1">When a secure DNS UPDATE is sent to an authoritative server, it should not be construed that this information is any more reliable than the original mDNS announcement was for which it was based. Care should always be taken when receiving mDNS announcements to ensure they are source IP address is one that belongs to an IP subnet on the received interface of the Update proxy. In addition, the TTL of the received link local announcement MUST be 1 to ensure it was not forwarded from a remote network.</p>
+<p id="rfc.section.8.p.2">Each Update proxy requires configuration of a shared secret for creation of the TSIG signature resource record contained as the last record in the UPDATE message.</p>
 <p></p>
 <h1 id="rfc.references">
-<a href="#rfc.references">8.</a> References</h1>
+<a href="#rfc.references">9.</a> References</h1>
 <h1 id="rfc.references.1">
-<a href="#rfc.references.1">8.1.</a> Normative References</h1>
+<a href="#rfc.references.1">9.1.</a> Normative References</h1>
 <table><tbody>
 <tr>
 <td class="reference"><b id="RFC1035">[RFC1035]</b></td>
@@ -772,7 +786,7 @@
 </tr>
 </tbody></table>
 <h1 id="rfc.references.2">
-<a href="#rfc.references.2">8.2.</a> Informative References</h1>
+<a href="#rfc.references.2">9.2.</a> Informative References</h1>
 <table><tbody>
 <tr>
 <td class="reference"><b id="I-D.ietf-dnssd-hybrid">[I-D.ietf-dnssd-hybrid]</b></td>
@@ -809,9 +823,10 @@
 <a href="#rfc.appendix.A">Appendix A.</a> <a href="#comparison-to-discovery-proxy" id="comparison-to-discovery-proxy">Comparison to Discovery Proxy</a>
 </h1>
 <p id="rfc.section.A.p.1">The Update Proxy defined in this document is an alternative to the Discovery Proxy <a href="#I-D.ietf-dnssd-hybrid" class="xref">[I-D.ietf-dnssd-hybrid]</a> and the Discovery Relay <a href="#I-D.ietf-dnssd-mdns-relay" class="xref">[I-D.ietf-dnssd-mdns-relay]</a>. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer some advantages at a cost of increased state.</p>
-<p id="rfc.section.A.p.2">The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshing them, and then inserting them into subdomains using DNS Update.</p>
+<p id="rfc.section.A.p.2">The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshing them, and then inserting them into subdomains using DNS UPDATE.</p>
 <p id="rfc.section.A.p.3">The main advantages of the Update proxy include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.</p>
-<p id="rfc.section.A.p.4">Another key difference is that the Update proxy never becomes an authoritative unicast DNS server for the attached subdomain. It simply updates the existing authoritative server for the domain. Therefore, the administrator is free to use existing authoritative DNS server infrastructure.</p>
+<p id="rfc.section.A.p.4">While the Discovery Proxy increases multicast queries and responses based on received unicast queries <samp>O(n^2)</samp>, the Update proxy can reduce or eliminate mDNS traffic on the local links <samp>O(1)</samp>.</p>
+<p id="rfc.section.A.p.5">Another key difference is that the Update proxy never becomes an authoritative unicast DNS server for the attached subdomain. It simply updates the existing authoritative server for the domain. Therefore, the administrator is free to use existing authoritative DNS server infrastructure.</p>
 <h1 id="rfc.authors"><a href="#rfc.authors">Author's Address</a></h1>
 <div class="avoidbreak">
   <address class="vcard">

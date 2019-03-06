@@ -53,9 +53,9 @@
 
 <t>Multicast DNS is used today for link-local service discovery. While this has worked reasonably well on the local link, current deployment reveals two problems. First, mDNS wasn’t designed to traverse across multi-subnet campus networks. Second, IP multicast doesn’t work across all link types and can be problematic on 802.11 Wifi networks. Therefore, a solution is desired to contain legacy multicast DNS service discovery and transition to a unicast DNS service discovery model. By mapping the current mDNS discovered services into regular authoritative unicast DNS servers, clients from any IP subnet can make unicast queries through normal unicast DNS resolvers.</t>
 
-<t>There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS Update messages <xref target="RFC2136"/> directly to an authoritative unicast DNS server. While it is possible for each host providing a service to send it’s own DNS Update, key management has prevented widespread deployment of DNS Updates across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS Updates on a larger scale is needed.</t>
+<t>There are many ways to map services discovered using multicast DNS into the unicast namespace. This document describes a way to do the mapping using a proxy that sends DNS UPDATE messages <xref target="RFC2136"/> directly to an authoritative unicast DNS server. While it is possible for each host providing a service to send it’s own DNS UPDATE, key management has prevented widespread deployment of DNS UPDATEs across a domain. By having a limited number of proxies sitting on one or more IP subnets, it is possible to provide secure DNS updates at a manageable scale. Future work to automate secure DNS UPDATEs on a larger scale is needed.</t>
 
-<t>This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update Proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.</t>
+<t>This document will explain how services on each .local domain will be mapped into the unicast DNS namespace and how unicast clients will discover these services. It is important to note that no changes are required in either the clients, DNS authoritative servers, or DNS resolver infrastructure. In addition, while the Update proxy is a new logical concept, it requires no new protocols to be defined and can be built using existing DNS libraries.</t>
 
 <t>An Update proxy is an ideal service to run on routers and/or switches to map local services into a larger network infrastructure.</t>
 
@@ -71,40 +71,42 @@ These words may also appear in this document in
 lower case as plain English words, absent their normative meanings.</t>
 
 </section>
-<section anchor="dns-subdomain-model" title="DNS subdomain model">
+<section anchor="dns-subdomain-model" title="DNS Subdomain Model">
 
-<t>Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browsable (respond to PTR queries for b._dns-sd._udp.&lt;subdomain&gt;.&lt;domain&gt;.). See Section 11 of <xref target="RFC6763"/> for more details about browsing. In the context of the Update proxy, these subdomains are typically special use subdomains for mDNS mappings.</t>
+<t>Each .local domain which logically maps to an IP subnet is modeled as a separate subdomain in the unicast DNS hierarchy. Each of these subdomains must be browsable (respond to PTR queries for <spanx style="verb">b._dns-sd._udp.&lt;subdomain&gt;.</spanx>). See Section 11 of <xref target="RFC6763"/> for more details about browsing. In the context of the Update proxy, these subdomains are typically special use subdomains for mDNS mappings.</t>
 
-<section anchor="subdomain" title="Subdomain naming">
+<section anchor="subdomain" title="Subdomain Naming">
 
 <t>The browseable subdomain label is prepended to the domain name and separated by a period. See <xref target="RFC7719"/> for more information on subdomains and labels. It is not important that the label be human readable or have organizational significance. End users will not be interacting with these labels. The main requirement is that they be unique within the domain for each IP subnet. Subdomain labels can be obtained by the proxy in several ways. The following methods should be attempted in order to assure consistency among redundant proxies:</t>
 
 <t><list style="numbers">
   <t>address-derived domain enumeration through local resolver  <vspace blankLines='1'/>
-The proxy issues a PTR query for the registration or browse domains based on the IP subnet. Separate queries are performed for IPv4 and IPv6 on the same link since they are different IP subnets. Since the Update proxy will be registering services with DNS Update, it should begin querying for registration domains and fallback to browse domains if no registration domains are configured.  <vspace blankLines='1'/>
-As an example, suppose a proxy was connected to IPv4 subnet 203.0.113.0/24. In order to determine if there was a subdomain name for this subnet, the base domain name to query would be derived as 0.113.0.203.in-addr.arpa. The proxy would issue a PTR query for the following names in order to find the subdomain for the IP subnet:  <vspace blankLines='1'/>
-<spanx style="verb">dr._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx>  <vspace blankLines='1'/>
-<spanx style="verb">r._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx>  <vspace blankLines='1'/>
-<spanx style="verb">db._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx>  <vspace blankLines='1'/>
-<spanx style="verb">b._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx>  <vspace blankLines='1'/>
-<spanx style="verb">lb._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx>  <vspace blankLines='1'/>
+The proxy issues a PTR query for the registration or browse domains based on the IP subnet. Separate queries are performed for IPv4 and IPv6 on the same link since they are different IP subnets. Since the Update proxy will be registering services with DNS UPDATE, it should begin querying for registration domains and fallback to browse domains if no registration domains are configured.  <vspace blankLines='1'/>
+As an example, suppose a proxy was connected to IPv4 subnet <spanx style="verb">203.0.113.0/24</spanx>. In order to determine if there was a subdomain name for this subnet, the base domain name to query would be derived as <spanx style="verb">0.113.0.203.in-addr.arpa.</spanx> The proxy would issue a PTR query for the following names in order to find the subdomain for the IP subnet:  <vspace blankLines='1'/>
+<spanx style="verb">dr._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx> <vspace />
+ <spanx style="verb">r._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx> <vspace />
+ <spanx style="verb">db._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx> <vspace />
+ <spanx style="verb">b._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx> <vspace />
+ <spanx style="verb">lb._dns-sd._udp.0.113.0.203.in-addr.arpa.</spanx>  <vspace blankLines='1'/>
 The first response with an answer should be the subdomain name including the domain name for the network and further queries through this list are not needed. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.  <vspace blankLines='1'/>
 The Update proxy should periodically rediscover the subdomain name at approximately 5 minute intervals for each IP subnet adding appropriate random jitter across IP subnets so as to prevent synchronization.</t>
   <t>proxy local configuration override  <vspace blankLines='1'/>
 If no answer is returned, the proxy may have local configuration containing a subdomain name for the network. If so, this subdomain should be used.</t>
   <t>algorithmic subdomain label generation  <vspace blankLines='1'/>
-If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to a hexadecimal string. This will give a 8 character unique string to use as a subdomain label. For the example above, this label would be cb007100.</t>
+If no local configuration is present for the IP subnet, the proxy may generate a unique label and use that for the subdomain by appending a common domain name. One such algorithm is to take the network form of an IPv4 subnet without a prefix length (host portion all zeros) and convert it to a hexadecimal string. This will give a 8 character unique string to use as a subdomain label. For the example above, this label would be <spanx style="verb">cb007100</spanx>.</t>
 </list></t>
 
+<t>In the cases where through either local configuration or algorithmic generation of subdomain names, a subdomain name is known by the proxy but cannot be address derived through a PTR query, the Update proxy SHOULD register the appropriate address-derived enumeration records through an UPDATE to the zone master. If the IP subnet is removed or becomes inactive on the Update proxy, the proxy MUST attempt to remove these records.</t>
+
 </section>
-<section anchor="domain-name-discovery" title="Domain name discovery">
+<section anchor="domain-name-discovery" title="Domain Name Discovery">
 
 <t>The base domain name to use for each subdomain also has to be discovered on a per IP subnet basis. In most cases, the domain name will be the same for all IP subnets because they are all contained in a single administrative domain. However, this is not required and a proxy administrator may need to span multiple administrative boundaries requiring different domain names on different IP subnets (and therefore, subdomains).</t>
 
 <t>There is not a direct query to discover a separate domain name but the domain name is included with the subdomain in the response to the PTR query above in <xref target="subdomain"/>. If the PTR query returns an empty response, then the domain name can be obtained from local proxy configuration and if no domain name is specified there, the default domain for the host should be used.</t>
 
 </section>
-<section anchor="client-service-discovery" title="Client service discovery">
+<section anchor="client-service-discovery" title="Client Service Discovery">
 
 <t>Fortunately, clients performing service discovery require no changes in order to work with the Update proxy. Existing clients already support wide-area bonjour which specifies how to query search domains and subdomains for services. See section 11 of <xref target="RFC6763"/>.</t>
 
@@ -114,20 +116,20 @@ If no local configuration is present for the IP subnet, the proxy may generate a
 
 </section>
 </section>
-<section anchor="update-proxy-behavior" title="Update proxy behavior">
+<section anchor="update-proxy-behavior" title="Update Proxy Behavior">
 
 <t>Since no new protocols are defined, this document mostly describes the expected behavior of the Update proxy and how it uses existing protocols to achieve multi IP subnet service discovery. The behavior is mostly intuitive but is described to ensure compatibility and completeness.</t>
 
-<section anchor="mdns-service-announcements" title="mDNS service announcements">
+<section anchor="mdns-service-announcements" title="mDNS Service Announcements">
 
 <t>The Update proxy should listen to mDNS service announcements (responses) on all interfaces it is proxying for. Multiple Update proxies can be active on the same IP subnet at the same time. See <xref target="RFC6762"/> for more information on multicast DNS.</t>
 
 </section>
-<section anchor="service-caching-and-refresh" title="Service caching and refresh">
+<section anchor="service-caching-and-refresh" title="Service Caching and Refresh">
 
-<t>As specified in Section 8.3 of <xref target="RFC6762"/>, service announcements are sent multiple times for redundancy. However, there is no need to send duplicate Update messages to the authoritative unicast DNS server. Therefore, the Update proxy should cache service announcements and only send DNS Update messages when needed.</t>
+<t>As specified in Section 8.3 of <xref target="RFC6762"/>, service announcements are sent multiple times for redundancy. However, there is no need to send duplicate UPDATE messages to the authoritative unicast DNS server. Therefore, the Update proxy should cache service announcements and only send DNS UPDATE messages when needed.</t>
 
-<t>As described in Section 8.4 of <xref target="RFC6762"/>, a host may send “goodbye” announcements by setting the TTL to 0. In this case, the record MUST be removed from the cache or otherwise marked as expired and a DNS Update should be sent to the authoritative unicast DNS server removing the record.</t>
+<t>As described in Section 8.4 of <xref target="RFC6762"/>, a host may send “goodbye” announcements by setting the TTL to 0. In this case, the record MUST be removed from the cache or otherwise marked as expired and a DNS UPDATE should be sent to the authoritative unicast DNS server removing the record.</t>
 
 <t>The Update proxy MUST also remove/expire old cache entries and remove the records from the authoritative unicast DNS server when the cache-flush bit is set on new announcements as described in Section 10.2 of <xref target="RFC6762"/>.</t>
 
@@ -135,33 +137,33 @@ If no local configuration is present for the IP subnet, the proxy may generate a
 
 <t>As described in Section 11 of <xref target="RFC6762"/>, the Update proxy should use an IP source address of the IP subnet of the interface it is transmitting over and that is on the same IP subnet as the service provider. It is also permissible to use a link-local IP address in the IPv6 case as long as the service itself is available on an IPv6 address that is reachable from outside the local link.</t>
 
-<t>In order for the Update proxy to discover as many services available on each IP subnet as possible, it should periodically send a PTR multicast query for <spanx style="verb">_services._dns-sd._udp.local</spanx> on each subnet. The unicast response bit SHOULD be set in the query in order to force unicast responses to the Update proxy. As PTR responses are received, The Update proxy can then send Service Instance Enumeration PTR queries (also with the unicast response bit set) for each service.</t>
+<t>In order for the Update proxy to discover as many services available on each IP subnet as possible, it should periodically send a PTR multicast query for <spanx style="verb">_services._dns-sd._udp.local.</spanx> on each subnet. The unicast response bit SHOULD be set in the query in order to force unicast responses to the Update proxy. As PTR responses are received, The Update proxy can then send Service Instance Enumeration PTR queries (also with the unicast response bit set) for each service.</t>
 
 <t>This was not the intended behavior of mDNS since local clients would just ask dynamically when they needed to know all of the providers of a service name but keeping this information up to date in the authoritative server provides benefits to remote clients such as faster response times and ability to use DNSSEC validation that were not previously possible with multicast DNS. These benefits are provided at the additional cost of a slight increase in network activity and processing time by the hosts announcing services. However, if the Update proxy uses unicast to query the service providers directly, other clients are not affected by these refresh queries and do not have to turn their radios on for queries/responses that they have no interest in.</t>
 
 </section>
-<section anchor="mdns-probing" title="mDNS probing">
+<section anchor="mdns-probing" title="mDNS Probing">
 
 <t>While Section 8.2 of <xref target="RFC6762"/> recommends all potential answers be included in mDNS probe queries, because these records haven’t gone through conflict resolution, they should not be regarded as announcements of services. Therefore, an Update proxy MUST NOT rely on information in any section of DNS query messages.</t>
 
 </section>
-<section anchor="link-local-addressing" title="Link-local addressing">
+<section anchor="link-local-addressing" title="Link-local Addressing">
 
-<t>In the IPv6 case, the source address of the announcements is a link-local IPv6 address that will probably be different than the IP subnet that the service is being provided on. However, it is certainly possible that link-local addressing is used with IPv4 as well. This is not as common but exists in a zero-conf environment where no IPv4 addresses are assigned via DHCP or statically and the hosts revert to link-local IPv4 addresses (169.254/16), see <xref target="RFC3927"/>.</t>
+<t>In the IPv6 case, the source address of the announcements is a link-local IPv6 address that will probably be different than the IP subnet that the service is being provided on. However, it is certainly possible that link-local addressing is used with IPv4 as well. This is not as common but exists in a zero-conf environment where no IPv4 addresses are assigned via DHCP or statically and the hosts revert to link-local IPv4 addresses (<spanx style="verb">169.254/16</spanx>), see <xref target="RFC3927"/>.</t>
 
 <t>If the service SRV target resolves to only a link-local address, then the service is not eligible to be advertised outside of the link and shouldn’t be sent to the authoritative unicast DNS server by the Update proxy.</t>
 
-<t>In general, the Update proxy needs to ensure that the service is reachable outside of the link it is announced on before sending an Update to the authoritative server for the subdomain.</t>
+<t>In general, the Update proxy needs to ensure that the service is reachable outside of the link it is announced on before sending an UPDATE to the authoritative server for the subdomain.</t>
 
 </section>
-<section anchor="ipv6-and-ipv4-on-same-link" title="IPv6 and IPv4 on same link">
+<section anchor="ipv6-and-ipv4-on-same-link" title="IPv6 and IPv4 on Same Link">
 
-<t>Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 <spanx style="verb">A</spanx> records <xref target="RFC1035"/> and IPv6 <spanx style="verb">AAAA</spanx> records <xref target="RFC3596"/> are published for an SRV target <xref target="RFC2782"/> name, the administrator should provide the service over both protocols.</t>
+<t>Announced services may be available on IPv4, IPv6, or both on the same link. If both IPv4 A records <xref target="RFC1035"/> and IPv6 AAAA records <xref target="RFC3596"/> are published for an SRV target <xref target="RFC2782"/> name, the administrator should provide the service over both protocols.</t>
 
 <t>In some cases, this won’t be possible. This will not incur any extra delays if clients attempt connections over both IPv4 and IPv6 protocols simultaneously but if one protocol is preferred over another, delays may occur.</t>
 
 </section>
-<section anchor="multiple-logical-ip-subnets" title="multiple logical IP subnets">
+<section anchor="multiple-logical-ip-subnets" title="Multiple Logical IP Subnets">
 
 <t>Multiple IP subnets on the same link is just a more general case of IPv4 and IPv6 on the same link. When multiple IP subnets exist for the same protocol on the same link, they appear as separate interfaces to the Update proxy and require a separate subdomain name just as IPv4 and IPv6 do.</t>
 
@@ -170,14 +172,16 @@ If no local configuration is present for the IP subnet, the proxy may generate a
 <t>If a SRV target resolves to addresses on multiple logical IP subnets of the same interface, the service can be included in multiple subdomains on the appropriate server(s) for those subdomains.</t>
 
 </section>
-<section anchor="proxy-redundancy" title="Proxy redundancy">
+<section anchor="proxy-redundancy" title="Proxy Redundancy">
 
-<t>Providing redundant Update proxies for the same IP subnet can be easily achieved using the DNS Update protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.</t>
+<t>Providing redundant Update proxies for the same IP subnet can be easily achieved by virtue of the DNS UPDATE protocol. None of the redundant proxies needs to be aware of any of the other redundant proxies on an IP subnet.</t>
 
-<t>Alternatives for ways to format DNS Update messages are defined below in <xref target="prereq"/> as to possible uses of the Prerequisite section for use with redundant Update proxies.</t>
+<t>Alternatives for ways to format DNS UPDATE messages are defined below in <xref target="prereq"/> as to possible uses of the Prerequisite section for use with redundant Update proxies.</t>
+
+<t>Alternatively, a proxy MAY choose to hibernate when it discovers another active Update proxy as described below in <xref target="unicast"/>.</t>
 
 </section>
-<section anchor="service-filtering-and-translation" title="Service filtering and translation">
+<section anchor="service-filtering-and-translation" title="Service Filtering and Translation">
 
 <t>In the process of registering services with an authoritative unicast DNS server, the proxy can perform filtering and translation on the dynamically discovered services.</t>
 
@@ -189,64 +193,64 @@ If no local configuration is present for the IP subnet, the proxy may generate a
 
 </section>
 </section>
-<section anchor="dns-update" title="DNS update">
+<section anchor="dns-update" title="DNS UPDATE">
 
-<t>While DNS Update is well supported in authoritative DNS servers, it typically requires some form of authentication for the server to accept the update. The most common form is TSIG <xref target="RFC2845"/>,<xref target="RFC4635"/> which is based on a shared secret and a one way hash over the contents of the record.</t>
+<t>While DNS UPDATE is well supported in authoritative DNS servers, it typically requires some form of authentication for the server to accept the update. The most common form is TSIG <xref target="RFC2845"/>,<xref target="RFC4635"/> which is based on a shared secret and a one way hash over the contents of the record.</t>
 
-<t>The Update proxy doesn’t dictate a method of privacy or authentication for communication to an authoritative DNS Update server. However, implementations SHOULD ensure some form of authentication exists and even refuse to operate in an environment without authentication.</t>
+<t>The Update proxy doesn’t dictate a method of privacy or authentication for communication to an authoritative DNS UPDATE server. However, implementations SHOULD ensure some form of authentication exists and even refuse to operate in an environment without authentication.</t>
 
-<section anchor="selection-of-authoritative-unicast-dns-server" title="Selection of authoritative unicast DNS server">
+<section anchor="selection-of-authoritative-unicast-dns-server" title="Selection of Authoritative Unicast DNS Server">
 
-<t>The Update proxy should attempt to locate the authoritative DNS Update server for each subdomain in the following manner:</t>
+<t>The Update proxy should attempt to locate the authoritative DNS UPDATE server for each subdomain in the following manner:</t>
 
 <t><list style="numbers">
-  <t>An Update proxy should first send an SRV query for _dns-update-tls._tcp.&lt;subdomain&gt;.&lt;domain&gt;. If an answer is received, the target and port number will provide the parameters needed for where to send updates. The proxy can also try the TCP and UDP variants of this service name _dns-update._tcp and _dns-update._udp if the TLS variant does not exist. If no TLS variant is found, the proxy can still attempt a TLS connection on the SRV port of the TCP or UDP variant. The proxy can also attempt to connect to the target on the reserved port (853) for DNS over TLS as defined in Section 3.1 of <xref target="RFC7858"/>.</t>
-  <t>The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn’t returned: _dns-update-tls._tcp.&lt;domain&gt; as well as the TCP and UDP variants.</t>
-  <t>If no matching SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS Update server has been configured.</t>
-  <t>If no local configuration exists for a DNS Update server, the Update proxy can query the SOA records for the subdomain and try sending updates to the MNAME master server configured for the subdomain. Again, using TLS/TCP is encouraged if available.</t>
-  <t>If DNS Updates are not accepted by the server(s) represented by the SOA MNAME master server, then the Update proxy can assume that DNS Updates are not available for the subdomain and listening to mDNS announcements on the IP subnet would be unproductive.</t>
+  <t>An Update proxy should first send an SRV query for <spanx style="verb">_dns-update-tls._tcp.&lt;subdomain&gt;.</spanx> If an answer is received, the target and port number will provide the parameters needed for where to send updates. The proxy can also try the TCP and UDP variants of this service name <spanx style="verb">_dns-update._tcp</spanx> and <spanx style="verb">_dns-update._udp</spanx> if the TLS variant does not exist. If no TLS variant is found, the proxy can still attempt a TLS connection on the SRV port of the TCP or UDP variant. The proxy can also attempt to connect to the target on the reserved port (853) for DNS over TLS as defined in Section 3.1 of <xref target="RFC7858"/>.</t>
+  <t>The Update proxy can make a similar query for the same service in the domain if a subdomain specific answer isn’t returned: <spanx style="verb">_dns-update-tls._tcp.&lt;domain&gt;.</spanx> as well as the TCP and UDP variants.</t>
+  <t>If no matching SRV records are returned, the Update proxy SHOULD consult local configuration policy to see if an DNS UPDATE server has been configured.</t>
+  <t>If no local configuration exists for a DNS UPDATE server, the Update proxy can query the SOA records for the subdomain and try sending updates to the MNAME master server configured for the subdomain. Again, using TLS/TCP is encouraged if available.</t>
+  <t>If DNS UPDATEs are not accepted by the server(s) represented by the SOA MNAME master server, then the Update proxy can assume that DNS UPDATEs are not available for the subdomain and listening to mDNS announcements on the IP subnet would be unproductive.</t>
 </list></t>
 
 </section>
-<section anchor="dns-update-sections" title="DNS update sections">
+<section anchor="dns-update-sections" title="DNS UPDATE Sections">
 
-<t>A DNS Update message contains four sections as specified in <xref target="RFC2136"/>.</t>
+<t>A DNS UPDATE message contains four sections as specified in <xref target="RFC2136"/>.</t>
 
-<section anchor="zone-section" title="Zone section">
+<section anchor="zone-section" title="Zone Section">
 
 <t>When an Update proxy is adding or removing services to/from a subdomain, the zone section MUST contain a single zone (ZOCOUNT = 1) and the ZNAME MUST be the subdomain being updated. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the records being added/removed.</t>
 
-<t>Updates to multiple subdomains MUST be performed in separate DNS Update messages with one subdomain per message.</t>
+<t>DNS UPDATEs to multiple subdomains MUST be performed in separate DNS UPDATE messages with one subdomain per message.</t>
 
 <t>If a new subdomain is being created for a domain by the Update proxy, the subdomain’s parent zone should be used for the ZNAME. ZTYPE MUST be SOA and ZCLASS MUST be the same class as the subdomain’s NS record CLASS that is going to be added. Similarly for removing a subdomain.</t>
 
 </section>
-<section anchor="prereq" title="Prerequisite section">
+<section anchor="prereq" title="Prerequisite Section">
 
 <t>It is not necessary for the Update proxy to include any prerequisites when adding/removing records. However, if the Update proxy wants to have better error handling, it can add prerequisites to ensure the state of the authoritative server is consistent.</t>
 
 <t>Given that multiple Update proxies may exist for the same IP subnet (and subdomain), it is possible that similar records may be added or deleted to/from the authoritative server before the Update proxy’s own messages are processed. This is not to be considered a fatal error and may happen during normal operation of redundant proxies. The use of prerequisite can be used to identify these cases if desired.</t>
 
 </section>
-<section anchor="update-section" title="Update section">
+<section anchor="update-section" title="Update Section">
 
 <t>The Update section contains all of the records that the proxy wants to be added/removed in a single subdomain. If TIMEOUT resource records are being manually added to the authoritative server, they MUST be included as regular resource records in the Update section. See <xref target="lifetimes"/> below for more information.</t>
 
 </section>
-<section anchor="additional-data-section" title="Additional data section">
+<section anchor="additional-data-section" title="Additional Data Section">
 
 <t>The Update proxy may include additional data as needed. Instances where additional data might be included are:</t>
 
 <t><list style="numbers">
-  <t>When creating a subdomain by adding new NS records to a domain, <spanx style="verb">A</spanx> or <spanx style="verb">AAAA</spanx> glue records MAY be needed. Though, in most cases, the same authoritative server name / IP addresses should be used as in the parent domain.</t>
+  <t>When creating a subdomain by adding new NS records to a domain, A or AAAA glue records MAY be needed. Though, in most cases, the same authoritative server name / IP addresses should be used as in the parent domain.</t>
   <t>If including a lease lifetime as discussed below in <xref target="lifetimes"/>, the OPT recording containing the Update lease will be sent in the additional data section.</t>
-  <t>The TSIG cryptographic signature of the DNS Update message should be the last resource record in the additional data section.</t>
+  <t>The TSIG cryptographic signature of the DNS UPDATE message should be the last resource record in the additional data section.</t>
 </list></t>
 
 </section>
 </section>
 </section>
-<section anchor="dns-authoritative-server-behavior" title="DNS authoritative server behavior">
+<section anchor="dns-authoritative-server-behavior" title="DNS Authoritative Server Behavior">
 
 <t>The Update proxy will rely on the authoritative server to update the SERIAL number for the zone after each update is completed.</t>
 
@@ -255,18 +259,18 @@ If no local configuration is present for the IP subnet, the proxy may generate a
 <t>An authoritative unicast DNS server MAY support DNS Push notifications <xref target="I-D.ietf-dnssd-push"/> for client queries in order to provide more timely and more efficient responses. While this is outside of the scope of the Update proxy, it is mentioned here for completeness.</t>
 
 </section>
-<section anchor="dnssec-compatibility" title="DNSSEC compatibility">
+<section anchor="dnssec-compatibility" title="DNSSEC Compatibility">
 
-<t>With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone a priori. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and Updated in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.</t>
+<t>With mDNS, the next domain name field in an NSEC record could not reference the next record in the zone because it was not possible to know all of the records in the zone a priori. By mapping all known records into a unicast subdomain, the NSEC next domain name field can contain the next known record as defined. As new services are discovered and UPDATEd in the authoritative unicast DNS server, the NSEC records can be kept up to date by the authoritative server.</t>
 
 <t>The Update proxy will assume that DNS updates sent to zones with DNSSEC enabled will be updated as needed as specified in <xref target="RFC3007"/>.</t>
 
 </section>
-<section anchor="lifetimes" title="DNS Update record lifetimes">
+<section anchor="lifetimes" title="DNS Update Record Lifetimes">
 
-<t>When the Update proxy sends an DNS Update message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the Update server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.</t>
+<t>When the Update proxy sends an DNS UPDATE message to an authoritative unicast DNS server, it MAY include a lease lifetime to indicate how long the UPDATE server should keep the resource records active in the zone. This is different from the TTL which tells resolvers how long to keep the records in their cache. Lease lifetimes may be based on different origin data. For example, when an IP address is assigned to a host via DHCP, the DHCP server will provide a time period for which the address is assigned to the host.</t>
 
-<t>There are several possibilities for how a DNS Update server may limit the lifetime of records added via an update message.</t>
+<t>There are several possibilities for how a DNS UPDATE server may limit the lifetime of records added via an update message.</t>
 
 <t><list style="numbers">
   <t>The DNS update server MAY be configured to automatically delete the records after a certain fixed time period (such as 24 hours). This is a failsafe mechanism in case the origin of the record data goes offline and does not ever try to remove the records.</t>
@@ -278,11 +282,26 @@ If no local configuration is present for the IP subnet, the proxy may generate a
 
 </section>
 </section>
+<section anchor="unicast" title="Transitioning to Unicast">
+
+<t>The design of the Update proxy is intended to work within the existing mDNS model and allow it to scale to multiple subnets using existing unicast DNS infrastructure. It is careful not to increase the amount of multicast traffic used for service discovery but it is also capable of providing a transition path to actually reduce multicast usage incrementally. Hosts have generally not been able to directly register their own services through DNS UPDATE because of the security scaling problem of shared passwords needed by TSIG.</t>
+
+<t>By creating trusted infrastructure in the form of an Update proxy, services can now be registered through the Update proxy directly via unicast. This alleviates the need to advertise over mDNS at all.</t>
+
+<t>Therefore, if we allow service providers to discover the Update proxy using either unicast or multicast queries, we can then perform all subsequent communication over unicast. This greatly reduces the multicast usage and the need for every host on the network to wake up and listen to multicast responses and periodic announcements.</t>
+
+<t>In order to accomodate this transition, the Update proxy MAY announce and respond to PTR queries for the update proxy service using service name <spanx style="verb">_dns-updateproxy-tls._tcp.local.</spanx> pointing to a local instance name. As host implementations are updated to locate an Update proxy, they can switch entirely to unicast for all of the services they provide. The SRV record for the instance name can provide a target name and port for which the service provider can connect directly using TLS and send unicast registrations for all of its services. The TXT record for the instance name can contain vendor specific information associated with the Update proxy if desired. There are no required keys in the TXT record and while the record MUST exist (see Section 6 of <xref target="RFC6763"/>), it can consist of a single zero length byte. Multiple announcements can be sent across a single TLS connection. There are no responses expected from the Update proxy after sending the announcements. However, Update proxies MUST only announce this service if they intend to provide a unicast interface for service providers on the local subnet.</t>
+
+<t>Discovery of the Update proxy can also be entirely using unicast for service providers that prefer or are not multicast capable. The service provider would use address-derived domain enumeration as described in <xref target="subdomain"/> to determine the subdomain name of the local link and then perform a normal unicast PTR query through the local resolver for <spanx style="verb">_dns-updateproxy-tls._tcp.&lt;subdomain&gt;.</spanx> to find the Update proxy instance. In the case of redundant proxies, multiple PTR records with different instance names may exist. The SRV records priority and weight fields can be used to determine the preferred Update proxy.</t>
+
+<t>Once these services are initially registered with the Update proxy, the proxy may occasionally sent unicast queries to confirm these services are still active. A 60 second interval with appropriate jitter is recommended for confirmation. If, in the meantime, the service is discontinued, the service provider SHOULD reconnect to the Update proxy and send “goodbye” announcements with TTL 0 as normally would be done with mDNS to expire the services as described in Section 8.4 of <xref target="RFC6762"/>. The Update proxy will not send any response to these “goodbye” announcements, therefore, the connection MUST be closed gracefully to ensure proper delivery.</t>
+
+</section>
 <section anchor="security-considerations" title="Security Considerations">
 
-<t>When a secure DNS Update is sent to an authoritative server, it should not be construed that this information is any more reliable than the original mDNS announcement was for which it was based. Care should always be taken when receiving mDNS announcements to ensure they are source IP address is one that belongs to an IP subnet on the received interface of the Update proxy. In addition, the TTL of the received link local announcement MUST be 1 to ensure it was not forwarded from a remote network.</t>
+<t>When a secure DNS UPDATE is sent to an authoritative server, it should not be construed that this information is any more reliable than the original mDNS announcement was for which it was based. Care should always be taken when receiving mDNS announcements to ensure they are source IP address is one that belongs to an IP subnet on the received interface of the Update proxy. In addition, the TTL of the received link local announcement MUST be 1 to ensure it was not forwarded from a remote network.</t>
 
-<t>Each Update proxy requires configuration of a shared secret for creation of the TSIG signature resource record contained as the last record in the Update message.</t>
+<t>Each Update proxy requires configuration of a shared secret for creation of the TSIG signature resource record contained as the last record in the UPDATE message.</t>
 
 <t><vspace blankLines='999' /></t>
 
@@ -645,9 +664,11 @@ If no local configuration is present for the IP subnet, the proxy may generate a
 
 <t>The Update Proxy defined in this document is an alternative to the Discovery Proxy <xref target="I-D.ietf-dnssd-hybrid"/> and the Discovery Relay <xref target="I-D.ietf-dnssd-mdns-relay"/>. This solution makes different trade-offs than the ones made by the Discovery Proxy which offer some advantages at a cost of increased state.</t>
 
-<t>The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshing them, and then inserting them into subdomains using DNS Update.</t>
+<t>The main difference is that the Discovery Proxy builds the list of matching services on demand by querying over mDNS and collecting the announcements in response to client queries. Whereas the Update proxy tries to build a complete list of services by listening for all announcements, discovering and refreshing them, and then inserting them into subdomains using DNS UPDATE.</t>
 
 <t>The main advantages of the Update proxy include limiting further propagation of IP multicast across the campus, providing a pathway to eliminate multicast entirely, faster response time to client queries, and the ability to provide DNSSEC signed security responses for client queries.</t>
+
+<t>While the Discovery Proxy increases multicast queries and responses based on received unicast queries <spanx style="verb">O(n^2)</spanx>, the Update proxy can reduce or eliminate mDNS traffic on the local links <spanx style="verb">O(1)</spanx>.</t>
 
 <t>Another key difference is that the Update proxy never becomes an authoritative unicast DNS server for the attached subdomain. It simply updates the existing authoritative server for the domain. Therefore, the administrator is free to use existing authoritative DNS server infrastructure.</t>
 
@@ -657,199 +678,228 @@ If no local configuration is present for the IP subnet, the proxy may generate a
   </back>
 
 <!-- ##markdown-source:
-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
+H4sIAPg5gFwAA6Vd63LbSHb+z6dA7B9rVyhaku+u3LSyZ0dVviiWnM1ObWXU
+BJokxiDARQOSua55lzxLnizn2hcAtGeSVGXHkojG6dPn8p1b8+joaNaVXWVf
+Za/fX2WfdoXpbHbZNl/22appsyvb3pa5zV6XLm9ubbufFU1emy18vmjNqjva
+9Q6eaMujonauOOppgaMdLnB0fDLDn15lp8cnL2flrn2VdW3vutPj45fHpzPT
+WvMqu6jh8dp2s7s10XD1Ovtz034u63X2p7bpd7PPd+FDR6/xpbPcdK8y1xUz
+15m6+NlUTW1pbTub5U0Bz77K+m519GK2K1/Nsuwo65qc/uv229auHP+7aTv6
+YWb6btO09En4/ywra/cqu15kl7I5+iXv+rrZpr9uWnjZp9qsVmVVwq8L+q2D
+lS0Qee8e/ZiX3f5V9tFUtlxv+DdNAau9P89Onz87fiG/6uuuhc99ujqjX+w2
+tK9/PMkevDx5+TB78ez50cnjx8f0R7s1ZfUqU/7/29LU618WebOdzY6OjjKz
+BBJM3s1m15vSZXBq/dbWXVZYl7fl0rrMZFsL2y6AN1mxh92VuamqfbY1u2zb
+Vx386DqSClPXQFpucQEHzIEHuo3N+jp8BJnjdgYkBaWmdzZb7jMnwlOo8GR5
+VeIai+wCKGmAiLpBklZlbeEt+6y2dxnIDpxWU7ls2Xe4lMvsl9J1KBH4qvD3
+sqYH7sweVqRtuqa6jT8Pn11Wduuyu7LbTNBj8rZxjre7q2x2cZm5fgmCRoub
+zJVb+PU829sus3DCOZI/BxbVtW0XzOltWRQVCN59lNK2Kfq8K5t6NnuX8BCI
+g60gswvDqlWV9eejqgGmjwlbZH/elEBPh5vaGKAfVAKeBo1xTW2WcEx3tqqy
+pqaT4FVwwXmW923LB72rmj2deWtvrQF+dXeN58gi+6FsHe4Fqbszrv4DCUe5
+rolK0CYDlMBBxjw6Yu5kudmC4AH3OyQMFruyeVMXc2RgkB08YVwWP6PLgIgR
+oVm336EQ1gUsVmdLq5QZeBj39eL4dHFykv25XJXRe643FlS2aeFMDJ52j7xG
+5iLpLVMOlHQGjq+ya5PvB7I8IQNAAmy2diWtBQuYRLTHT2xBd6tF9kfSlR3K
+GR6CMp4Yqh8GiuR5UZzWrvvKtBmbnLKD7d7a0fuA8XNVlmzVgs1B7fDSSSzb
+ms/hwb/1YAPgHd0GbOZ6A3rVbkEk4nVbS9rRugXaBCAtAwOMorwnDcKNo+p7
+cqMt9A43mTJyZAa8CRBdnDQ58CayN/yoso/XNxm5DfiL6YCMunDsky5fn12/
+AWPlnFnDIl+//sPHH85PTx4/+/VXILK1eVfRosCT73FV9arsUGZ2IJAlyByp
+ozX5Jts08HGg4rYsmCI9fFgeKYIH/+Cy5q6OKJtnny1KQg3U0X5RX3eoc+C0
+CrA8sH/40RSxSjaraAXnlQMYA2a9JtnamFumoSq3Ja5U99ulbfFR5BOeNogs
+mTkQW/AU4IpANNvYis2HO+0a2Z6F/YDEWiKDvTa8v0OvQDsx+GkHZgWO84e+
+w0+SGiOf+w6o7JIVdCMNWk2Q7zUQSk/j22trC1sshq7orgRbYL/sKlTWTXMX
+RA9WoeNYsGFjpvDnlyw1wI7v+CFUa1xU/6raRKuobOPzzvoXk18CEsHqAzYw
+QCO8AlyUZZmswbZswM0ip2Dfrf1bTzYHaLPgX3g5fdGcXWcikF614aRilYQV
+Vi0Q2YLvAI4CGcDGoiCDNM/uxBVYhWesJiXKC/q/qlmj60a7l9tdR2cutKGD
+HThV2BHwkH1uEdvfZV9Wnahi4nCrctkatC5wgmf1mAiwv4WNvBhauR4lMgNb
+BNiErPwj2LIDL5xvrDc1ifMT++ilR2z+kDXoZz/y5hiOvIUD6UFgyaiRKsJj
+YDruvft0dX1vzv/N3n+gf3988++fLj6+eY3/vvrx7O1b/4+ZfOLqxw+f3r4O
+/wpPnn949+7N+9f8MPw2S341u/fu7C/wF2TovQ+X1xcf3p+9vYei0SVCj4LD
+R1AipgXDgKpt3EytJInTH88v/+e/T554W3fyEmwd//Di5PkT+OFuY2t+W1Mj
+GqAfQUb2M9QO0xJ+AUnPzQ6krwKZA6vkNmi60PYvkFvOCq+2YJXhM8B9/2xK
+dVnPquYOTgVUyeJKrLRv6nVVug2vMkfMiR8GKsqWPRBJ/daaGmQJxQcODyXq
+ql+KTr9DVzqbvZnQ9k0JvxPZZljqxMoHPwg0kjMmFpK53pmWTJN/Q1mPjMSm
+tCDQ+QZgFr0YLKrYAX0K4Q58GLWibe4cGcMHoE67piaIcXn90btcdB43y8XP
+EAAduWLxc1/sFv/kV/qXxc1DhEcWIRIBDAA18EI+zGfPnz2Gw1yp5S4sIBdQ
+UrMEzeF3A+fIHpBpAWRjv3RCcKKJ8/EWSNT2O+Gf29m8REiQfohejUwRX4yn
+dP9+dELvITAAQ/D1vn/oV1Y1ok78hP90ZZa2Io/T2h04TMGS8HH5ABpoEls9
+qgIjBXD9wMymYE59/fqvwJvnz0nqPW/AELBIkbdLNgrL0Yu9AcewIjLiaLwJ
+JxN1cKqbHrwcoumC6IdXgLfF/65BVP9O70DLBGAY4CfYRwQ1b2oEQmjOyIXg
+K1SLIc5CHlGQwceg5FwTyilrNcisTc6TtMc1QDZBmOhxkVZhlsclXuIX0cnw
+O9R8N0sEvcxOXELsMzAKkEgLu9EwCeFOBdpMkI4iQDIMfVXgMqbr7HbXsRkC
+tUanBkrnHHp6kD8HjsHWAKvNtoEFwP31dYFMFkzyajY7WaDzAm1xR/A4WIBC
+92MBwgAtjLMFqbLSqyecUWx7HeiHFxNwVI3j2Ak3CEi6xBiXBaIVecxUKJYG
+wy0JkGL+qYlQ/UU1AelD4YIHcPWLy9snJFTwj2e6hEPBpcgFVDK3fHj4bFGu
+VpaQf8Bd8Br9UOovFcMw8UAA8NA7QJKfGFiCI/cnswb+EQPwEaQy2X+sCivQ
+96XJCasNmFKuEBBMP8nnuyrXcNII1vAgzsi92y+Gw2DX7wBJWo/UIWzEZ2qw
+bKzoxDmxzTenx48XxxDDwf8+On1yQ1bMSxRYOttuMe4vyZghvmQT7uWbTAWf
+Nob2tCqZOTrbxKDAgiwcdyrHKnmw5o0QsUCCyvoIhXNh2p1Z3ESSxk+SvE2K
+W1AawpiJegCWKlhIPPH6mJeJV8RQ+p8beH/iLr5B4F//yo/8/ieK5e9+5Pc/
+Uf3mR4JmrzDxkLE3dWz2KHarHSKMYIpShtI5g1JVfaER91hOrIeNpAh9S6h8
+GByTPAFwYTSGhlwilOxiFXJBTI9CfQCfNRtFbwx0B3MKzikAY7+sT4plprwP
+5rKCWZZNEnTrSaHQz1ej/Y6kaBHYmNgVWZC9qHh8UOMozBkujbHejow2xnLw
+8acZqCPgdXZpt5gwGvsfCkswKsVHdy0mPLMWeN1ss18gGIVXSSgbZdIQVzqO
+PCkozty+zuEo1NPCnk4Xsg/2BmqHxLbDDloIMXjrF2TCRFjgHPVo5hF7Ec+S
+Q59aTtJDEt9P81ukiATCNXNvgeSzQUbxbIH+x+DyqjUGepttmY/w0NrW4vbi
+PUwRx8iJYPTo7Ic7lFUt56sQQfDbDAMVxhi6SiAJ4dYOsRlzIG+2W+8GiAuL
+7EOND8C5+00RZgEghzmnWM3Qa6LYEyoPth91GhEsOgqINL9kla3XoOYPOMEC
+uAw3i/HJ3y2Iy0OOQ5saTrpDr0eB4Ab8TgGgFRNZ4K4ICFMGgZzoGkMLk73A
+kBwBGEiDcIE/i2v0HKyY4YEssh+ELeLaEHDfWjln5qL3JDf58vj4+cnx8Q0c
+tAJxg2npO3JbalUkBTApwW0iHkEckHWpCLr5WCqBps81Rm4JtEOLkmNqnnCo
+IC7v95SqyJXNx3BEYlxFI2y9ItUe4rgYwLU2p+DRv6nWVJ0g/r+jSdwaXJgU
+KRFmVt1tg6sieIPF2KsilkYoXk+HOEI4BfWCVSnhQEsJ+BbKOJJ57cOYuIrF
+EcwEjECR8WYvnANFxxvj0ychN0oZL7C70dZg3dIR3NmiuJOwzEceS6Gg9ycr
+EpMqNp3AFsOqLGCTQno2YOyNvOcwBZhvgXW31icSf4SwHQgV0ZbQyGeuUO0U
+zEULYMhl9uQVKfO5w3Sz94vpiyBShQCA/Csvi7oXMHEs2sirKbScPTCMnzS1
+H2K7hz5ZLaQbSfkKOkMkqU4uCv9jPqvnHWgUQwlK0HLUNs4ZeIgiAh1AIZkL
+/NjXryEs/tVLefggeydG0SCq+wg0wAfrEWHDYI5y/2xS+JRSw4J8Y0w/2B1F
++6vSCltF+uzKwClmA4hKNnnk0kB1zimTOVEDnoH57PqacEOoU0gQFYU0Uc1E
+RC7OocYImpyJP4lY6yHw1mSkvshUGLnvORxpO0qxH2E1GYSx/qXpW0keKRMc
+JYJ9jOAsJn+SkGmQEAn5YExHuIOJG2CT1y+/G1xAKY3FcxwfpNBqPvgEmbhl
+kmdhdZWYjq2cP0V5ivJWaqbZXggqDXv0cirPqCUvKNnNyd8JZ0EE5cBmyofb
+raqJmkggjj5ia0oWDCwoCGXYSfCkK6otzL9fD+MkZVH4U19JEv2yd5vsfdNR
+pgYPCktE/3px9HpR2m4lfQk7+BBlTVEu2LUbjOfik0IyuXCImY2KHB7Qj2nZ
+Ha9LVSAVjXN50idP7zAVishlQCRZ3hWwrW+TAgzaBK0pwwrY4cC7x89AtImA
+BzOmSVPGHy3WhZp2NuMMwyi/TykJzu7PB1lc9EYA9EM9jhHQjsP3paw8lV30
+1ZRyWJFPCgtw4qXFjC/6isghTtS3yf/qGymNS7TBCfQl+5W+k7qupMVhfZEs
+gAo74NSyrMpuL9ARUVwHuMqJ26ecplqus7iBgX3/VPRUUW6LRCEu/KbtDw/U
+ggNqFQxLAdPKUA2Dy224quRpFtk79ZzRO9Eoia1PAQ8hgSjc6sJvuxKxOSdI
+xQadfiNBmpRrJasrOzrHg0L0D6z7aFewo81sdhZ7DdACzVe/WDxO7B68c36A
+Nyh7FLt4sIA0O0lXcaYw3yegxLv2gDawzlr0uwrV2Y7Kv+KLv1/pjVoFRuIs
+B54DH+yhvWhpheiZKkRjzSXUNs9iWU3Y92TMPsNOF00HLX9v3TTFcm/vDYig
+Jhqu8eIerq/f4v6PpSBQOsKWcwEr5A7Uayi2JgDBIQvuFdUbmQ62CrE5NZUY
+VOddhAejzQZYwKWd38Z8frtSzZQtJvSOUTzaTib3EdORNf5s4KWcpK2LCON7
+j+V3912K7hRt0bpHqwq9xpLVFViMCoN2dCADB8705HhxOjxUFIHD/QPkJLhu
+7rMzpHf+XMWZxgTI9kqOTOi/n631DSe69q2pyiLku9FlAdjyapj0h1BpOLfA
+JBepIUNIMnoeY0mB2zovfYCtYTXqXtFXK/iQ8F48B24HiOpFMqf0C5vd4JBx
+T5gnqNE5IlvSJDHuFuxj3hOWie0bRKymZR5HCCfqH5jInExFvqR9od9nnPZV
+4glYx90mHjnLtganIqkKQZypFlGbhWTN6FSXtruzIJ9PSc5PjhFyNtj/siQD
+ljIV+FCQaXRjgdGWipIq5YdM0gDIkkU6ZCIphcIlVwDWeUg0NMOAXn7hnaH4
+Qmqt2mqjCsVpFOwZ+usBr+cS3gtgarW6RxZjh+WD0NXCWdSopw5WU1JLFYfb
+Z76ATRhv8J6yc7Za0RtuTVlxabCW3NYzv5zS3iLCpQ+RnoIcO4R1XdKQx0g3
+RAYjPicRrON+LC/ICR3DTGxo64krRUkKWMQbxTq1BSzgNz97OJtk8Yn8xY1/
+qdbOrqNCug+O0YiKNpGAd8pvfk9SJ2lQgoYreJ+ehn0gvUh3+BSbJDJeAG1H
+zgThFMXUtGmFOhc19gjDP95Eqau4fP9AsLuEnpPbg009jLJCouHSz4RlKwyb
+VPip6B2DaQaThNYlOaitSHRgv2DEZtznpAlX3dVeAAZZwxoAeGTuVC1IF01q
+qRA9B19B6Y5gPPsdSR3b1An3KS5T1kcrVENAwUESOuHONzlJlhgcMaX5oowJ
+4T6CEwLTRUexw/vNOfssLQSDOt1ZqcRgjaBsegc88E1rdDgpnMXjx8NRyqiI
+y/QWCpq1g4rSsa4TLlXleoMiioGss9xDLCUjBOIaUcBioBbUDMUmeu8tvotN
+fogHY2860nIKmlS2fCZiysg572XmDNUSl0wpsNVKIra9T3gylvAlbUTQHMxT
+GQT1q2/pqEs4JFOUDZleFGl55lGkjb43gR4GZEA2HZAA/COKriAgXQILZjPu
+qQyAd4SNCK9tt9TSiQK8AxGqO+xG0VLZ0oaEHGYxpNF76cv08zgXGnK8RCL2
+GK8x2aypaEySQfjQcVtBz210tCMxkpI0ZxQhzUMJ8sO8vD/ZKJIw9QSCxWaw
+FktoWMCJ9IySInufP5KeTz56jSKYn2+D3zpjL0OMvRg4LsFTk4540KTvht5w
+6MAIKiCLqZt8GfcxwN8HAMrLRPCVeGaSAGCta+JsM/v+3LaYUIl1mRaKCDN+
+u75FntSdezActbkLltIMsNOaFRo5SkRItz7Wko7w7CFsuC3bpmZMtGHbIkvy
++8SdGCcN77clhD0/nl9igOQ6D9IlLy1qj+XLltQ35Wy86oObk2cvF6dPnzw6
+eXbzEANlDdcfvzx9TmHCRYJWs6uP/5F12PPYaRcMGVqKPc0Eq6LMcXQYlLgD
+26Z4iEpCSG5JYYFgE5EVamOhvCepA+rP743wxB4mLpsElotb1QSiRE/mojTO
+lEwFTDVFMkuVSjpFO4KQndYzh0WoSc82KoqyFrKScN/PE1z8Cl0p6iY2vupL
+PTjDmA7ZHGM0fHJOC1GT77LBqGjQQETpV/oLvefM2zKWk5Pjx0/BZPr+ozP4
+v8FHHj99ic3v5PT6JbZgSucSbD8SJ+keff4CTTDCgrn4xbjQo7BRkpLxeRAm
+JUJ9lo/P2DVbG8paiIEakSHV87hSS814NQRxZA3tF3gxxCUVzhyAq/TeTYp5
+0k9E+dZAQNqSFZKOrkRcYGrLkIGShivqxdDPSEkdTBtV6zgAIcc6VyrwIBuM
+MlkMfL7urTRWgxm84kqVTPUMRoVGHWLwSkZ1nJgTleDYA+T52/1lOKNg68mZ
+JDJ2QXrxCb/N4TLi8KSjF5t/tTgWpSsngLekWrhaM9lRSwBTUOtgL0WjqLjU
+cqBKphy0zipUgbchfsRWch8+0iTPdku2p9M2oSFcku5RCsSpEjtRX/TpAc9h
+ssHmkOUNxryJjmFEsEvW9XSnOQ/J8SbYRleMik5yeHHpnU3VA/dQzrtJ+nZZ
+Urkk8NFnVmezS597Cp2Zg7RzIj7pSNESqzauRMfDmXxiL7jSrveGOEoOquwt
+svdR99OoJTQYfrSWd2i16Kz3+gTD3PFzGnuH3qezUCXhjejkEoOuyTRtVBAB
+ArDmQ3VbsAkgoGhFuTdJAQohdSHskj7Tl67sQhlQBxxJIA9xOaUVsbyW2d+d
+/SXLN03DZeVNuaQPWY74wMFpMsCpmdICQaqkcWon2pV4asIZUcL/h7KSZlNU
+1WtMyVTSjyQYU+Id3Pnh3tTfMGEVN2mgSElROFslFHSBApX9OPqdmJ7jdNZU
+M6qM+YHa1J3260ULEMqQYEircpQHlnG9s7K9xEd9hc5ppiNsgopznIX7z2vN
+tAN2bHKa+A3ZAyFCq4AddUohXw1A/s927xTScsSxj2NUNRm+r6aREqWncKqq
+HJq9hpxQjrEQjdjmSy8mUC2JraXdlJQ3Atz5mbq3m1ZgtOvAjCENcXhpctzi
+VFFCVv6DIwNLYYtuD/VgaUUuhm3rriFV0AlhR4Ncu6zoWYK0BN7sfB9VrYBO
+DMUgTuN0M1Hb9hUEkJ2EQTJ8jA9HQkmJchFdb51XFekddoiBS611SgPsDlfT
+IlG9H1kijY8j21SKEIg8SidPolnJJCh2xPlBDj/aRSjMN+D1GBV0UgJP0tci
+jzkOh3GOizgjwwnUocTxFK0FtF1fXfxJweOLJwBG5/zDk2eETLmIXkYt9uCW
+N4a1NW8xNUnSgz7hjjox3SbzLRA0w1IH73m4OqTjwwVE8tzmKAPrNAFZ3qKs
+N+3UzgNu0IneKfZqiUvqhSF2RUXB0FFEQZKbErV8i+sSjOL2sdMV8zI923mW
+VMspgTQ81VbJZCk131XIHZwlG/gUWd4r2sHhunbUJ4eRJLdvfI8hU11wki2M
+5kdoEJ5nPoYqJy/nbm9ORHN0EuefMessd0Z0EF383OWD4SmMlUJzOKFKzQCT
+zjJ8o4wdWnaZkdXkhg9pEMRuLfkHSaiuvE3TmrNMwY6Nv8NpeDZP1+eX9LJP
+ry+zWwNIzUsy1RGjDGy8N9rXDT2Y/rov4NeSL7x+e6VLBstHErWQhuH4E9hS
+gp13Q3/rOty6nrihZ0JIpaYMj4H4pRU7znxEu5rkQiRIsqZGEHIOjW+cQxmS
+M3nw4unjh75dhwwBUkUQZqV9jJo9fLyIilPPXzx9QVDmdDGd76cZeLqmocSy
+5KB0h8fgcwtJr1K5Srpspe8hD2KGdkc7y18dktMgpJFXPyQl3CXOB+ldBp6D
+OsR4zuBwwRJHsLCHb6rNeNdUZb5neaa5GlNP6DV2sS6x2phM+zxZfKMrXewa
+x3GjFSeIxbMJKe6rDyGBMe5HZzy49ykcHUYXyXr3/uzdG2kj1i0EyidSOdnZ
+Gv4zl0lmkLRHeBygL7YGFNBCTEA9kz5tA5t/SptPBvI1105eM8CTEJW1Vhr1
+wx9xnxPkRgm7EZNwsG4rqbDJ9/vk0jTjuGVJ2t2348tahpXw0Nbe1zu5rOTW
+Sqd0OFjRRoc9DeOYSjuQyQS1GhgRtk06iOKbGugV97OfEBTI6giMbD1KqSMk
+5SGTJmok8YFI1zziCzECJ1gAqd1cgzTuVZSLQHyPNH3kwU8fzj98en+d/XN2
+8tBneH+ic9PumZTRnOhmuSwW2U/Xf7kMH8VDx0V+On97dnWVrkAdvZVxTg2D
+agGvCNu0xSPp1AEGxQKAxzmRKNDlw8AiTXhKjmayS6mkFGS8H+xWl79rKgR7
+X9JeTaKQuz01gxMGSIayPOhdBbwPFCG64UNJeou9JBPL/1/sjF9I1ylQYMZP
+ajCzbkQ7eEgCD/CK3UW1l8Y0ETEzyAffT+N/9VBf70vqAFjnh41DlHeoyC8p
+IIr6dtG60kfGIv/IE6MzDN8uK94ZiQcpsllamsCybUsDzXWBLaQUPZCpKYrB
+i+NUvKWyRxhhm0qbly5MAGOQ9afy1kr9dnugxxFTqxNZy2CPHiTt1w/HF5bQ
+ZTDi31V9NPNeFDw9gjcA8ATqowMdYVq1CP00MR/lTpckZSQJEZSXuPrEgkRs
+KChuNdnKdOAxmeu4G54+wxErDVjlNp4oXF2N013SXsEp4vigkjlClCSMwMuV
+Fn95FgmkQ65AEtmV/XlbG+EnNZLejEdNBWGqx8QDi17QlO1qtpIZlMgJg1W5
+vnj35sOn63Hoj+xl+wLxQ8+FtiK6KmDq6CSdrfbAJ1SN81cqjd5TJk5Xdq0d
+tFW5stSlABEtJ9CmGmmFmWchTfMaTnuSq2Ewz6t6eKrAp4wLg6bSlqJDZMOP
+bqlLIdloaznOIqdJhnk4wrjcq+dEc+4NIqeSMvWVZ6gxVFRaYzfZIB+jBF5v
+sJJOYw3DISbS4En1osDnUdR6Zd3Q+Bt/LOIhvME9JaEJE74G0yyY35ODooCh
+dHnvXJrzjE6SCfxwqUk68mFh3jOSBl5bZ7AcX3Ii5bH0KFRuCL/jeVN6JG/3
+u65Zt2a3wYHPcl1z9nCcJVfQlA42V9JkFEvs9ylgkJZmAjj6jwYDRjJJu9QG
+hYO2ERt0+CnCsm8+Xpy91XhajTe5c7MiL4OpAXmAHAN34BcBS44HMygv993S
+MkqiZmr9OvVvG/AIwzeh5TVqQNOUAKk5yozU+OnnMIzhe2GSe/iwXTEtSrsc
+TPr0bSzsxhCEA8Egr6TlkpsajCpIS9R5PNUA2JianuBvc0kjf+nSgffSVoXk
+k97j8yJDuW9woaKn1WsoaIFUzug0ta0GCNZOtvi2sGHT2cC2skBgOg6ONLkS
+D5/hqdXwSHK33gC+0x4O7BIdoIJ5v5d48SiZQI2DBGd9E2VaEKDAnFQzKNxv
+KmpEXPbDG58xpxr10wk2nlKwqRQnaeYwBtQAWPsxkMfhchAkwuIVkFR3YPMl
+oUlwMAdCscfHx8+1NBRd9/qRefhW7ShA3GBTJUobQU++oC/NMKip+22X8ZGS
+oLJ7fzm0+ASbudmZpo+oaZcoSTIaYlmpW1zSTwPAwRW0SGYDqAsFYw8dsdWa
+k9ydrSoXbk6MiGji18UqUbY8YrDI3iab8ajVZ83Dm4FLeL0LGnseTffVmjuJ
+kONuZhfalnhOHv2zNjCxqFIrk04+xLlQw92M3CQsOVDa6MYeegH+CV+RXBup
+lwqxqUCTpaVlZNFEkoh2TzcZsvvTIyYkLKdEGBA3Ymr1LCFMPWHnGxQkdhfL
++O6a6I5CrSdSfJAcFjsxoy1qYGi+2CJhzgPtbT19ApvqW/cwCA2C/rJyZoUU
+4jxr6Wgckjo8qKTNJ5oYTXbm64bqy6uK77wtolwveWEeah7PujBCOhuqiNih
+qFPCszDAoEGu9TWXWmMTQLLq/aqzn017RDnPCseaadu+Hdj4sY1IjCZcBJ+n
+3r+WnCcPLlM42bVNVcUJtrqwfgYxVKqU73InIFKzJmlNWIj39FIoHN26aYpm
+x8PSdGPVd+GHa1YdNilIwhbsD2y7R+QPnzkY0wjn4uuwm51PGTO/AJ/ozF8c
+7gxYExs9Sq0Ls3n4A3ktd33Shcn+TtBJw5dcFTB+V2Bsp6XAVQXhOvp+bKWi
+pL9nLtd6qWj9f+QoXSxiilsIJnGnWnw4xNPknjSyOl3T2gNeW95VlZ+ZSG0q
+YfnHJIO/dUbnDHHGxrR7P2EctZv6ht9Se+3Lbfgot6uTmkIYh2WUluZoAW/W
+OQ/2fpFBALQTvc4gDnT3Lu5FrtjEvve3jY5vbqVrtRtpNZhQ4oqVeNA4NfFi
+uhxJIP13Tw+X46HvgweFzsxuDd+NqEPAPlSEj2PFYip/5WVLIcDBV2gjDQVB
+1/66ZsntaTX0631tgGGwxRdaT04000xE568o9BcQiHD5AWe+HBEvmeSyNrVk
+8BU1fMHtIFNLnWGDW1Rjro6ueuVOaYO14kpTTH48gU5oixfD0ySJn4HoWrxw
+Pg8J1fGNC9QLGealcrPjJtVVMqAY3XwN0QfPrwNleoFUn9vorT0ZKCKO6uM0
+sPcj9UaTcZBGR3iUhRqxi8iuH52L75oBrIQYPuT2pX8/Qg8anvgRv7xvcUYD
+eR/d8E4N+9yDsAPwwteaChYGz4IhO0gOhCc+cULfREDGJD6PUOL29xqlcZ2n
+FS05xkbRZX7RtTtjSdf9o3MWeRDzCwyzt6Uf6NM5aN++zSVTLu6gTa4UiXkL
+dWdFLsfDJMMbKAZTKSSmfHGRCilmwYZzo3N8hR+w0p4uQy0sfto07bqgN6Yb
+XSPvvVyJ0xkIl9ZjiAvUgkDCrA2e/KdOr6K+ozvQd1EpzKvjYMSMOgRkNC6t
+kcUTetwn04C6s+XU+cXSj5AMxj8Ae+pi0jh78I7YyP1qBMWHxadwsHmAv0vD
+V511Nm/XgPkS82ekalvqsBtf43XmmG/DhhZ0pRoyhp6QkaiT26WeArq3GWex
+S8oioSsSYRlAv0iT7V6lkIF7KHV7biTkcrdgCFO4ocBfF+tv0wjxylDYNU1A
+fQle33wZWG6dxUYPP+MX7sF08VZwoiwZ/4n7/g5TrymKW3gJmmTtKohngqa6
+BlO/FBL5WYi36NZOaaemPkKxU3E/IuwsXBUeXwfABZgHLrqE+NnwKpuHvk4k
+JR4Zl5PCqW0bHfJe7hGRvwvXJMb1ZsG3POasl9rLImkrymh3qqn+QhIfj6ed
+ryuurNf+GshUm0PBbFCKIlbwVI1qbNK1w/hkL6gguajFS0zoTo99bjSIGX8f
+h29G9BcnTQIR312ztEHFWGpjLZsw7YgSebSBwgFpGQjWT1w+S/BIW+7CfPf3
+b+sd3oSQ3HuV3uea1s5JOXSGx09Fq5mPfMnwKyvCKH7sU9PbgkdNZANbmXaS
+xRe1pionmhzu2ZZBjVGNbh6gHs8mMzglTQ7pnMQyRDXQoSF0kjeVkdM7S0Uf
+Snm6YdEv5W8YaBkMYH2QdG/0pQYkGGVd4rxlhL8OGaDhLZNNDtygYgTPk3fj
+7xxpOPnSbqfeLA1p3GeSnWXP9HYDf8+o9JZHsw9ylSh3+/HgqKABeRHX5rKL
+1VwNIV4yj7FNOn5RyteYoKfsta1qpAn+FsRBU9toLOabd7XQLjB1eEx5WJLm
+Kr6RmPphNatPxXe+7SRxnIeuHJm4RmaiJ87PW0m/ZbhvTvYE/zhAv1zGEy7M
+iboGteqaQ5AKZK1bsIAQrTAUkBYCPD1LpfiSbnjCOO1K0fq51Mu1DMSNP9no
+C0T4NhZOe48yyFHWOB3jRY+FX/5VaLpgMO9ecq89FXnAupZGGgvqKFUHYjhq
+n6KCSMAcUiGh/O0iOyfhlgbbiuZQsLQHgLTmrC03qvoQMhWWpPVCkhsc8KaZ
+Xp5qNh3VO+v1+BsQfMcld8VGHmrC1wy+WERz3SFvx2uQhZaZ05gdKgYnEflR
+2Qg4dcfj1NKgJXcF6GW68jUPicD6ZvbBhamrUU85aT8Fb40P6KkSG2qvw3Jq
+yH5Jv5AUXeMaWFq54K/0OuIv9sI71FGKqTDXlo5byYMzp+mrpKjD81hRpnXw
+LRpULxnc9Ea5nHTNifLmZr9sy0LGQtNHPuIQ48QjW3SLLf7Rp3D9F2Zh32xc
++gAQXNijZrVykV7U5LsKX9QaUsla0eAa3BXvM3vyTUJ664JmMwruMZJCGMED
+JYFttW86Gb4Kv5umkDMUbDoau4iyUECwvyo/Cp7poriKWuqnoGNGVyEGc5nW
+kanxArcxdg2dukEik+9UphqvJ9bTuNxHLZsacQzssMbrOiwltzsIzdt5AE8A
+NDBFIH/gAmvULMggMljXmPHRWU1mxyQfRxUbolXuUkczb9ZeC5PvexPAzwgK
+vyBunqSaML8k3/9lcV0aewtPK/adT14mMj4Qz4f4ihGF7FIolSqWzxqFKGPc
+KLDQQZ0pAVQRdhN3aoW4H//uy3venA7x0s2HB/V/nT68OdA3LVk3TH0ELhFi
+kJzf6Ev/aMmThzc098R5b/wepAO6NZjJ57Y4vn35NxRtQ96467DMWSRNXx1/
+Y+I+NHHHqdRvzuLrGtcpCkmH1XHqobU+GX5g5Yja0bdH/S9Up5JU8XQAAA==
 
 -->
 
