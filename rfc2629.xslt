@@ -500,10 +500,10 @@
 
 <xsl:variable name="includeDirectives">
   <xsl:call-template name="getIncludes">
-    <xsl:with-param name="nodes" select="/rfc/back/references/processing-instruction('rfc')|/rfc/back/references/referencegroup/processing-instruction('rfc')"/>
+    <xsl:with-param name="nodes" select="/rfc/back//references/processing-instruction('rfc')|/rfc/back//references/referencegroup/processing-instruction('rfc')"/>
   </xsl:call-template>
   <xsl:call-template name="getXIncludes">
-    <xsl:with-param name="nodes" select="/rfc/back/references/xi:include|/rfc/back/references/referencegroup/xi:include"/>
+    <xsl:with-param name="nodes" select="/rfc/back//references/xi:include|/rfc/back//references/referencegroup/xi:include"/>
   </xsl:call-template>
 </xsl:variable>
 
@@ -1394,13 +1394,13 @@
 </xsl:template>
 
 <xsl:template name="insert-begin-code">
-  <xsl:if test="@x:is-code-component='yes'">
+  <xsl:if test="(self::artwork and @x:is-code-component='yes') or (self::sourcecode and @markers='true')">
     <pre class="ccmarker cct"><span>&lt;CODE BEGINS></span></pre>
   </xsl:if>
 </xsl:template>
 
 <xsl:template name="insert-end-code">
-  <xsl:if test="@x:is-code-component='yes'">
+  <xsl:if test="(self::artwork and @x:is-code-component='yes') or (self::sourcecode and @markers='true')">
     <pre class="ccmarker ccb"><span>&lt;CODE ENDS></span></pre>
   </xsl:if>
 </xsl:template>
@@ -2399,7 +2399,7 @@
     <xsl:if test="number($indent)=$indent">
       <xsl:attribute name="style">margin-left: <xsl:value-of select="$indent div 2"/>em</xsl:attribute>
     </xsl:if>
-    <xsl:variable name="block-level-children" select="t | dl"/>
+    <xsl:variable name="block-level-children" select="artwork|dl|sourcecode|t"/>
     <xsl:choose>
       <xsl:when test="$block-level-children">
         <!-- TODO: improve error handling-->
@@ -3333,6 +3333,12 @@
     </xsl:if>
     
     <xsl:for-each select="$front[1]/author">
+      <xsl:if test="@fullname and not(@surname) and (not(organization) or organization='')">
+        <xsl:call-template name="error">
+          <xsl:with-param name="msg">Missing @surname for author '<xsl:value-of select="@fullname"/>' - will ignore</xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
+
       <xsl:choose>
         <xsl:when test="@surname and @surname!=''">
           <xsl:variable name="displayname">
@@ -3602,6 +3608,8 @@
   <xsl:variable name="refseccount" select="count(/rfc/back/references)+count(/rfc/back/ed:replace/ed:ins/references)"/>
 
   <xsl:choose>
+    <!-- handled in make-references -->
+    <xsl:when test="ancestor::references"/>
     <!-- insert pseudo section when needed -->
     <xsl:when test="not(preceding::references) and $refseccount!=1">
       <xsl:call-template name="insert-conditional-hrule"/>
@@ -3655,6 +3663,7 @@
 
   <xsl:variable name="elemtype">
     <xsl:choose>
+      <xsl:when test="$nested and count(ancestor::references)&gt;=2">h4</xsl:when>
       <xsl:when test="$nested">h3</xsl:when>
       <xsl:otherwise>h2</xsl:otherwise>
     </xsl:choose>
@@ -3708,18 +3717,36 @@
       </xsl:if>
  
       <xsl:variable name="included" select="exslt:node-set($includeDirectives)/myns:include[@in=generate-id(current())]/reference"/>
-      <dl class="{$css-reference}">
-        <xsl:choose>
-          <xsl:when test="$xml2rfc-sortrefs='yes' and $xml2rfc-symrefs!='no'">
-            <xsl:apply-templates select="*|$included">
-              <xsl:sort select="concat(/rfc/back/displayreference[@target=current()/@anchor]/@to,@anchor,.//ed:ins//reference/@anchor)" />
-            </xsl:apply-templates>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="*|$included"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </dl>
+      <xsl:variable name="refs" select="reference|referencegroup|ed:del|ed:ins|ed:replace|$included"/>
+      <xsl:choose>
+        <xsl:when test="references">
+          <xsl:for-each select="references">
+            <xsl:call-template name="make-references">
+              <xsl:with-param name="nested" select="true()"/>
+            </xsl:call-template>
+          </xsl:for-each>
+          <xsl:if test="$refs">
+            <xsl:call-template name="error">
+              <xsl:with-param name="msg">Cannot mix &lt;references> elements with other child nodes such as <xsl:value-of select="local-name($refs[1])"/> (these will be ignored)</xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$refs">
+          <dl class="{$css-reference}">
+            <xsl:choose>
+              <xsl:when test="$xml2rfc-sortrefs='yes' and $xml2rfc-symrefs!='no'">
+                <xsl:apply-templates select="$refs">
+                  <xsl:sort select="concat(/rfc/back/displayreference[@target=current()/@anchor]/@to,@anchor,.//ed:ins//reference/@anchor)" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="$refs"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </dl>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
     </div>
   </section>
 </xsl:template>
@@ -4181,6 +4208,7 @@
         <a href="#{$anchor-pref}section.{$sectionNumber}">
           <xsl:call-template name="emit-section-number">
             <xsl:with-param name="no" select="$sectionNumber"/>
+            <xsl:with-param name="appendixPrefix" select="true()"/>
           </xsl:call-template>
         </a>
         <xsl:text>&#0160;</xsl:text>
@@ -5572,12 +5600,14 @@
     </xsl:if>
     <xsl:variable name="org">
       <xsl:choose>
-        <xsl:when test="organization/@abbrev"><xsl:value-of select="organization/@abbrev" /></xsl:when>
-        <xsl:otherwise><xsl:value-of select="organization" /></xsl:otherwise>
+        <xsl:when test="organization/@showOnFrontPage='false'"/>
+        <xsl:when test="organization/@abbrev"><xsl:value-of select="organization/@abbrev"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="organization"/></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="orgOfFollowing">
       <xsl:choose>
+        <xsl:when test="following-sibling::*[1]/organization/@showOnFrontPage='false'"/>
         <xsl:when test="following-sibling::*[1]/organization/@abbrev"><xsl:value-of select="following-sibling::*[1]/organization/@abbrev" /></xsl:when>
         <xsl:otherwise><xsl:value-of select="following-sibling::*/organization" /></xsl:otherwise>
       </xsl:choose>
@@ -6661,7 +6691,7 @@ pre {
   background-color: lightyellow;
   padding: .25em;
   page-break-inside: avoid;
-}<xsl:if test="//artwork[@x:is-code-component='yes']"><!-- support "<CODE BEGINS>" and "<CODE ENDS>" markers-->
+}<xsl:if test="//artwork[@x:is-code-component='yes']|//sourcecode[@markers='true']"><!-- support "<CODE BEGINS>" and "<CODE ENDS>" markers-->
 pre.ccmarker {
   background-color: white;
   color: gray;
@@ -8229,6 +8259,7 @@ dd, li, p {
             <a href="#{$anchor-pref}section.{$number}">
               <xsl:call-template name="emit-section-number">
                 <xsl:with-param name="no" select="$number"/>
+                <xsl:with-param name="appendixPrefix" select="true()"/>
               </xsl:call-template>
             </a>
             <xsl:text>&#160;&#160;&#160;</xsl:text>
@@ -10298,11 +10329,11 @@ dd, li, p {
   <xsl:variable name="gen">
     <xsl:text>http://greenbytes.de/tech/webdav/rfc2629.xslt, </xsl:text>
     <!-- when RCS keyword substitution in place, add version info -->
-    <xsl:if test="contains('$Revision: 1.1075 $',':')">
-      <xsl:value-of select="concat('Revision ',normalize-space(translate(substring-after('$Revision: 1.1075 $', 'Revision: '),'$','')),', ')" />
+    <xsl:if test="contains('$Revision: 1.1087 $',':')">
+      <xsl:value-of select="concat('Revision ',normalize-space(translate(substring-after('$Revision: 1.1087 $', 'Revision: '),'$','')),', ')" />
     </xsl:if>
-    <xsl:if test="contains('$Date: 2019/02/19 10:14:05 $',':')">
-      <xsl:value-of select="concat(normalize-space(translate(substring-after('$Date: 2019/02/19 10:14:05 $', 'Date: '),'$','')),', ')" />
+    <xsl:if test="contains('$Date: 2019/03/09 15:37:25 $',':')">
+      <xsl:value-of select="concat(normalize-space(translate(substring-after('$Date: 2019/03/09 15:37:25 $', 'Date: '),'$','')),', ')" />
     </xsl:if>
     <xsl:value-of select="concat('XSLT vendor: ',system-property('xsl:vendor'),' ',system-property('xsl:vendor-url'))" />
   </xsl:variable>
@@ -10374,7 +10405,7 @@ dd, li, p {
     </xsl:when>
     <xsl:otherwise>
       <xsl:choose>
-        <xsl:when test="self::references">
+        <xsl:when test="self::references and not(parent::references)">
           <xsl:choose>
             <xsl:when test="count(/*/back/references)=1">
               <xsl:call-template name="get-references-section-number"/>
@@ -10383,6 +10414,9 @@ dd, li, p {
               <xsl:call-template name="get-references-section-number"/>.<xsl:number count="references"/>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:when>
+        <xsl:when test="self::references and parent::references">
+          <xsl:for-each select=".."><xsl:call-template name="get-section-number"/></xsl:for-each>.<xsl:number count="references"/>
         </xsl:when>
         <xsl:when test="self::reference">
           <xsl:for-each select="parent::references">
@@ -10416,6 +10450,8 @@ dd, li, p {
 
 <xsl:template name="emit-section-number">
   <xsl:param name="no"/>
+  <xsl:param name="appendixPrefix" select="false()"/>
+  <xsl:if test="$appendixPrefix and translate($no,$ucase,'')=''">Appendix </xsl:if>
   <xsl:value-of select="$no"/><xsl:if test="not(contains($no,'.')) or $xml2rfc-ext-sec-no-trailing-dots!='no'">.</xsl:if>
 </xsl:template>
 
@@ -11184,10 +11220,10 @@ prev: <xsl:value-of select="$prev"/>
 </xsl:template>
 
 <!-- artwork/sourcecode element -->
-<xsl:template match="figure/artwork | figure/ed:replace/ed:*/artwork | section/artwork | li/artwork" mode="validate" priority="9">
+<xsl:template match="figure/artwork | figure/ed:replace/ed:*/artwork | section/artwork | li/artwork | dd/artwork" mode="validate" priority="9">
   <xsl:apply-templates select="@*|*" mode="validate"/>
 </xsl:template>
-<xsl:template match="figure/sourcecode | figure/ed:replace/ed:*/sourcecode | section/sourcecode | li/sourcecode" mode="validate" priority="9">
+<xsl:template match="figure/sourcecode | figure/ed:replace/ed:*/sourcecode | section/sourcecode | li/sourcecode | dd/sourcecode | td/sourcecode" mode="validate" priority="9">
   <xsl:apply-templates select="@*|*" mode="validate"/>
 </xsl:template>
 <xsl:template match="artwork|sourcecode" mode="validate">

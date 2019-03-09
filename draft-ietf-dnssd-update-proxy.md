@@ -67,7 +67,7 @@ The browseable subdomain label is prepended to the domain name and separated by 
     `b._dns-sd._udp.0.113.0.203.in-addr.arpa.` \\
     `lb._dns-sd._udp.0.113.0.203.in-addr.arpa.`
 
-    The first response with an answer should be the subdomain name including the domain name for the network and further queries through this list are not needed. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.
+    The first response with an answer should be the subdomain name including the domain name for the IP subnet and further queries through this list are not needed. If multiple answers are returned in the same response, any one of the answers can be used but the proxy should only use a single subdomain name for the IP subnet.
 
     The Update proxy should periodically rediscover the subdomain name at approximately 5 minute intervals for each IP subnet adding appropriate random jitter across IP subnets so as to prevent synchronization.
 
